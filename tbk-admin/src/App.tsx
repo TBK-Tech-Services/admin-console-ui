@@ -13,6 +13,9 @@ import FinanceDashboard from "./pages/FinanceDashboard";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import { Toaster } from "sonner";
+import Login from "./pages/Login";
+import ChangePassword from "./pages/ChangePassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 
 const queryClient = new QueryClient();
@@ -24,7 +27,12 @@ const App = () => (
       <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Routes with Layout */}
+            {/* Un-Authenticated Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+
+            {/* Authenticated Routes */}
             <Route element={<Layout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/booking" element={<BookingForm />} />
@@ -34,8 +42,10 @@ const App = () => (
               <Route path="/expenses" element={<Expenses />} />
               <Route path="/finance" element={<FinanceDashboard />} />
               <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
             </Route>
+
+            {/* 404 Page */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
     </TooltipProvider>
