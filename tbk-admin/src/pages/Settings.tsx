@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -15,12 +14,9 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { 
   Settings as SettingsIcon, 
-  Bell, 
   Shield, 
-  Palette, 
   Building,
   Users,
-  CreditCard,
   Download,
   Copy,
   Check
@@ -300,51 +296,6 @@ export default function Settings() {
             <Button variant="outline">
               Add New Villa
             </Button>
-          </CardContent>
-        </Card>
-
-        {/* Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Bell className="h-5 w-5" />
-              Notifications
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-medium">Email Notifications</div>
-                <div className="text-sm text-muted-foreground">
-                  Receive email alerts for new bookings and updates
-                </div>
-              </div>
-              <Switch defaultChecked />
-            </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-medium">WhatsApp Notifications</div>
-                <div className="text-sm text-muted-foreground">
-                  Get WhatsApp messages for urgent booking updates
-                </div>
-              </div>
-              <Switch defaultChecked />
-            </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-medium">Daily Summary</div>
-                <div className="text-sm text-muted-foreground">
-                  Receive daily booking summary reports
-                </div>
-              </div>
-              <Switch />
-            </div>
           </CardContent>
         </Card>
 
@@ -807,30 +758,6 @@ export default function Settings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-medium">Two-Factor Authentication</div>
-                <div className="text-sm text-muted-foreground">
-                  Add an extra layer of security to your account
-                </div>
-              </div>
-              <Button variant="outline">Setup 2FA</Button>
-            </div>
-            
-            <Separator />
-            
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <div className="font-medium">Daily Backup</div>
-                <div className="text-sm text-muted-foreground">
-                  Automatically backup booking data daily
-                </div>
-              </div>
-              <Switch defaultChecked />
-            </div>
-            
-            <Separator />
-            
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
                 <div className="font-medium">Export Data</div>
