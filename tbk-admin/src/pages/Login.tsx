@@ -1,9 +1,77 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { loginService } from '@/services/auth.service';
+import { setIsAuthenticated, setUser } from '@/store/slices/authSlice';
+import { User } from '@/types/global/user';
+import { useMutation } from '@tanstack/react-query';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 export default function Login() {
+    // useDispatch
+    const dispatch = useDispatch();
+
+    // State Variables
+    const [email , setEmail] = useState("");
+    const [password , setPassword] = useState("");
+
+    // useMutation
+    const loginMutation = useMutation({
+        mutationFn: async (): Promise<User> => {
+            return await loginService({ loginData: { email, password } });
+        },
+        onSuccess: (user: User) => {
+            dispatch(setIsAuthenticated());
+            dispatch(setUser(user));
+        },
+        onError: (err) => {
+            console.log(err);
+            alert(err.message || 'Login failed !!!');
+        },
+    });
+    
+    const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        loginMutation.mutate(); 
+    };
+
+
+    // Handler Functions
+    const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+        const {id , value} = e.target;
+
+        if(id === "email"){ 
+            setEmail(value);
+        }
+        else if(id === "password"){
+            setPassword(value);
+        }
+    }
+
+    // const handleLogin = async(e : React.FormEvent<HTMLFormElement>) => {
+    //     e.preventDefault();
+
+    //     try {
+    //         const loginData = {
+    //             email : email,
+    //             password : password
+    //         }
+
+    //         const response : User = await loginService({loginData});
+    //         console.log(response);
+
+    //         if(response){
+    //             dispatch(setIsAuthenticated());
+    //             dispatch(setUser(response));
+    //         }
+    //     }
+    //     catch (error) {
+    //         console.log(error);
+    //     }
+    // }
+    
     return (
         <div className="flex min-h-screen bg-background text-foreground antialiased">
             {/* Left side: Hero Section */}
@@ -32,24 +100,30 @@ export default function Login() {
                         </p>
                     </div>
 
-                    <form className="grid gap-4">
+                    <form onSubmit={handleLogin} className="grid gap-4">
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email</Label>
                             <Input
+                                onChange={(e) => handleChange(e)}
                                 id="email"
                                 type="email"
+                                value={email}
                                 placeholder="yourname@example.com"
                             />
                         </div>
                         <div className="grid gap-2">
                             <Label htmlFor="password">Password</Label>
                             <Input
+                                onChange={(e) => handleChange(e)}
                                 id="password"
                                 type="password"
+                                value={password}
                                 placeholder='********'
                             />
                         </div>
-                        <Button className="w-full">Sign In</Button>
+                        <Button type='submit' className="w-full">
+                            Login
+                        </Button>
                     </form>
 
                     <div className="flex flex-col items-center justify-center gap-2 text-sm text-muted-foreground">
