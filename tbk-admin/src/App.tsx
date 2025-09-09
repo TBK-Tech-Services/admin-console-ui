@@ -15,6 +15,7 @@ import { Toaster } from "sonner";
 import Login from "./pages/Login";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const App = () => (
     <TooltipProvider>
@@ -28,15 +29,17 @@ const App = () => (
             <Route path="/forgot-password" element={<ForgotPassword />} />
 
             {/* Authenticated Routes */}
-            <Route element={<Layout />}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/booking" element={<BookingForm />} />
-              <Route path="/bookings" element={<BookingsManagement />} />
-              <Route path="/villas" element={<Villas />} />
-              <Route path="/villas/:id" element={<VillaDetails />} />
-              <Route path="/expenses" element={<Expenses />} />
-              <Route path="/finance" element={<FinanceDashboard />} />
-              <Route path="/settings" element={<Settings />} />
+            <Route element={<ProtectedRoute/>}>
+              <Route element={<Layout />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/booking" element={<BookingForm />} />
+                <Route path="/bookings" element={<BookingsManagement />} />
+                <Route path="/villas" element={<Villas />} />
+                <Route path="/villas/:id" element={<VillaDetails />} />
+                <Route path="/expenses" element={<Expenses />} />
+                <Route path="/finance" element={<FinanceDashboard />} />
+                <Route path="/settings" element={<Settings />} />
+              </Route>
             </Route>
 
             {/* 404 Page */}
