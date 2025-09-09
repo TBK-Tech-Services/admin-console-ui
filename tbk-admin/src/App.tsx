@@ -17,6 +17,7 @@ import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GlobalLoader from "./components/GlobalLoader";
+import PublicRoute from "./components/PublicRoute";
 
 const App = () => (
     <TooltipProvider>
@@ -26,9 +27,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             {/* Un-Authenticated Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route element={<PublicRoute/>}>
+              <Route path="/login" element={<Login />} />
+              <Route path="/change-password" element={<ChangePassword />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+            </Route>
 
             {/* Authenticated Routes */}
             <Route element={<ProtectedRoute/>}>

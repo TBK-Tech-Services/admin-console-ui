@@ -9,10 +9,13 @@ import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function Login() {
+    // useNavigate
+    const navigate = useNavigate();
+
     // useDispatch
     const dispatch = useDispatch();
 
@@ -31,6 +34,9 @@ export default function Login() {
             setEmail("");
             setPassword("");
             toast.success("Logged in successfully!");
+            setTimeout(() => {
+                navigate("/");
+            }, 1000);
         },
         onError: (error: unknown) => {
             const err = error as AxiosError<ApiErrorResponse>;
