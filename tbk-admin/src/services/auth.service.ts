@@ -9,10 +9,25 @@ export const loginService = async(loginData : LoginData) : Promise<User> => {
         const response = await axios.post(`${API_URL}/auth/v1/login`, loginData , {
             withCredentials : true
         });
-        return response.data;
+        return response.data.data;
     }
     catch (error) {
         console.error("Error Logging In...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+export const logoutService = async() : Promise<void> => {
+    try {
+        const response = await axios.post(`${API_URL}/auth/v1/logout`, {
+            withCredentials : true
+        });
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Logging Out...");
         throw {
             message: error.response?.data?.message || "Something went wrong",
             status: error.response?.status,

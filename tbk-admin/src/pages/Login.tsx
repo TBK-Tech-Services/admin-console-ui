@@ -26,7 +26,7 @@ export default function Login() {
             return await loginService({email , password});
         },
         onSuccess: (user: User) => {
-            dispatch(setIsAuthenticated());
+            dispatch(setIsAuthenticated(true));
             dispatch(setUser(user));
             setEmail("");
             setPassword("");
