@@ -16,11 +16,13 @@ import Login from "./pages/Login";
 import ChangePassword from "./pages/ChangePassword";
 import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import GlobalLoader from "./components/GlobalLoader";
 
 const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+        <GlobalLoader />
         <BrowserRouter>
           <Routes>
             {/* Un-Authenticated Routes */}

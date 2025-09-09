@@ -4,15 +4,18 @@ import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const loginService = async({loginData} : {loginData : LoginData}) : Promise<User> => {
+export const loginService = async(loginData : LoginData) : Promise<User> => {
     try {
         const response = await axios.post(`${API_URL}/auth/v1/login`, loginData , {
             withCredentials : true
         });
-        return response.data.data;
+        return response.data;
     }
     catch (error) {
         console.error("Error Logging In...");
-        throw new Error(`Error Logging In : ${error}`);
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
     }
 }

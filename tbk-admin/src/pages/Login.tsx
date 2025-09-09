@@ -3,11 +3,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { loginService } from '@/services/auth.service';
 import { setIsAuthenticated, setUser } from '@/store/slices/authSlice';
+import { ApiErrorResponse } from '@/types/global/apiErrorResponse';
 import { User } from '@/types/global/user';
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 export default function Login() {
     // useDispatch
@@ -20,16 +23,20 @@ export default function Login() {
     // useMutation
     const loginMutation = useMutation({
         mutationFn: async (): Promise<User> => {
-            return await loginService({ loginData: { email, password } });
+            return await loginService({email , password});
         },
         onSuccess: (user: User) => {
             dispatch(setIsAuthenticated());
             dispatch(setUser(user));
+            setEmail("");
+            setPassword("");
+            toast.success("Logged in successfully!");
         },
-        onError: (err) => {
-            console.log(err);
-            alert(err.message || 'Login failed !!!');
-        },
+        onError: (error: unknown) => {
+            const err = error as AxiosError<ApiErrorResponse>;
+            const backendMessage = err.response?.data?.message || "Something went wrong!";
+            toast.error(backendMessage);
+        }
     });
     
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,28 +56,6 @@ export default function Login() {
             setPassword(value);
         }
     }
-
-    // const handleLogin = async(e : React.FormEvent<HTMLFormElement>) => {
-    //     e.preventDefault();
-
-    //     try {
-    //         const loginData = {
-    //             email : email,
-    //             password : password
-    //         }
-
-    //         const response : User = await loginService({loginData});
-    //         console.log(response);
-
-    //         if(response){
-    //             dispatch(setIsAuthenticated());
-    //             dispatch(setUser(response));
-    //         }
-    //     }
-    //     catch (error) {
-    //         console.log(error);
-    //     }
-    // }
     
     return (
         <div className="flex min-h-screen bg-background text-foreground antialiased">
