@@ -11,21 +11,21 @@ const availableRoles = ["Admin", "Manager", "Viewer", "Agent"];
 
 export default function UserManagementSettings() {
 
+    // useQuery
+    const { data: usersList } = useQuery({
+      queryKey: ['users'],
+      queryFn: getAllUsersService,
+    })
+
     // State Variables
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
-    const [selectedUser, setSelectedUser] = useState<any>(null);
+    const [selectedUser, setSelectedUser] = useState(null);
     const [newUserCredentials, setNewUserCredentials] = useState<{email: string, password: string} | null>(null);
     const [roles, setRoles] = useState(availableRoles);
 
-    // useQuery
-    const { data } = useQuery({
-        queryKey: ['users'],
-        queryFn: getAllUsersService
-    })
-
     // Handler Functions
-    const handleEditUser = (user: any) => {
+    const handleEditUser = (user) => {
         setSelectedUser(user);
         setEditModalOpen(true);
     };
@@ -34,15 +34,15 @@ export default function UserManagementSettings() {
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                User Management
+                    <Users className="h-5 w-5" />
+                    User Management
                 </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-4">
                     {
-                        data?.map((user) => (
-                            <div key={user.email} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                        usersList?.map((user) => (
+                            <div key={user.id} className="flex items-center justify-between p-4 border border-border rounded-lg">
                                 <div>
                                     <div className="font-medium">{user.firstName}</div>
                                     <div className="text-sm text-muted-foreground">{user.email}</div>
@@ -62,12 +62,12 @@ export default function UserManagementSettings() {
                 
                 {/* Invite User Modal */}
                 <InviteUserModal
-                inviteModalOpen={inviteModalOpen}
-                setInviteModalOpen={setInviteModalOpen}
-                newUserCredentials={newUserCredentials}
-                setNewUserCredentials={setNewUserCredentials}
-                roles={roles}
-                setRoles={setRoles}
+                    inviteModalOpen={inviteModalOpen}
+                    setInviteModalOpen={setInviteModalOpen}
+                    newUserCredentials={newUserCredentials}
+                    setNewUserCredentials={setNewUserCredentials}
+                    roles={roles}
+                    setRoles={setRoles}
                 />
 
                 {/* Edit User Modal */}
