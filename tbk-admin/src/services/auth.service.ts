@@ -19,6 +19,7 @@ export const loginService = async(loginData : LoginData) : Promise<User> => {
         };
     }
 }
+
 export const logoutService = async() : Promise<void> => {
     try {
         const response = await axios.post(`${API_URL}/auth/v1/logout`, {

@@ -4,11 +4,13 @@ import { useState } from "react";
 import { Users } from "lucide-react";
 import InviteUserModal from "./InviteUserModal";
 import EditUserModal from "./EditUserModal";
+import { useQuery } from "@tanstack/react-query";
+import { getAllUsersService } from "@/services/userManagementSettings.service";
 
 const availableRoles = ["Admin", "Manager", "Viewer", "Agent"];
 
 export default function UserManagementSettings() {
-    
+
     // State Variables
     const [inviteModalOpen, setInviteModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
@@ -16,32 +18,11 @@ export default function UserManagementSettings() {
     const [newUserCredentials, setNewUserCredentials] = useState<{email: string, password: string} | null>(null);
     const [roles, setRoles] = useState(availableRoles);
 
-    const users = [
-        { 
-        name: "Admin User", 
-        email: "admin@goavillaretreats.com", 
-        role: "Admin",
-        firstName: "Admin",
-        lastName: "User",
-        permissions: ["view_bookings", "create_bookings", "edit_bookings", "delete_bookings", "view_finances", "manage_villas", "manage_users", "system_settings"]
-        },
-        { 
-        name: "Manager", 
-        email: "manager@goavillaretreats.com", 
-        role: "Manager",
-        firstName: "John",
-        lastName: "Manager",
-        permissions: ["view_bookings", "create_bookings", "edit_bookings", "view_finances", "manage_villas"]
-        },
-        { 
-        name: "Viewer", 
-        email: "viewer@goavillaretreats.com", 
-        role: "Viewer",
-        firstName: "Jane",
-        lastName: "Viewer",
-        permissions: ["view_bookings"]
-        },
-    ];
+    // useQuery
+    const { data } = useQuery({
+        queryKey: ['users'],
+        queryFn: getAllUsersService
+    })
 
     // Handler Functions
     const handleEditUser = (user: any) => {
@@ -59,22 +40,24 @@ export default function UserManagementSettings() {
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-4">
-                {users.map((user) => (
-                    <div key={user.email} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                    <div>
-                        <div className="font-medium">{user.name}</div>
-                        <div className="text-sm text-muted-foreground">{user.email}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-sm bg-secondary text-secondary-foreground px-2 py-1 rounded">
-                        {user.role}
-                        </span>
-                        <Button variant="outline" size="sm" onClick={() => handleEditUser(user)}>
-                        Edit
-                        </Button>
-                    </div>
-                    </div>
-                ))}
+                    {
+                        data?.map((user) => (
+                            <div key={user.email} className="flex items-center justify-between p-4 border border-border rounded-lg">
+                                <div>
+                                    <div className="font-medium">{user.firstName}</div>
+                                    <div className="text-sm text-muted-foreground">{user.email}</div>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <span className="text-sm bg-secondary text-secondary-foreground px-2 py-1 rounded">
+                                        {user.role.name}
+                                    </span>
+                                    <Button variant="outline" size="sm" onClick={() => handleEditUser(user)}>
+                                        Edit
+                                    </Button>
+                                </div>
+                            </div>
+                        ))
+                    }
                 </div>
                 
                 {/* Invite User Modal */}
