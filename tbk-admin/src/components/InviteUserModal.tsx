@@ -7,13 +7,26 @@ import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Copy, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { useQuery } from "@tanstack/react-query";
-import { getAllPermissionsService, getAllRolesService } from "@/services/userManagementSettings.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { getAllPermissionsService, getAllRolesService, inviteUserService } from "@/services/userManagementSettings.service";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 
-export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, newUserCredentials, setNewUserCredentials, roles, setRoles }) {
+export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, newUserCredentials, setNewUserCredentials }) {
     
     // useToast
     const { toast } = useToast();
+
+    // State Variables
+    const [copiedField, setCopiedField] = useState<string | null>(null);
+    const [isCreatingNewRole, setIsCreatingNewRole] = useState<boolean>(false);
+    const [firstName, setFirstName] = useState<string | null>("");
+    const [lastName, setLastName] = useState<string | null>("");
+    const [email, setEmail] = useState<string | null>("");
+    const [password, setPassword] = useState<string | null>("");
+    const [selectedRole, setSelectedRole] = useState<string>("");
+    const [customRole, setCustomRole] = useState<string>("");
+    const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
 
     // useQuery
     const { data: rolesList } = useQuery({ 
@@ -25,50 +38,89 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         queryFn: getAllPermissionsService 
     });
 
-    // State Variables
-    const [copiedField, setCopiedField] = useState(null);
-    const [isCreatingNewRole, setIsCreatingNewRole] = useState(false);
-    const [customRole, setCustomRole] = useState("");
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [selectedRole, setSelectedRole] = useState("");
-    const [selectedPermissions, setSelectedPermissions] = useState([]);
+    // useMutation
+    const inviteUserMutation = useMutation({
+        mutationFn: async (payload: any) => {
+            console.log(">>> Sending payload to API:", payload);
+            return await inviteUserService(payload);
+        },
+        onSuccess: (_data, payload) => {
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setPassword("");
+            setSelectedRole("");
+            setCustomRole("");
+            setSelectedPermissions([]);
+            setIsCreatingNewRole(false);
+
+            setNewUserCredentials({ email: payload.email, password: payload.password });
+
+            toast({
+            title: "User invited successfully",
+            description: "The new user has been created."
+            });
+        },
+        onError: (error: unknown) => {
+            const err = error as AxiosError<ApiErrorResponse>;
+            const backendMessage = err.response?.data?.message || "Something went wrong!";
+            toast({
+                title: "Something went wrong",
+                description: backendMessage
+            });
+        }
+    });
 
     // Handler Functions
-    const handleSubmit = (e) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        console.log("Invite user:", { firstName, lastName, email, password, role: selectedRole, permissions: selectedPermissions });
-        setNewUserCredentials({ email, password });
-        toast({ title: "User invited successfully", description: "The new user has been created and credentials are ready to share." });
-        setFirstName(""); setLastName(""); setEmail(""); setPassword(""); setSelectedRole(""); setSelectedPermissions([]);
+
+        if (!firstName || !lastName || !email || !password) {
+            toast({ 
+                title: "Please fill all required fields" 
+            });
+            return;
+        }
+
+        const payload: any = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password
+        };
+
+        if (isCreatingNewRole) {
+            if (!customRole?.trim() || selectedPermissions.length === 0) {
+                toast({ 
+                    title: "Provide role name and at least one permission" 
+                });
+                return;
+            }
+            payload.role = customRole.trim();
+            payload.permissions = selectedPermissions;
+        } 
+        else {
+            if (!selectedRole) {
+                toast({ 
+                    title: "Select an existing role" 
+                });
+                return;
+            }
+            payload.role = Number(selectedRole);
+        }
+
+        console.log("Invite user payload:", payload, { isCreatingNewRole, customRole, selectedRole, selectedPermissions });
+
+        inviteUserMutation.mutate(payload);
     };
 
-    const copyToClipboard = async (text, field) => {
-        await navigator.clipboard.writeText(text);
-        setCopiedField(field);
-        setTimeout(() => setCopiedField(null), 2000);
-        toast({ title: "Copied to clipboard", description: `${field} has been copied to clipboard.` });
-    };
-
-    const handleRoleSelect = (value) => {
+    const handleRoleSelect = (value: string) => {
         if (value === "create_new_role") { 
-            setIsCreatingNewRole(true); setCustomRole(""); 
+            setIsCreatingNewRole(true); 
         }
         else { 
-            setIsCreatingNewRole(false); setSelectedRole(value);
-        }
-    };
-
-    const handleAddCustomRole = () => {
-        if (customRole.trim() && !roles.includes(customRole.trim())) {
-            const updatedRoles = [...roles, customRole.trim()];
-            setRoles(updatedRoles);
-            setSelectedRole(customRole.trim());
             setIsCreatingNewRole(false);
-            setCustomRole("");
-            toast({ title: "Role created", description: `New role "${customRole.trim()}" has been added.` });
+            setSelectedRole(value); 
         }
     };
 
@@ -79,6 +131,13 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         else{
             setSelectedPermissions(selectedPermissions.filter(p => p !== permissionId));
         };
+    };
+
+    const copyToClipboard = async (text, field) => {
+        await navigator.clipboard.writeText(text);
+        setCopiedField(field);
+        setTimeout(() => setCopiedField(null), 2000);
+        toast({ title: "Copied to clipboard", description: `${field} has been copied to clipboard.` });
     };
 
     return (
@@ -100,6 +159,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                                     <Input 
                                         value={firstName} 
                                         onChange={(e) => setFirstName(e.target.value)} 
+                                        id="firstName"
                                         className="h-10" 
                                         placeholder="sahil" />
                                 </div>
@@ -108,6 +168,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                                     <Input 
                                         value={lastName} 
                                         onChange={(e) => setLastName(e.target.value)} 
+                                        id="lastName"
                                         className="h-10"
                                         placeholder="ladhania" />
                                 </div>
@@ -119,6 +180,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                                     value={email} 
                                     onChange={(e) => setEmail(e.target.value)} 
                                     type="email" 
+                                    id="email"
                                     className="h-10" 
                                     placeholder="s@gmail.com" />
                             </div>
@@ -129,6 +191,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                                     value={password} 
                                     onChange={(e) => setPassword(e.target.value)} 
                                     type="password" 
+                                    id="password"
                                     className="h-10" 
                                     placeholder="********" />
                             </div>
@@ -143,7 +206,12 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                                             <SelectContent>
                                                 {
                                                     rolesList?.map((role) => 
-                                                        <SelectItem key={role.id} value={role.name}>{role.name}</SelectItem>
+                                                        <SelectItem 
+                                                            key={role.id} 
+                                                            value={String(role.id)}
+                                                        >
+                                                                {role.name}
+                                                        </SelectItem>
                                                     )
                                                 }
                                                 <SelectItem value="create_new_role" className="bg-primary/10 text-primary font-medium">+ Create new role</SelectItem>
@@ -157,16 +225,9 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                                                 value={customRole} 
                                                 onChange={(e) => setCustomRole(e.target.value)} 
                                                 placeholder="Enter new role name" 
+                                                id="customRole"
                                                 className="h-10" 
-                                                onKeyPress={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddCustomRole(); } }} />
-                                            <Button 
-                                                type="button" 
-                                                onClick={handleAddCustomRole} 
-                                                size="sm" 
-                                                className="h-10"
-                                            >
-                                                Add
-                                            </Button>
+                                            />
                                             <Button 
                                                 type="button" 
                                                 variant="outline" 

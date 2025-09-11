@@ -57,3 +57,21 @@ export const getAllPermissionsService = async() : Promise<Permission[]> => {
         };
     }
 }
+
+export const inviteUserService = async({formData}) : Promise<User> => {
+    try {
+        const response = await axios.post(`${API_URL}/settings/v1/user-management/invite-user` , formData , {
+            withCredentials : true
+        });
+
+        console.log(response.data.data);
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error getting all permissions...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}

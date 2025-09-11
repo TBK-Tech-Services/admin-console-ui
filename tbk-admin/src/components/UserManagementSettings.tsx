@@ -66,8 +66,6 @@ export default function UserManagementSettings() {
                     setInviteModalOpen={setInviteModalOpen}
                     newUserCredentials={newUserCredentials}
                     setNewUserCredentials={setNewUserCredentials}
-                    roles={roles}
-                    setRoles={setRoles}
                 />
 
                 {/* Edit User Modal */}

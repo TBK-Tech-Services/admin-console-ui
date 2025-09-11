@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useToast } from '@/hooks/use-toast';
 import { loginService } from '@/services/auth.service';
 import { setIsAuthenticated, setUser } from '@/store/slices/authSlice';
 import { ApiErrorResponse } from '@/types/global/apiErrorResponse';
@@ -10,9 +11,11 @@ import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 export default function Login() {
+    // useToast
+    const { toast } = useToast();
+
     // useNavigate
     const navigate = useNavigate();
 
@@ -33,7 +36,9 @@ export default function Login() {
             dispatch(setUser(user));
             setEmail("");
             setPassword("");
-            toast.success("Logged in successfully!");
+            toast({
+                title: "Logged in successfully!"
+            });
             setTimeout(() => {
                 navigate("/");
             }, 1000);
@@ -41,7 +46,10 @@ export default function Login() {
         onError: (error: unknown) => {
             const err = error as AxiosError<ApiErrorResponse>;
             const backendMessage = err.response?.data?.message || "Something went wrong!";
-            toast.error(backendMessage);
+            toast({
+                title : "Something went wrong",
+                description : backendMessage
+            });
         }
     });
     
