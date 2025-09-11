@@ -58,9 +58,9 @@ export const getAllPermissionsService = async() : Promise<Permission[]> => {
     }
 }
 
-export const inviteUserService = async({formData}) : Promise<User> => {
+export const inviteUserService = async(payload: any) : Promise<User> => {
     try {
-        const response = await axios.post(`${API_URL}/settings/v1/user-management/invite-user` , formData , {
+        const response = await axios.post(`${API_URL}/settings/v1/user-management/invite-user` , payload , {
             withCredentials : true
         });
 
