@@ -3,21 +3,21 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
 import { Toaster } from "sonner";
-import Dashboard from "./pages/Dashboard";
-import BookingForm from "./pages/BookingForm";
-import BookingsManagement from "./pages/BookingsManagement";
-import Villas from "./pages/Villas";
 import VillaDetails from "./pages/VillaDetails";
 import Expenses from "./pages/Expenses";
 import FinanceDashboard from "./pages/FinanceDashboard";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
-import ChangePassword from "./pages/ChangePassword";
-import ForgotPassword from "./pages/ForgotPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
 import GlobalLoader from "./components/GlobalLoader";
 import PublicRoute from "./components/PublicRoute";
+import LoginPage from "./page/LoginPage";
+import ForgotPasswordPage from "./page/ForgotPasswordPage";
+import ChangePasswordPage from "./page/ChangePasswordPage";
+import HomePage from "./page/HomePage";
+import NewBookingPage from "./page/NewBookingPage";
+import ManageBookingsPage from "./page/ManageBookingsPage";
+import VillasPage from "./page/VillasPage";
 
 const App = () => (
     <TooltipProvider>
@@ -28,18 +28,18 @@ const App = () => (
           <Routes>
             {/* Un-Authenticated Routes */}
             <Route element={<PublicRoute/>}>
-              <Route path="/login" element={<Login />} />
-              <Route path="/change-password" element={<ChangePassword />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/change-password" element={<ChangePasswordPage />} />
             </Route>
 
             {/* Authenticated Routes */}
             <Route element={<ProtectedRoute/>}>
               <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/booking" element={<BookingForm />} />
-                <Route path="/bookings" element={<BookingsManagement />} />
-                <Route path="/villas" element={<Villas />} />
+                <Route path="/" element={<HomePage />} />
+                <Route path="/booking" element={<NewBookingPage />} />
+                <Route path="/bookings" element={<ManageBookingsPage />} />
+                <Route path="/villas" element={<VillasPage />} />
                 <Route path="/villas/:id" element={<VillaDetails />} />
                 <Route path="/expenses" element={<Expenses />} />
                 <Route path="/finance" element={<FinanceDashboard />} />

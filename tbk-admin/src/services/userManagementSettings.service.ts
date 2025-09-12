@@ -3,8 +3,10 @@ import { Role } from "@/types/global/role";
 import { User } from "@/types/global/user";
 import axios from "axios";
 
+// API URL Endpoint
 const API_URL = import.meta.env.VITE_API_URL;
 
+// Service to get All Users
 export const getAllUsersService = async() : Promise<User[]> => {
     try {
         const response = await axios.get(`${API_URL}/users/v1/` , {
@@ -22,6 +24,7 @@ export const getAllUsersService = async() : Promise<User[]> => {
     }
 }
 
+// Service to get All Roles
 export const getAllRolesService = async() : Promise<Role[]> => {
     try {
         const response = await axios.get(`${API_URL}/settings/v1/user-management/roles` , {
@@ -40,6 +43,7 @@ export const getAllRolesService = async() : Promise<Role[]> => {
     }
 }
 
+// Service to get All Permissions
 export const getAllPermissionsService = async() : Promise<Permission[]> => {
     try {
         const response = await axios.get(`${API_URL}/settings/v1/user-management/permissions` , {
@@ -58,6 +62,7 @@ export const getAllPermissionsService = async() : Promise<Permission[]> => {
     }
 }
 
+// Service to Invite a User
 export const inviteUserService = async(payload: any) : Promise<User> => {
     try {
         const response = await axios.post(`${API_URL}/settings/v1/user-management/invite-user` , payload , {
