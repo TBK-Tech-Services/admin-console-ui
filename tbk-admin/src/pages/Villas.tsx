@@ -78,9 +78,14 @@ const villas = [
 ];
 
 export default function Villas() {
+
+  // useNavigate
   const navigate = useNavigate();
+
+  // State Variables
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Helper to get Status Color
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Available":

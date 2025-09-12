@@ -8,6 +8,7 @@ export default function PublicRoute() {
         (state: RootState) => state.auth.isAuthenticated
     );
 
+  // Conditionally Rendering Components
   return isAuthenticated ? 
     <Navigate to="/" replace /> 
     : 

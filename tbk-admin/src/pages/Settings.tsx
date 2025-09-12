@@ -6,13 +6,12 @@ import { RootState } from "@/store/store";
 import { useSelector } from "react-redux";
 
 export default function Settings() {
+
       // useSelector
       const user = useSelector((state: RootState) => state.auth.user);
       const email = user?.email;
       const userRole = user?.role;
-      console.log(userRole);
-      console.log(email);
-
+      
       return (
         <div className="space-y-6 max-w-4xl">
           <div>

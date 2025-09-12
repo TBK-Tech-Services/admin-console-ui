@@ -13,6 +13,7 @@ import { AxiosError } from 'axios';
 import { ApiResponse } from './types/global/apiResponse.ts';
 import { ApiErrorResponse } from './types/global/apiErrorResponse.ts';
 
+// Configuring Tanstack Query
 const queryClient = new QueryClient({
   defaultOptions: {
     mutations: {
@@ -48,7 +49,7 @@ createRoot(document.getElementById('root')!).render(
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
           <QueryClientProvider client={queryClient}>
-            <Toaster /> {/* This is for Sonner */}
+            <Toaster /> 
             <App />
             <ReactQueryDevtools initialIsOpen={false}/>
           </QueryClientProvider>

@@ -24,7 +24,7 @@ export default function UserManagementSettings() {
     const [newUserCredentials, setNewUserCredentials] = useState<{email: string, password: string} | null>(null);
     const [roles, setRoles] = useState(availableRoles);
 
-    // Handler Functions
+    // Handler to Handle Edit User
     const handleEditUser = (user) => {
         setSelectedUser(user);
         setEditModalOpen(true);

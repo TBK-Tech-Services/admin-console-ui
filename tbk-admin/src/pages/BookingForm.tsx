@@ -8,6 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, Users, MapPin, Phone, Mail, CreditCard } from "lucide-react";
 
 export default function BookingForm() {
+  
+  // State Variables
   const [formData, setFormData] = useState({
     guestName: "",
     email: "",
@@ -19,12 +21,13 @@ export default function BookingForm() {
     specialRequests: "",
   });
 
+  // Handler to Handle Booking Form Submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
     console.log("Form submitted:", formData);
   };
 
+  // Handler to Handle to Input Change
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };

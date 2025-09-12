@@ -52,14 +52,14 @@ export default function Login() {
             });
         }
     });
-    
+
+    // Handler to Handle Login
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         loginMutation.mutate(); 
     };
 
-
-    // Handler Functions
+    // Handler to Handle Input Change
     const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const {id , value} = e.target;
 

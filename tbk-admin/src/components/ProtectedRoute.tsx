@@ -8,6 +8,7 @@ export default function ProtectedRoute() {
         (state: RootState) => state.auth.isAuthenticated
     );
 
+  // Conditionally Rendering Components
   return isAuthenticated ?
     <Outlet/>
     :

@@ -55,6 +55,8 @@ const villas = ["Villa 1", "Villa 2", "Villa 3", "Villa 4"];
 const categories = ["Maintenance", "Cleaning", "Marketing", "Utilities", "Staff", "Supplies"];
 
 export default function Expenses() {
+
+  // State Variables
   const [expenses, setExpenses] = useState<Expense[]>(mockExpenses);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");
@@ -68,6 +70,7 @@ export default function Expenses() {
     villa: "",
   });
 
+  // Handler to Handle Form Submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newExpense: Expense = {
@@ -89,6 +92,7 @@ export default function Expenses() {
     resetForm();
   };
 
+  // Handler to Handle Reset Form
   const resetForm = () => {
     setFormData({ title: "", amount: "", date: "", category: "", villa: "" });
     setExpenseType("individual");
@@ -96,6 +100,7 @@ export default function Expenses() {
     setSelectedVillas([]);
   };
 
+  // Handler to Handle Villa Toggle
   const handleVillaToggle = (villa: string) => {
     setSelectedVillas(prev => 
       prev.includes(villa) 

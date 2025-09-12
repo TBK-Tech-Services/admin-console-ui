@@ -136,10 +136,13 @@ const getStatusColor = (status: string) => {
 };
 
 export default function BookingsManagement() {
+
+  // State Variables
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
+  // Handler to Handle Filtering in Bookings
   const filteredBookings = mockBookings.filter((booking) => {
     const matchesSearch = 
       booking.guestName.toLowerCase().includes(searchTerm.toLowerCase()) ||

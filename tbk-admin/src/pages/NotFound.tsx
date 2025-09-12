@@ -3,8 +3,11 @@ import { useLocation, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export default function NotFound() {
+
+    // useLocation
     const location = useLocation();
 
+    // useEffect
     useEffect(() => {
         console.error(
             "404 Error: User attempted to access non-existent route:",

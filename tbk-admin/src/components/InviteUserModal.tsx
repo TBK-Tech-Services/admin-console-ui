@@ -71,7 +71,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         }
     });
 
-    // Handler Functions
+    // Handler to Handle Invite User Submission
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -114,6 +114,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         inviteUserMutation.mutate(payload);
     };
 
+    // Handler to Handle Role Selection
     const handleRoleSelect = (value: string) => {
         if (value === "create_new_role") { 
             setIsCreatingNewRole(true); 
@@ -124,6 +125,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         }
     };
 
+    // Handler to Handle Permission Change
     const handlePermissionChange = (permissionId, checked) => {
         if (checked){
             setSelectedPermissions([...selectedPermissions, permissionId]);
@@ -133,6 +135,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         };
     };
 
+    // Handler to Handle Copy to Clipboard
     const copyToClipboard = async (text, field) => {
         await navigator.clipboard.writeText(text);
         setCopiedField(field);

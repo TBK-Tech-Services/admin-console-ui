@@ -33,6 +33,8 @@ const expenseCategories = [
 ];
 
 export default function FinanceDashboard() {
+
+  // State Variables
   const [selectedVilla, setSelectedVilla] = useState<string>("all");
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });

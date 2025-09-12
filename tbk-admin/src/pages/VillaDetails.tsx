@@ -25,7 +25,6 @@ import {
   Settings
 } from "lucide-react";
 
-// Mock data - in real app this would come from API
 const getVillaData = (id: string) => {
   const villas = {
     "1": {
@@ -79,16 +78,27 @@ const getVillaData = (id: string) => {
 };
 
 export default function VillaDetails() {
+
+  // useParams
   const { id } = useParams();
+
+  // useNavigate
   const navigate = useNavigate();
+
+
+  // Extracting Data
   const villa = getVillaData(id || "1");
+
+  // State Variables
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showAllBookings, setShowAllBookings] = useState(false);
 
+  // Handling Empty State
   if (!villa) {
     return <div>Villa not found</div>;
   }
 
+  // Helper to get Status Color
   const getStatusColor = (status: string) => {
     switch (status) {
       case "Available":
