@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import AddVillaFormComponent from "@/components/villa/VillaCardComponent";
-import VillaCardComponent from "@/components/villa/AddVillaFormComponent";
+import AddVillaFormComponent from "@/components/villa/AddVillaFormComponent";
+import VillaCardComponent from "@/components/villa/VillaCardComponent";
 
 const villas = [
   {

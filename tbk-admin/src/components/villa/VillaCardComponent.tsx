@@ -1,163 +1,120 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Users, Bed, Bath, Star } from "lucide-react";
 
-interface AddVillaFormComponentProps {
-  onClose: () => void;
+interface Villa {
+  id: number;
+  name: string;
+  location: string;
+  price: string;
+  rating: number;
+  reviews: number;
+  bedrooms: number;
+  bathrooms: number;
+  maxGuests: number;
+  amenities: string[];
+  image: string;
+  status: string;
+  totalBookings: number;
+  revenue: string;
 }
 
-export default function AddVillaFormComponent({ onClose }: AddVillaFormComponentProps) {
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+interface VillaCardComponentProps {
+  villa: Villa;
+  onClick: () => void;
+}
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      setSelectedImages(Array.from(files));
-    }
-  };
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case "Available":
+      return "bg-success text-white border-success";
+    case "Occupied":
+      return "bg-warning text-white border-warning";
+    case "Maintenance":
+      return "bg-destructive text-white border-destructive";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
 
-  const removeImage = (index: number) => {
-    setSelectedImages(prev => prev.filter((_, i) => i !== index));
-  };
-
+export default function VillaCardComponent({ villa, onClick }: VillaCardComponentProps) {
   return (
-    <>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="name">Villa Name</Label>
-            <Input id="name" placeholder="Enter villa name" />
-          </div>
-          <div>
-            <Label htmlFor="location">Location</Label>
-            <Input id="location" placeholder="Enter location" />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Label htmlFor="bedrooms">Bedrooms</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1</SelectItem>
-                <SelectItem value="2">2</SelectItem>
-                <SelectItem value="3">3</SelectItem>
-                <SelectItem value="4">4</SelectItem>
-                <SelectItem value="5">5+</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="bathrooms">Bathrooms</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1</SelectItem>
-                <SelectItem value="2">2</SelectItem>
-                <SelectItem value="3">3</SelectItem>
-                <SelectItem value="4">4+</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label htmlFor="maxGuests">Max Guests</Label>
-            <Input id="maxGuests" type="number" placeholder="8" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="price">Price per Night</Label>
-            <Input id="price" placeholder="₹15,000" />
-          </div>
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <Select>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="occupied">Occupied</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="amenities">Amenities</Label>
-          <Textarea 
-            id="amenities" 
-            placeholder="WiFi, Pool, Parking, Beach Access (comma separated)" 
-            className="min-h-[60px]"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea 
-            id="description" 
-            placeholder="Describe the villa and its features..." 
-            className="min-h-[80px]"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="images">Villa Images</Label>
-          <div className="space-y-2">
-            <Input 
-              id="images" 
-              type="file" 
-              multiple 
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="file:mr-2 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
-            />
-            {selectedImages.length > 0 && (
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {selectedImages.map((file, index) => (
-                  <div key={index} className="relative bg-slate-50 rounded-md p-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span className="truncate flex-1 mr-2">{file.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => removeImage(index)}
-                        className="text-red-500 hover:text-red-700 text-xs"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                    <div className="text-xs text-slate-500 mt-1">
-                      {(file.size / 1024 / 1024).toFixed(2)} MB
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+    <Card 
+      className="overflow-hidden hover:shadow-elegant transition-all duration-300 cursor-pointer group"
+      onClick={onClick}
+    >
+      <div className="relative">
+        <img 
+          src={villa.image} 
+          alt={villa.name}
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute top-4 right-4">
+          <Badge className={getStatusColor(villa.status)}>
+            {villa.status}
+          </Badge>
         </div>
       </div>
       
-      <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={onClose}>
-          Cancel
-        </Button>
-        <Button 
-          className="bg-gradient-primary hover:opacity-90"
-          onClick={onClose}
-        >
-          Add Villa
-        </Button>
-      </div>
-    </>
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between">
+          <div>
+            <CardTitle className="text-lg mb-1">{villa.name}</CardTitle>
+            <div className="flex items-center text-muted-foreground text-sm">
+              <MapPin className="h-4 w-4 mr-1" />
+              {villa.location}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="font-bold text-primary">{villa.price}</div>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <Star className="h-3 w-3 mr-1 fill-warning text-warning" />
+              {villa.rating} ({villa.reviews})
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center">
+            <Bed className="h-4 w-4 mr-1" />
+            {villa.bedrooms} Bed
+          </div>
+          <div className="flex items-center">
+            <Bath className="h-4 w-4 mr-1" />
+            {villa.bathrooms} Bath
+          </div>
+          <div className="flex items-center">
+            <Users className="h-4 w-4 mr-1" />
+            Up to {villa.maxGuests}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-1">
+          {villa.amenities.slice(0, 3).map((amenity) => (
+            <Badge key={amenity} variant="secondary" className="text-xs">
+              {amenity}
+            </Badge>
+          ))}
+          {villa.amenities.length > 3 && (
+            <Badge variant="secondary" className="text-xs">
+              +{villa.amenities.length - 3} more
+            </Badge>
+          )}
+        </div>
+
+        <div className="border-t pt-3 grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <div className="text-muted-foreground">Total Bookings</div>
+            <div className="font-semibold">{villa.totalBookings}</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Revenue</div>
+            <div className="font-semibold text-success">{villa.revenue}</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
