@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Shield, Download } from "lucide-react";
 
-export default function SecurityAndBackupSettings() {
+export default function SecurityAndBackupSettingsComponent() {
   return (
     <Card>
       <CardHeader>
