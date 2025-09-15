@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
 
 interface AddVillaFormComponentProps {
@@ -11,6 +12,21 @@ interface AddVillaFormComponentProps {
 
 export default function AddVillaFormComponent({ onClose }: AddVillaFormComponentProps) {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([]);
+  const [customAmenities, setCustomAmenities] = useState<string[]>([]);
+  const [newAmenityInput, setNewAmenityInput] = useState<string>("");
+
+  // Available amenities (matching your database enum)
+  const amenitiesList = [
+    { id: 1, name: "WIFI" },
+    { id: 2, name: "POOL" },
+    { id: 3, name: "PARKING" },
+    { id: 4, name: "BEACH_ACCESS" },
+    { id: 5, name: "KITCHEN" },
+    { id: 6, name: "AC" },
+    { id: 7, name: "TV" },
+    { id: 8, name: "BALCONY" }
+  ];
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -21,6 +37,32 @@ export default function AddVillaFormComponent({ onClose }: AddVillaFormComponent
 
   const removeImage = (index: number) => {
     setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAmenityChange = (amenityId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedAmenities([...selectedAmenities, amenityId]);
+    } else {
+      setSelectedAmenities(selectedAmenities.filter(id => id !== amenityId));
+    }
+  };
+
+  const addCustomAmenity = () => {
+    if (newAmenityInput.trim() && !customAmenities.includes(newAmenityInput.trim())) {
+      setCustomAmenities([...customAmenities, newAmenityInput.trim()]);
+      setNewAmenityInput("");
+    }
+  };
+
+  const removeCustomAmenity = (amenity: string) => {
+    setCustomAmenities(customAmenities.filter(item => item !== amenity));
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCustomAmenity();
+    }
   };
 
   return (
@@ -64,9 +106,9 @@ export default function AddVillaFormComponent({ onClose }: AddVillaFormComponent
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="available">Available</SelectItem>
-                <SelectItem value="occupied">Occupied</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
+                <SelectItem value="AVAILABLE">Available</SelectItem>
+                <SelectItem value="OCCUPIED">Occupied</SelectItem>
+                <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -74,11 +116,66 @@ export default function AddVillaFormComponent({ onClose }: AddVillaFormComponent
 
         <div>
           <Label htmlFor="amenities">Amenities</Label>
-          <Textarea 
-            id="amenities" 
-            placeholder="WiFi, Pool, Parking, Beach Access (comma separated)" 
-            className="min-h-[60px]"
-          />
+          
+          {/* Predefined Amenities */}
+          <div className="grid grid-cols-2 gap-3 mt-2">
+            {amenitiesList.map((amenity) => (
+              <div key={amenity.id} className="flex flex-row items-start space-x-3 space-y-0">
+                <Checkbox 
+                  checked={selectedAmenities.includes(amenity.id)} 
+                  onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)} 
+                />
+                <Label className="text-sm font-normal">{amenity.name}</Label>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Custom Amenity */}
+          <div className="mt-4 space-y-2">
+            <Label className="text-sm font-medium">Add Custom Amenity</Label>
+            <div className="flex gap-2">
+              <Input
+                value={newAmenityInput}
+                onChange={(e) => setNewAmenityInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Enter custom amenity (e.g., Hot Tub, Gym)"
+                className="flex-1"
+              />
+              <Button
+                type="button"
+                onClick={addCustomAmenity}
+                variant="outline"
+                size="sm"
+                className="px-4"
+              >
+                Add
+              </Button>
+            </div>
+          </div>
+
+          {/* Custom Amenities Display */}
+          {customAmenities.length > 0 && (
+            <div className="mt-3">
+              <Label className="text-sm font-medium text-muted-foreground">Custom Amenities:</Label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {customAmenities.map((amenity, index) => (
+                  <div
+                    key={index}
+                    className="inline-flex items-center gap-1 bg-primary/10 text-primary px-2 py-1 rounded-md text-xs"
+                  >
+                    <span>{amenity}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeCustomAmenity(amenity)}
+                      className="text-primary hover:text-primary/70 ml-1"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
