@@ -3,12 +3,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useState } from "react";
 
 interface AddVillaFormComponentProps {
   onClose: () => void;
 }
 
 export default function AddVillaFormComponent({ onClose }: AddVillaFormComponentProps) {
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      setSelectedImages(Array.from(files));
+    }
+  };
+
+  const removeImage = (index: number) => {
+    setSelectedImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <>
       <div className="grid gap-4 py-4">
@@ -80,11 +94,6 @@ export default function AddVillaFormComponent({ onClose }: AddVillaFormComponent
         </div>
 
         <div>
-          <Label htmlFor="image">Villa Image URL</Label>
-          <Input id="image" placeholder="https://example.com/image.jpg" />
-        </div>
-
-        <div>
           <Label htmlFor="amenities">Amenities</Label>
           <Textarea 
             id="amenities" 
@@ -100,6 +109,41 @@ export default function AddVillaFormComponent({ onClose }: AddVillaFormComponent
             placeholder="Describe the villa and its features..." 
             className="min-h-[80px]"
           />
+        </div>
+
+        <div>
+          <Label htmlFor="images">Villa Images</Label>
+          <div className="space-y-2">
+            <Input 
+              id="images" 
+              type="file" 
+              multiple 
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="file:mr-2 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
+            />
+            {selectedImages.length > 0 && (
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {selectedImages.map((file, index) => (
+                  <div key={index} className="relative bg-slate-50 rounded-md p-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="truncate flex-1 mr-2">{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="text-red-500 hover:text-red-700 text-xs"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <div className="text-xs text-slate-500 mt-1">
+                      {(file.size / 1024 / 1024).toFixed(2)} MB
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
       
