@@ -17,15 +17,15 @@ export default function AdditionalInformationComponent({ formData, onInputChange
           Additional Information
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <div className="space-y-2">
-          <Label htmlFor="specialRequests">Special Requests</Label>
+          <Label htmlFor="specialRequest">Special Requests</Label>
           <Textarea
-            id="specialRequests"
-            value={formData.specialRequests}
-            onChange={(e) => onInputChange("specialRequests", e.target.value)}
+            id="specialRequest"
             placeholder="Any special requirements, dietary restrictions, or additional services needed..."
             className="min-h-[100px]"
+            value={formData.specialRequest}
+            onChange={(e) => onInputChange("specialRequest", e.target.value)}
           />
         </div>
       </CardContent>

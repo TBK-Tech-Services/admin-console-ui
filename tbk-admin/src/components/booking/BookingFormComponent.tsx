@@ -1,24 +1,24 @@
 import GuestInformationComponent from '@/components/booking/GuestInformationComponent';
 import BookingDetailsComponent from './BookingDetailsComponent';
 import AdditionalInformationComponent from './AdditionalInformationComponent';
-import PricingSummaryComponent from './PricingSummaryComponent';
-import BookingFormActionsComponent from './BookingFormActionsComponent';
+import { Button } from "@/components/ui/button";
+import GSTPricingConfigurationComponent from './GSTPricingConfigurationComponent';
 
 interface FormData {
   guestName: string;
-  email: string;
-  phone: string;
-  villa: string;
+  guestEmail: string;
+  guestPhone: string;
+  villaId: string;
   checkIn: string;
   checkOut: string;
-  guests: string;
-  specialRequests: string;
-  customRate: string;
+  totalGuests: string;
+  specialRequest: string;
+  isGSTIncluded: boolean;
 }
 
 interface BookingFormComponentProps {
   formData: FormData;
-  onInputChange: (field: string, value: string) => void;
+  onInputChange: (field: string, value: string | boolean) => void;
   onSubmit: (e: React.FormEvent) => void;
   isLoading?: boolean;
 }
@@ -30,7 +30,7 @@ export default function BookingFormComponent({
   isLoading = false 
 }: BookingFormComponentProps) {
   return (
-    <form onSubmit={onSubmit} className="space-y-6">
+    <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
         <GuestInformationComponent 
           formData={formData}
@@ -47,12 +47,21 @@ export default function BookingFormComponent({
         onInputChange={onInputChange}
       />
 
-      <PricingSummaryComponent
+      <GSTPricingConfigurationComponent
         formData={formData}
         onInputChange={onInputChange}
       />
 
-      <BookingFormActionsComponent isLoading={isLoading} />
-    </form>
+      <div className="flex justify-end">
+        <Button 
+          onClick={onSubmit} 
+          size="lg" 
+          className="min-w-[150px]"
+          disabled={isLoading}
+        >
+          {isLoading ? "Creating..." : "Create Booking"}
+        </Button>
+      </div>
+    </div>
   );
 }

@@ -1,31 +1,37 @@
 import { useState } from "react";
 import BookingFormHeaderComponent from '@/components/booking/BookingFormHeaderComponent';
 import BookingFormComponent from '@/components/booking/BookingFormComponent';
+import BookingSummaryModal from "@/components/booking/BookingSummaryModal";
 
 export default function NewBookingPage() {
-    
-  // State Variables
   const [formData, setFormData] = useState({
     guestName: "",
-    email: "",
-    phone: "",
-    villa: "",
+    guestEmail: "",
+    guestPhone: "",
+    villaId: "",
     checkIn: "",
     checkOut: "",
-    guests: "",
-    specialRequests: "",
-    customRate: "",
+    totalGuests: "",
+    specialRequest: "",
+    isGSTIncluded: false
   });
 
-  // Handler to Handle Booking Form Submission
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleInputChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Handler to Handle Input Change
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // API call logic will go here
+    // On success, show modal with API response data
+    setShowModal(true);
+  };
+
+  const handleSaveAsDraft = () => {
+    console.log("Saving as draft...");
+    setShowModal(false);
   };
 
   return (
@@ -35,6 +41,13 @@ export default function NewBookingPage() {
         formData={formData}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
+      />
+      
+      <BookingSummaryModal 
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onSaveAsDraft={handleSaveAsDraft}
+        formData={formData}
       />
     </div>
   );

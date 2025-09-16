@@ -1,8 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Users } from "lucide-react";
-import GuestNameFieldComponent from "./GuestNameFieldComponent";
-import GuestEmailFieldComponent from "./GuestEmailFieldComponent";
-import GuestPhoneFieldComponent from "./GuestPhoneFieldComponent";
 
 interface GuestInformationComponentProps {
   formData: any;
@@ -19,20 +18,36 @@ export default function GuestInformationComponent({ formData, onInputChange }: G
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <GuestNameFieldComponent 
-          value={formData.guestName}
-          onChange={(value) => onInputChange("guestName", value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="guestName">Full Name *</Label>
+          <Input
+            id="guestName"
+            placeholder="Enter guest's full name"
+            value={formData.guestName}
+            onChange={(e) => onInputChange("guestName", e.target.value)}
+          />
+        </div>
         
-        <GuestEmailFieldComponent 
-          value={formData.email}
-          onChange={(value) => onInputChange("email", value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="guestEmail">Email Address *</Label>
+          <Input
+            id="guestEmail"
+            type="email"
+            placeholder="guest@example.com"
+            value={formData.guestEmail}
+            onChange={(e) => onInputChange("guestEmail", e.target.value)}
+          />
+        </div>
         
-        <GuestPhoneFieldComponent 
-          value={formData.phone}
-          onChange={(value) => onInputChange("phone", value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="guestPhone">Phone Number *</Label>
+          <Input
+            id="guestPhone"
+            placeholder="+91 98765 43210"
+            value={formData.guestPhone}
+            onChange={(e) => onInputChange("guestPhone", e.target.value)}
+          />
+        </div>
       </CardContent>
     </Card>
   );
