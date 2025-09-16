@@ -1,5 +1,5 @@
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 interface GuestCountSelectComponentProps {
   value: string;
@@ -10,18 +10,15 @@ export default function GuestCountSelectComponent({ value, onChange }: GuestCoun
   return (
     <div className="space-y-2">
       <Label htmlFor="guests">Number of Guests *</Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="h-12">
-          <SelectValue placeholder="Select number of guests" />
-        </SelectTrigger>
-        <SelectContent>
-          {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
-            <SelectItem key={num} value={num.toString()}>
-              {num} Guest{num > 1 ? 's' : ''}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <Input
+        id="guests"
+        type="number"
+        placeholder="Enter number of guests"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        min="1"
+        className="h-12"
+      />
     </div>
   );
 }

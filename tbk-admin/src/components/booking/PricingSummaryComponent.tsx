@@ -2,7 +2,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { CreditCard } from "lucide-react";
-import CustomRateFieldComponent from "./CustomRateFieldComponent";
 
 interface PricingSummaryComponentProps {
   formData: any;
@@ -10,7 +9,8 @@ interface PricingSummaryComponentProps {
 }
 
 export default function PricingSummaryComponent({ formData, onInputChange }: PricingSummaryComponentProps) {
-  const isGSTEnabled = false;
+  // You'll add your state logic here
+  const isGSTEnabled = false; // This will be your state variable
 
   const summaryDataWithoutGST = [
     { label: "Villa Rate (per night)", amount: "₹15,000" },
@@ -38,13 +38,8 @@ export default function PricingSummaryComponent({ formData, onInputChange }: Pri
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <CustomRateFieldComponent
-            value={formData.customRate}
-            onChange={(value) => onInputChange("customRate", value)}
-          />
-          
           {/* GST Toggle */}
-          <div className="flex items-center justify-between py-3 border-t border-b">
+          <div className="flex items-center justify-between py-3 border-b">
             <Label htmlFor="gst-toggle" className="text-sm font-medium">
               Include GST (18%)
             </Label>
