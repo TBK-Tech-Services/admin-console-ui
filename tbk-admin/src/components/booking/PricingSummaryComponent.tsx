@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { CreditCard } from "lucide-react";
 import CustomRateFieldComponent from "./CustomRateFieldComponent";
-import BookingSummaryComponent from "./BookingSummaryComponent";
 
 interface PricingSummaryComponentProps {
   formData: any;
@@ -9,6 +10,24 @@ interface PricingSummaryComponentProps {
 }
 
 export default function PricingSummaryComponent({ formData, onInputChange }: PricingSummaryComponentProps) {
+  const isGSTEnabled = false;
+
+  const summaryDataWithoutGST = [
+    { label: "Villa Rate (per night)", amount: "₹15,000" },
+    { label: "Number of Nights", amount: "3" },
+    { label: "Subtotal", amount: "₹45,000" },
+  ];
+
+  const summaryDataWithGST = [
+    { label: "Villa Rate (per night)", amount: "₹15,000" },
+    { label: "Number of Nights", amount: "3" },
+    { label: "Subtotal", amount: "₹45,000" },
+    { label: "Total GST", amount: "₹8,100" },
+  ];
+
+  const currentSummaryData = isGSTEnabled ? summaryDataWithGST : summaryDataWithoutGST;
+  const totalAmount = isGSTEnabled ? "₹53,100" : "₹45,000";
+
   return (
     <Card>
       <CardHeader>
@@ -24,7 +43,29 @@ export default function PricingSummaryComponent({ formData, onInputChange }: Pri
             onChange={(value) => onInputChange("customRate", value)}
           />
           
-          <BookingSummaryComponent />
+          {/* GST Toggle */}
+          <div className="flex items-center justify-between py-3 border-t border-b">
+            <Label htmlFor="gst-toggle" className="text-sm font-medium">
+              Include GST (18%)
+            </Label>
+            <Switch id="gst-toggle" />
+          </div>
+
+          {/* Booking Summary */}
+          <div className="space-y-3">
+            {currentSummaryData.map((item, index) => (
+              <div key={index} className="flex justify-between">
+                <span className="text-muted-foreground">{item.label}</span>
+                <span className="font-medium">{item.amount}</span>
+              </div>
+            ))}
+            <div className="border-t pt-3">
+              <div className="flex justify-between">
+                <span className="text-lg font-semibold">Total Amount</span>
+                <span className="text-lg font-bold text-primary">{totalAmount}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>
