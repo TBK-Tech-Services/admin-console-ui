@@ -7,7 +7,13 @@ const API_URL = import.meta.env.VITE_API_URL;
 // Service to Add a Booking
 export const addBookingService = async(formData: Booking_Data) : Promise<void> => {
     try {
-        const response = await axios.post(`${API_URL}/bookings/v1/`, formData , {
+        const transformedData = {
+            ...formData,
+            villaId: Number(formData.villaId),
+            totalGuests: Number(formData.totalGuests),
+        };
+
+        const response = await axios.post(`${API_URL}/bookings/v1/`, transformedData , {
             withCredentials : true
         });
 

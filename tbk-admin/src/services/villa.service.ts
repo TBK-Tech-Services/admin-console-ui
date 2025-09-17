@@ -23,7 +23,7 @@ export const addVillaService = async(formData: Villa_Data) : Promise<void> => {
 }
 
 // Service to Get All Villas
-export const getAllVillasService = async() : Promise<void> => {
+export const getAllVillasService = async() : Promise<[]> => {
     try {
         const response = await axios.get(`${API_URL}/villas/v1` , {
             withCredentials : true
@@ -40,7 +40,7 @@ export const getAllVillasService = async() : Promise<void> => {
     }
 }
 
-// Service to Get All Villas
+// Service to Get Al Villas
 export const getAVillaService = async(id: number) : Promise<void> => {
     try {
         const response = await axios.get(`${API_URL}/villas/v1/${id}` , {

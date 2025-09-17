@@ -7,6 +7,6 @@ export interface Booking_Data{
     checkIn: string,
     checkOut: string,
     totalGuests: number,
-    specialRequest?: string,
+    specialRequest: string,
     isGSTIncluded: boolean
 };

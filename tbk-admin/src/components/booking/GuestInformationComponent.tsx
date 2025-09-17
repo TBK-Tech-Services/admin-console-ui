@@ -3,12 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Users } from "lucide-react";
 
-interface GuestInformationComponentProps {
-  formData: any;
-  onInputChange: (field: string, value: string) => void;
-}
-
-export default function GuestInformationComponent({ formData, onInputChange }: GuestInformationComponentProps) {
+export default function GuestInformationComponent({ formData, onInputChange }) {
   return (
     <Card>
       <CardHeader>

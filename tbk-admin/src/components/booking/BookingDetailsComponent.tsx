@@ -2,14 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RootState } from "@/store/store";
 import { Calendar } from "lucide-react";
+import { useSelector } from "react-redux";
 
-interface BookingDetailsComponentProps {
-  formData: any;
-  onInputChange: (field: string, value: string) => void;
-}
+export default function BookingDetailsComponent({ formData , onInputChange }) {
+  
+  // useSelector
+  const villas = useSelector((state: RootState) => state.villas);
 
-export default function BookingDetailsComponent({ formData, onInputChange }: BookingDetailsComponentProps) {
   return (
     <Card>
       <CardHeader>
@@ -26,9 +27,13 @@ export default function BookingDetailsComponent({ formData, onInputChange }: Boo
               <SelectValue placeholder="Choose a villa" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="1">Sunset Villa</SelectItem>
-              <SelectItem value="2">Ocean View</SelectItem>
-              <SelectItem value="3">Palm Paradise</SelectItem>
+              {
+                villas?.listOfVilla?.map((villa) => (
+                  <SelectItem key={villa.id} value={villa.id}>
+                    {villa.name}
+                  </SelectItem>    
+                ))
+              }
             </SelectContent>
           </Select>
         </div>

@@ -10,17 +10,21 @@ import EditUserModalComponent from "./EditUserModalComponent";
 const availableRoles = ["Admin", "Manager", "Viewer", "Agent"];
 
 export default function UserManagementSettingsComponent() {
-  const { data: usersList } = useQuery({
-    queryKey: ['users'],
-    queryFn: getAllUsersService,
-  });
 
+  // State Variables
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [newUserCredentials, setNewUserCredentials] = useState<{email: string, password: string} | null>(null);
   const [roles, setRoles] = useState(availableRoles);
 
+  // useQuery
+  const { data: usersList } = useQuery({
+    queryKey: ['users'],
+    queryFn: getAllUsersService,
+  });
+
+  // Handler Function to Handle Edit User
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
     setEditModalOpen(true);

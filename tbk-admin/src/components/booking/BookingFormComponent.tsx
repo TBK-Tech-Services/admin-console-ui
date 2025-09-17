@@ -4,31 +4,7 @@ import AdditionalInformationComponent from './AdditionalInformationComponent';
 import { Button } from "@/components/ui/button";
 import GSTPricingConfigurationComponent from './GSTPricingConfigurationComponent';
 
-interface FormData {
-  guestName: string;
-  guestEmail: string;
-  guestPhone: string;
-  villaId: string;
-  checkIn: string;
-  checkOut: string;
-  totalGuests: string;
-  specialRequest: string;
-  isGSTIncluded: boolean;
-}
-
-interface BookingFormComponentProps {
-  formData: FormData;
-  onInputChange: (field: string, value: string | boolean) => void;
-  onSubmit: (e: React.FormEvent) => void;
-  isLoading?: boolean;
-}
-
-export default function BookingFormComponent({ 
-  formData, 
-  onInputChange, 
-  onSubmit,
-  isLoading = false 
-}: BookingFormComponentProps) {
+export default function BookingFormComponent({ formData , onInputChange, onSubmit, isLoading = false }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
