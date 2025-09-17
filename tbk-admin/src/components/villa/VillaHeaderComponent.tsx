@@ -1,12 +1,31 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { MapPin, Users, Bed, Bath, Star, Edit, Eye } from "lucide-react";
+import { MapPin, Users, Bed, Bath, Star, Edit, Eye, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { MoreVertical } from "lucide-react";
 
 interface VillaHeaderComponentProps {
   villa: any;
   onEditClick: () => void;
   showAllBookings: boolean;
   onToggleBookings: () => void;
+  onDeleteVilla?: () => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -30,8 +49,15 @@ export default function VillaHeaderComponent({
   villa, 
   onEditClick, 
   showAllBookings, 
-  onToggleBookings 
+  onToggleBookings,
+  onDeleteVilla
 }: VillaHeaderComponentProps) {
+  const handleDeleteVilla = () => {
+    if (onDeleteVilla) {
+      onDeleteVilla();
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2">
@@ -45,9 +71,63 @@ export default function VillaHeaderComponent({
         <div>
           <div className="flex items-start justify-between mb-2">
             <h1 className="text-2xl font-bold">{villa.name}</h1>
-            <Badge className={getStatusColor(villa.status)}>
-              {villa.status}
-            </Badge>
+            <div className="flex items-center gap-2">
+              <Badge className={getStatusColor(villa.status)}>
+                {villa.status}
+              </Badge>
+              
+              {/* More Actions Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onEditClick}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Villa
+                  </DropdownMenuItem>
+                  
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <DropdownMenuItem 
+                        onSelect={(e) => e.preventDefault()}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Villa
+                      </DropdownMenuItem>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete Villa</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Are you sure you want to permanently delete "{villa.name}"? 
+                          This action cannot be undone and will remove all associated data including:
+                          <br /><br />
+                          • All booking history ({villa.stats.totalBookings} bookings)
+                          • Revenue data ({villa.stats.totalRevenue})
+                          • Villa images and details
+                          • Guest information and reviews
+                          <br /><br />
+                          <strong>This action is irreversible.</strong>
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction 
+                          onClick={handleDeleteVilla}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete Permanently
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           </div>
           <div className="flex items-center text-muted-foreground mb-2">
             <MapPin className="h-4 w-4 mr-1" />

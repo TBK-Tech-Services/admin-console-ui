@@ -29,11 +29,6 @@ export default function NewBookingPage() {
     setShowModal(true);
   };
 
-  const handleSaveAsDraft = () => {
-    console.log("Saving as draft...");
-    setShowModal(false);
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <BookingFormHeaderComponent />
@@ -46,7 +41,6 @@ export default function NewBookingPage() {
       <BookingSummaryModal 
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        onSaveAsDraft={handleSaveAsDraft}
         formData={formData}
       />
     </div>

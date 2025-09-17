@@ -66,10 +66,33 @@ export default function SpecificVillaPage() {
   const villa = getVillaData(id || "1");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showAllBookings, setShowAllBookings] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   if (!villa) {
     return <div>Villa not found</div>;
   }
+
+  const handleDeleteVilla = async () => {
+    setIsDeleting(true);
+    
+    try {
+      // Simulate API call to delete villa
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Navigate back to villas list after successful deletion
+      navigate("/villas", { 
+        replace: true,
+        state: { 
+          message: `Villa "${villa.name}" has been deleted successfully.`,
+          type: 'success' 
+        }
+      });
+    } catch (error) {
+      console.error('Failed to delete villa:', error);
+      setIsDeleting(false);
+      // You could show an error toast here
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -80,11 +103,25 @@ export default function SpecificVillaPage() {
           size="sm" 
           onClick={() => navigate("/villas")}
           className="hover:bg-secondary"
+          disabled={isDeleting}
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Villas
         </Button>
       </div>
+
+      {/* Loading overlay during deletion */}
+      {isDeleting && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 text-center max-w-md">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <h3 className="text-lg font-semibold mb-2">Deleting Villa</h3>
+            <p className="text-muted-foreground">
+              Please wait while we delete "{villa.name}" and all associated data...
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Villa Header */}
       <VillaHeaderComponent 
@@ -92,6 +129,7 @@ export default function SpecificVillaPage() {
         onEditClick={() => setIsEditModalOpen(true)}
         showAllBookings={showAllBookings}
         onToggleBookings={() => setShowAllBookings(!showAllBookings)}
+        onDeleteVilla={handleDeleteVilla}
       />
 
       {/* Stats Cards */}

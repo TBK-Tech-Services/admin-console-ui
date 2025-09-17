@@ -1,17 +1,15 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CheckCircle } from "lucide-react";
 
 interface BookingSummaryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSaveAsDraft: () => void;
   formData: {
     isGSTIncluded: boolean;
   };
 }
 
-export default function BookingSummaryModal({ isOpen, onClose, onSaveAsDraft, formData }: BookingSummaryModalProps) {
+export default function BookingSummaryModal({ isOpen, onClose, formData }: BookingSummaryModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
@@ -58,12 +56,6 @@ export default function BookingSummaryModal({ isOpen, onClose, onSaveAsDraft, fo
             Booking has been created with status: <strong>Confirmed</strong>
           </div>
         </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onSaveAsDraft} className="w-full">
-            Save as Draft
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
