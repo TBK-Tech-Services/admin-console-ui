@@ -3,19 +3,7 @@ import BookingsSearchComponent from "./BookingsSearchComponent";
 import BookingsStatusFilterComponent from "./BookingsStatusFilterComponent";
 import BookingsExportComponent from "./BookingsExportComponent";
 
-interface BookingsFiltersComponentProps {
-  searchTerm: string;
-  statusFilter: string;
-  onSearchChange: (value: string) => void;
-  onStatusFilterChange: (value: string) => void;
-}
-
-export default function BookingsFiltersComponent({ 
-  searchTerm, 
-  statusFilter, 
-  onSearchChange, 
-  onStatusFilterChange 
-}: BookingsFiltersComponentProps) {
+export default function BookingsFiltersComponent({ searchTerm, statusFilter, onSearchChange, onStatusFilterChange }) {
   return (
     <Card>
       <CardContent className="pt-6">

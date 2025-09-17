@@ -1,10 +1,6 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-interface BookingAvatarComponentProps {
-  guestName: string;
-}
-
-export default function BookingAvatarComponent({ guestName }: BookingAvatarComponentProps) {
+export default function BookingAvatarComponent({guestName}) {
   return (
     <Avatar className="h-12 w-12">
       <AvatarFallback className="bg-gradient-primary text-primary-foreground">

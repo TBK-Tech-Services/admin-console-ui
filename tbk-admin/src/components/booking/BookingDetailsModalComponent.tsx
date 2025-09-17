@@ -2,26 +2,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Phone, Mail, CreditCard, Clock } from "lucide-react";
 
-interface Booking {
-  id: string;
-  guestName: string;
-  email: string;
-  phone: string;
-  villa: string;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  status: "confirmed" | "pending" | "cancelled" | "checked-in" | "checked-out";
-  amount: string;
-  bookedOn: string;
-}
-
-interface BookingDetailsModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  booking: Booking | null;
-}
-
 const getStatusColor = (status: string) => {
   switch (status) {
     case "confirmed": return "bg-green-100 text-green-800";
@@ -42,7 +22,7 @@ const formatDate = (dateString: string) => {
   });
 };
 
-export default function BookingDetailsModalComponent({ isOpen, onClose, booking }: BookingDetailsModalProps) {
+export default function BookingDetailsModalComponent({ isOpen, onClose, booking }) {
   if (!booking) return null;
 
   return (
@@ -52,7 +32,7 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
           <DialogTitle className="flex items-center justify-between">
             <span>Booking Details - {booking.id}</span>
             <Badge className={getStatusColor(booking.status)}>
-              {booking.status.replace('-', ' ').toUpperCase()}
+              {/* {booking.status.replace('-', ' ').toUpperCase()} */}
             </Badge>
           </DialogTitle>
         </DialogHeader>

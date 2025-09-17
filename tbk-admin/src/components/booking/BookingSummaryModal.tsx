@@ -1,15 +1,7 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CheckCircle } from "lucide-react";
 
-interface BookingSummaryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  formData: {
-    isGSTIncluded: boolean;
-  };
-}
-
-export default function BookingSummaryModal({ isOpen, onClose, formData }: BookingSummaryModalProps) {
+export default function BookingSummaryModal({ isOpen, onClose, formData }) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">

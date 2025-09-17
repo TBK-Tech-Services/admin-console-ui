@@ -4,25 +4,7 @@ import BookingAvatarComponent from './BookingAvatarComponent';
 import BookingHeaderInfoComponent from './BookingHeaderInfoComponent';
 import BookingInfoComponent from './BookingInfoComponent';
 
-interface Booking {
-  id: string;
-  guestName: string;
-  email: string;
-  phone: string;
-  villa: string;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  status: "confirmed" | "pending" | "cancelled" | "checked-in" | "checked-out";
-  amount: string;
-  bookedOn: string;
-}
-
-interface BookingCardComponentProps {
-  booking: Booking;
-}
-
-export default function BookingCardComponent({ booking }: BookingCardComponentProps) {
+export default function BookingCardComponent({booking}) {
   return (
     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-all duration-200 gap-4">
       <div className="flex items-center gap-4 flex-1">

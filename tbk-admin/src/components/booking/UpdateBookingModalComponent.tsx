@@ -9,27 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, MapPin, CreditCard } from "lucide-react";
 
-interface Booking {
-  id: string;
-  guestName: string;
-  email: string;
-  phone: string;
-  villa: string;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  status: "confirmed" | "pending" | "cancelled" | "checked-in" | "checked-out";
-  amount: string;
-  bookedOn: string;
-}
-
-interface UpdateBookingModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  booking: Booking | null;
-}
-
-export default function UpdateBookingModalComponent({ isOpen, onClose, booking }: UpdateBookingModalProps) {
+export default function UpdateBookingModalComponent({ isOpen, onClose, booking }) {
   const [formData, setFormData] = useState({
     guestName: booking?.guestName || "",
     guestEmail: booking?.email || "",
@@ -37,7 +17,7 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     villaId: booking?.villa || "",
     checkIn: booking?.checkIn || "",
     checkOut: booking?.checkOut || "",
-    totalGuests: booking?.guests.toString() || "",
+    totalGuests: booking?.guests || "",
     specialRequest: "",
     isGSTIncluded: false
   });

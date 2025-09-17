@@ -15,24 +15,6 @@ import {
 import BookingDetailsModalComponent from "./BookingDetailsModalComponent";
 import UpdateBookingModalComponent from "./UpdateBookingModalComponent";
 
-interface Booking {
-  id: string;
-  guestName: string;
-  email: string;
-  phone: string;
-  villa: string;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  status: "confirmed" | "pending" | "cancelled" | "checked-in" | "checked-out";
-  amount: string;
-  bookedOn: string;
-}
-
-interface BookingActionsMenuComponentProps {
-  booking: Booking;
-}
-
 // WhatsApp Icon Component
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -44,14 +26,18 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function BookingActionsMenuComponent({ booking }: BookingActionsMenuComponentProps) {
+export default function BookingActionsMenuComponent({ booking }) {
+
+  // State Variables
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
+  // Handler Function to Handle View Booking Details
   const handleViewDetails = () => {
     setShowDetailsModal(true);
   };
 
+  // Handler Function to Handle Update Booking
   const handleEditBooking = () => {
     setShowUpdateModal(true);
   };

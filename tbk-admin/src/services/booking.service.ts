@@ -28,6 +28,25 @@ export const addBookingService = async(formData: Booking_Data) : Promise<void> =
     }
 }
 
+// Service to Search and Filter Bookings Service
+export const searchAndFilterBookingsService = async(searchText: string , status: string) : Promise<[]> => {
+    try {
+        const response = await axios.get(`${API_URL}/bookings/v1/` , {
+            withCredentials : true,
+            params: { searchText , status }
+        });
+        
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Searching and Filtering Bookings...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+
 // Service to Get a Booking Service
 export const getABookingService = async(id: number) : Promise<void> => {
     try {
@@ -39,25 +58,6 @@ export const getABookingService = async(id: number) : Promise<void> => {
     }
     catch (error) {
         console.error("Error Getting a Booking...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
-}
-
-// Service to Search and Filter Bookings Service
-export const searchAndFilterBookingsService = async(searchText: string , status: string) : Promise<void> => {
-    try {
-        const response = await axios.get(`${API_URL}/bookings/v1/` , {
-            withCredentials : true,
-            params: { searchText , status }
-        });
-        
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Searching and Filtering Bookings...");
         throw {
             message: error.response?.data?.message || "Something went wrong",
             status: error.response?.status,
