@@ -1,16 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Calendar, TrendingUp, IndianRupee, Users } from "lucide-react";
 
-interface VillaStatsComponentProps {
-  stats: {
-    totalBookings: number;
-    totalRevenue: string;
-    occupancyRate: string;
-    averageStay: string;
-  };
-}
 
-export default function VillaStatsComponent({ stats }: VillaStatsComponentProps) {
+export default function VillaStatsComponent({ stats }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
       <Card>
