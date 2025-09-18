@@ -8,48 +8,78 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { Users, Calendar, MapPin, CreditCard } from "lucide-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { formatDateForInput } from "@/utils/formatDateForInput";
+import { useMutation } from "@tanstack/react-query";
+import { updateBookingService } from "@/services/booking.service";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { useToast } from "@/hooks/use-toast";
 
 export default function UpdateBookingModalComponent({ isOpen, onClose, booking }) {
+  // useToast
+  const { toast } = useToast();
+
+  // useSelector
+  const villas = useSelector((state: RootState) => state.villas);
+
+  // State Variables
   const [formData, setFormData] = useState({
     guestName: booking?.guestName || "",
-    guestEmail: booking?.email || "",
-    guestPhone: booking?.phone || "",
-    villaId: booking?.villa || "",
-    checkIn: booking?.checkIn || "",
-    checkOut: booking?.checkOut || "",
-    totalGuests: booking?.guests || "",
-    specialRequest: "",
-    isGSTIncluded: false
+    guestEmail: booking?.guestEmail || "",
+    guestPhone: booking?.guestPhone || "",
+    villaId: booking?.villaId.toString() || "",
+    checkIn: formatDateForInput(booking?.checkIn) || "",
+    checkOut: formatDateForInput(booking?.checkOut) || "",
+    totalGuests: booking?.totalGuests || "",
+    specialRequest: booking?.specialRequest || "",
+    isGSTIncluded: booking?.isGSTIncluded || false
   });
 
-  const [isLoading, setIsLoading] = useState(false);
-
+  // Handler Function to Handle Input Change
   const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
+  // useMutate
+  const updateBookingMutation = useMutation({
+    mutationFn: async() => {
+      return await updateBookingService(formData , booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Updated Booking Successfully!"
+      });
       onClose();
-      // You can add success notification here
-    }, 1500);
-  };
+    },
+    onError: (error: unknown) => {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage
+      });
+    }
+  })
 
-  if (!booking) return null;
+  // Handler Function to Handle Form Submission
+  const handleUpdateBooking = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateBookingMutation.mutate();
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Update Booking - {booking.id}</DialogTitle>
+          <DialogTitle>Update Booking ID - {booking.id}</DialogTitle>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleUpdateBooking} className="space-y-6">
           {/* Guest Information & Booking Details in Grid */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Guest Information */}
@@ -110,10 +140,11 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                       <SelectValue placeholder="Choose a villa" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Sunset Villa">Sunset Villa</SelectItem>
-                      <SelectItem value="Ocean View">Ocean View</SelectItem>
-                      <SelectItem value="Palm Paradise">Palm Paradise</SelectItem>
-                      <SelectItem value="Coconut Grove">Coconut Grove</SelectItem>
+                      {
+                        villas.listOfVilla.map((villa) => (
+                          <SelectItem key={villa.id} value={villa.id.toString()}>{villa.name}</SelectItem>
+                        ))
+                      }
                     </SelectContent>
                   </Select>
                 </div>
@@ -209,7 +240,6 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
               type="button" 
               variant="outline" 
               onClick={onClose}
-              disabled={isLoading}
             >
               Cancel
             </Button>
@@ -217,9 +247,8 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
               type="submit"
               size="lg" 
               className="min-w-[150px]"
-              disabled={isLoading}
             >
-              {isLoading ? "Updating..." : "Update Booking"}
+              Update Booking
             </Button>
           </div>
         </form>

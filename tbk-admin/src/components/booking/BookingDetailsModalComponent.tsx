@@ -1,138 +1,144 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Users, Phone, Mail, CreditCard, Clock } from "lucide-react";
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "confirmed": return "bg-green-100 text-green-800";
-    case "pending": return "bg-yellow-100 text-yellow-800";
-    case "cancelled": return "bg-red-100 text-red-800";
-    case "checked-in": return "bg-blue-100 text-blue-800";
-    case "checked-out": return "bg-gray-100 text-gray-800";
-    default: return "bg-gray-100 text-gray-800";
-  }
-};
-
-const formatDate = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
-};
+import { calculateTotalDaysOfStay, formatDate } from "@/utils/modifyDates";
+import { getBookingStatusColor } from "@/utils/getBookingStatusColor";
+import { getPaymentStatusColor } from "@/utils/getPaymentStatusColor";
 
 export default function BookingDetailsModalComponent({ isOpen, onClose, booking }) {
   if (!booking) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            <span>Booking Details - {booking.id}</span>
-            <Badge className={getStatusColor(booking.status)}>
-              {/* {booking.status.replace('-', ' ').toUpperCase()} */}
+            <span>Booking ID - {booking.id}</span>
+            <Badge variant="outline" className={`ml-2 ${getBookingStatusColor(booking.bookingStatus)}`}>
+              {booking.bookingStatus.replace('_', ' ').toUpperCase()}
             </Badge>
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
+        {/* Compact 3-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
           {/* Guest Information */}
-          <div className="bg-muted/50 rounded-lg p-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2 text-base">
-              <Users className="h-5 w-5" />
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+              <Users className="h-4 w-4" />
               Guest Information
             </h3>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Name</p>
-                <p className="font-medium text-base">{booking.guestName}</p>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-muted-foreground">Name</p>
+                <p className="font-medium text-sm">{booking.guestName}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Number of Guests</p>
-                <p className="font-medium text-base">{booking.guests} guests</p>
+              <div>
+                <p className="text-xs text-muted-foreground">Guests</p>
+                <p className="font-medium text-sm">{booking.totalGuests} guests</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Mail className="h-3 w-3" />
                   Email
                 </p>
-                <p className="font-medium text-base">{booking.email}</p>
+                <p className="font-medium text-sm break-all">{booking.guestEmail}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Phone className="h-3 w-3" />
                   Phone
                 </p>
-                <p className="font-medium text-base">{booking.phone}</p>
+                <p className="font-medium text-sm">{booking.guestPhone}</p>
               </div>
             </div>
           </div>
 
           {/* Booking Information */}
-          <div className="bg-muted/50 rounded-lg p-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2 text-base">
-              <MapPin className="h-5 w-5" />
-              Booking Information
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+              <MapPin className="h-4 w-4" />
+              Booking Details
             </h3>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Villa</p>
-                <p className="font-medium text-base">{booking.villa}</p>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-muted-foreground">Villa</p>
+                <p className="font-medium text-sm">{booking.villa.name}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Booking ID</p>
-                <p className="font-medium text-base">{booking.id}</p>
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   Check-in
                 </p>
-                <p className="font-medium text-base">{formatDate(booking.checkIn)}</p>
+                <p className="font-medium text-sm">{formatDate(booking.checkIn)}</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   Check-out
                 </p>
-                <p className="font-medium text-base">{formatDate(booking.checkOut)}</p>
+                <p className="font-medium text-sm">{formatDate(booking.checkOut)}</p>
+              </div>
+              <div className="bg-orange-50 border border-orange-200 rounded px-2 py-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-orange-800">Duration</span>
+                  <span className="font-bold text-xs text-orange-900">
+                    {calculateTotalDaysOfStay(booking.checkIn, booking.checkOut)} nights
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Payment Information */}
-          <div className="bg-muted/50 rounded-lg p-6">
-            <h3 className="font-semibold mb-4 flex items-center gap-2 text-base">
-              <CreditCard className="h-5 w-5" />
-              Payment Information
+          <div className="bg-muted/50 rounded-lg p-4">
+            <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm">
+              <CreditCard className="h-4 w-4" />
+              Payment Details
             </h3>
-            <div className="grid grid-cols-2 gap-6">
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground">Total Amount</p>
-                <p className="font-bold text-xl text-primary">{booking.amount}</p>
+            <div className="space-y-2">
+              <div>
+                <p className="text-xs text-muted-foreground">Total Amount</p>
+                <p className="font-bold text-lg text-primary">{booking.totalPayableAmount} Rs</p>
               </div>
-              <div className="space-y-1">
-                <p className="text-sm text-muted-foreground flex items-center gap-1">
+              <div>
+                <p className="text-xs text-muted-foreground">Payment Status</p>
+                <Badge variant="outline" className={`text-xs ${getPaymentStatusColor(booking.paymentStatus)}`}>
+                  {booking.paymentStatus.replace('_', ' ').toUpperCase()}
+                </Badge>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">GST Included</p>
+                <p className="font-medium text-sm">
+                  {booking.isGSTIncluded ? 'Yes' : 'No'}
+                  {booking.isGSTIncluded && booking.totalTax && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      (₹{booking.totalTax})
+                    </span>
+                  )}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
                   <Clock className="h-3 w-3" />
                   Booked On
                 </p>
-                <p className="font-medium text-base">{formatDate(booking.bookedOn)}</p>
+                <p className="font-medium text-sm">{formatDate(booking.updatedAt)}</p>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Stay Duration */}
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-orange-800">Stay Duration</span>
-              <span className="font-bold text-lg text-orange-900">
-                {Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24))} nights
-              </span>
+        {/* Special Requests (if any) - Full width at bottom */}
+        {booking.specialRequest && booking.specialRequest.trim() && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+            <div className="space-y-1">
+              <span className="text-xs font-medium text-blue-800">Special Requests</span>
+              <p className="text-sm text-blue-700">{booking.specialRequest}</p>
             </div>
           </div>
-        </div>
+        )}
       </DialogContent>
     </Dialog>
   );

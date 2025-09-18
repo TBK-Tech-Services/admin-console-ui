@@ -30,8 +30,9 @@ export const addBookingService = async(formData: Booking_Data) : Promise<void> =
 
 // Service to Search and Filter Bookings Service
 export const searchAndFilterBookingsService = async(searchText: string , status: string) : Promise<[]> => {
+    console.log("Service called with:", { searchText, status });
     try {
-        const response = await axios.get(`${API_URL}/bookings/v1/` , {
+        const response = await axios.get(`${API_URL}/bookings/v1/search` , {
             withCredentials : true,
             params: { searchText , status }
         });
@@ -68,7 +69,13 @@ export const getABookingService = async(id: number) : Promise<void> => {
 // Service to Update a Booking
 export const updateBookingService = async(formData: Booking_Data , id: number): Promise<void> => {
     try {
-        const response = await axios.put(`${API_URL}/bookings/v1/${id}`, formData , {
+        const transformedData = {
+            ...formData,
+            villaId: Number(formData.villaId),
+            totalGuests: Number(formData.totalGuests),
+        };
+
+        const response = await axios.put(`${API_URL}/bookings/v1/${id}`, transformedData , {
             withCredentials : true,
         });
 

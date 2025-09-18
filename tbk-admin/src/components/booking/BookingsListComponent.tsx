@@ -20,9 +20,13 @@ export default function BookingsListComponent() {
               <BookingCardComponent key={booking.id} booking={booking} />
             ))
           }
-          {bookings.listOfBookings.length === 0 && (
-            <BookingsEmptyStateComponent />
-          )}
+          {
+            (bookings.listOfBookings.length === 0) 
+            && 
+            (
+              <BookingsEmptyStateComponent />
+            )
+          }
         </div>
       </CardContent>
     </Card>

@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/alert-dialog";
 import BookingDetailsModalComponent from "./BookingDetailsModalComponent";
 import UpdateBookingModalComponent from "./UpdateBookingModalComponent";
+import { useMutation } from "@tanstack/react-query";
+import { deleteBookingService, getABookingService } from "@/services/booking.service";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 
 // WhatsApp Icon Component
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -28,24 +33,74 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 
 export default function BookingActionsMenuComponent({ booking }) {
 
+  // useToast
+  const { toast } = useToast();
+
   // State Variables
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
+  // useMutate
+  const getBookingMutation = useMutation({
+    mutationFn: async() => {
+      return await getABookingService(booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Deleted Booking Successfully!"
+      });
+    },
+    onError: (error: unknown) => {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage
+      });
+    }
+  })
+
   // Handler Function to Handle View Booking Details
   const handleViewDetails = () => {
     setShowDetailsModal(true);
+    getBookingMutation.mutate();
   };
 
   // Handler Function to Handle Update Booking
   const handleEditBooking = () => {
     setShowUpdateModal(true);
   };
+  
+  
+  // useMutate
+  const deleteMutation = useMutation({
+    mutationFn: async() => {
+      return await deleteBookingService(booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Deleted Booking Successfully!"
+      });
+    },
+    onError: (error: unknown) => {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage
+      });
+    },
+  })
+
+  // Handler Function to Handle Delete Booking
+  const handleDeleteBooking = () => {
+    deleteMutation.mutate();
+  };
 
   return (
     <>
       <div className="flex gap-2">
-        <Button variant="ghost" size="sm" title="View Details" onClick={handleViewDetails}>
+        <Button onClick={handleViewDetails} variant="ghost" size="sm" title="View Details">
           <Eye className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="sm" title="Edit Booking" onClick={handleEditBooking}>
@@ -70,7 +125,7 @@ export default function BookingActionsMenuComponent({ booking }) {
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              <AlertDialogAction onClick={handleDeleteBooking} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

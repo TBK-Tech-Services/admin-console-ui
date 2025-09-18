@@ -1,37 +1,35 @@
-import { Calendar, Phone } from "lucide-react";
+import { formatDateRange } from "@/utils/modifyDates";
+import { Calendar, Phone, MapPin, Users } from "lucide-react";
 
-interface BookingInfoComponentProps {
-  villa: string;
-  guests: number;
-  id: string;
-  checkIn: string;
-  checkOut: string;
-  phone: string;
-}
-
-export default function BookingInfoComponent({ 
-  villa, 
-  guests, 
-  id, 
-  checkIn, 
-  checkOut, 
-  phone 
-}: BookingInfoComponentProps) {
+export default function BookingInfoComponent({ villa, guests, id, checkIn, checkOut, phone }) {
   return (
-    <>
-      <div className="text-sm text-muted-foreground">
-        {villa} • {guests} guests • {id}
+    <div className="space-y-2">
+      {/* Villa and Guest Info */}
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <MapPin className="h-3 w-3" />
+          <span className="font-medium">{villa}</span>
+        </div>
+        <div className="flex items-center gap-1">
+          <Users className="h-3 w-3" />
+          <span>{guests} guests</span>
+        </div>
+        <div className="text-xs bg-muted px-2 py-1 rounded">
+          ID: {id}
+        </div>
       </div>
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2 text-sm text-muted-foreground">
+      
+      {/* Date and Phone */}
+      <div className="flex items-center gap-4 text-sm text-muted-foreground">
         <div className="flex items-center gap-1">
           <Calendar className="h-3 w-3" />
-          {checkIn} - {checkOut}
+          <span>{formatDateRange(checkIn, checkOut)}</span>
         </div>
         <div className="flex items-center gap-1">
           <Phone className="h-3 w-3" />
-          {phone}
+          <span>{phone}</span>
         </div>
       </div>
-    </>
+    </div>
   );
 }

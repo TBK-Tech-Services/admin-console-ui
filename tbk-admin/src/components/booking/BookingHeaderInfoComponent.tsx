@@ -1,35 +1,14 @@
 import { Badge } from "@/components/ui/badge";
+import { getBookingStatusColor } from "@/utils/getBookingStatusColor";
 
-interface BookingHeaderInfoComponentProps {
-  guestName: string;
-  status: string;
-}
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "confirmed":
-      return "bg-success text-success-foreground";
-    case "pending":
-      return "bg-warning text-warning-foreground";
-    case "cancelled":
-      return "bg-destructive text-destructive-foreground";
-    case "checked-in":
-      return "bg-accent text-accent-foreground";
-    case "checked-out":
-      return "bg-secondary text-secondary-foreground";
-    default:
-      return "bg-secondary text-secondary-foreground";
-  }
-};
-
-export default function BookingHeaderInfoComponent({ guestName, status }: BookingHeaderInfoComponentProps) {
+export default function BookingHeaderInfoComponent({ guestName, status }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-      <div className="font-semibold text-foreground">
+    <div className="flex items-center justify-between">
+      <h3 className="font-semibold text-lg text-foreground truncate">
         {guestName}
-      </div>
-      <Badge className={getStatusColor(status)}>
-        {status}
+      </h3>
+      <Badge variant="outline" className={`ml-2 ${getBookingStatusColor(status)}`}>
+        {status.replace('_', ' ').toUpperCase()}
       </Badge>
     </div>
   );
