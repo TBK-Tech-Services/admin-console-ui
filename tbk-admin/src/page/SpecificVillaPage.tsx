@@ -58,9 +58,6 @@ export default function SpecificVillaPage() {
     averageStay: "0 days"
   };
 
-  // Mock bookings data since it's not in your API response
-  const mockBookings = [];
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -100,7 +97,7 @@ export default function SpecificVillaPage() {
       />
 
       {/* Stats Cards - You'll need to fetch this data separately or disable this section */}
-      {/* <VillaStatsComponent stats={mockStats} /> */}
+      <VillaStatsComponent stats={mockStats} />
 
       {/* All Bookings View - You'll need to fetch bookings for this villa */}
       {/* {showAllBookings && (
@@ -111,14 +108,14 @@ export default function SpecificVillaPage() {
       )} */}
 
       {/* Detailed Information */}
-      {/* <VillaTabsComponent villa={villa} /> */}
+      <VillaTabsComponent villa={villa} />
 
       {/* Edit Modal */}
-      {/* <EditVillaModalComponent
+      <EditVillaModalComponent
         villa={villa}
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-      /> */}
+      />
     </div>
   );
 }

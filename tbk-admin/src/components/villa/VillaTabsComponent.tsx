@@ -4,11 +4,8 @@ import VillaBookingsTabComponent from "./VillaBookingsTabComponent";
 import VillaRevenueTabComponent from "./VillaRevenueTabComponent";
 import VillaSettingsTabComponent from "./VillaSettingsTabComponent";
 
-interface VillaTabsComponentProps {
-  villa: any;
-}
-
-export default function VillaTabsComponent({ villa }: VillaTabsComponentProps) {
+export default function VillaTabsComponent({ villa }) {
+  
   return (
     <Tabs defaultValue="overview" className="w-full">
       <TabsList className="grid w-full grid-cols-4">
@@ -22,7 +19,7 @@ export default function VillaTabsComponent({ villa }: VillaTabsComponentProps) {
         <VillaOverviewTabComponent villa={villa} />
       </TabsContent>
 
-      <TabsContent value="bookings">
+      {/* <TabsContent value="bookings">
         <VillaBookingsTabComponent villa={villa} />
       </TabsContent>
 
@@ -32,7 +29,7 @@ export default function VillaTabsComponent({ villa }: VillaTabsComponentProps) {
 
       <TabsContent value="settings">
         <VillaSettingsTabComponent />
-      </TabsContent>
+      </TabsContent> */}
     </Tabs>
   );
 }

@@ -1,11 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-interface VillaOverviewTabComponentProps {
-  villa: any;
-}
-
-export default function VillaOverviewTabComponent({ villa }: VillaOverviewTabComponentProps) {
+export default function VillaOverviewTabComponent({ villa }) {
   return (
     <div className="space-y-4">
       <Card>
@@ -25,9 +21,9 @@ export default function VillaOverviewTabComponent({ villa }: VillaOverviewTabCom
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {villa.amenities.map((amenity: string) => (
-              <Badge key={amenity} variant="secondary">
-                {amenity}
+            {villa.amenities.map((amenityObj) => (
+              <Badge key={amenityObj.amenityId} variant="secondary">
+                {amenityObj.amenity.name}
               </Badge>
             ))}
           </div>
@@ -40,10 +36,10 @@ export default function VillaOverviewTabComponent({ villa }: VillaOverviewTabCom
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {villa.images.map((image: string, index: number) => (
+            {villa.images.map((imageObj, index) => (
               <img 
-                key={index}
-                src={image} 
+                key={imageObj.id}
+                src={imageObj.link} 
                 alt={`${villa.name} ${index + 1}`}
                 className="w-full h-40 object-cover rounded-lg"
               />
