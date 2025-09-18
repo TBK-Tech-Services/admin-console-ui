@@ -9,10 +9,21 @@ import VillaTabsComponent from "@/components/villa/VillaTabsComponent";
 import EditVillaModalComponent from "@/components/villa/EditVillaModalComponent";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useMutation } from "@tanstack/react-query";
+import { deleteAVillaService } from "@/services/villa.service";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { useToast } from "@/hooks/use-toast";
 
 export default function SpecificVillaPage() {
+
+  // useToast
+  const { toast } = useToast();
+
   // useParams
   const { id } = useParams();
+  console.log(id);
+  console.log(typeof id);
   
   // useSelector
   const villas = useSelector((state: RootState) => state.villas);
@@ -28,23 +39,32 @@ export default function SpecificVillaPage() {
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  if (!villa) {
-    return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold mb-2">Villa not found</h2>
-        <p className="text-muted-foreground mb-4">The requested villa does not exist or may have been deleted.</p>
-        <Button onClick={() => navigate("/villas")} variant="outline">
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Villas
-        </Button>
-      </div>
-    );
-  }
+  // useMutate
+  const deleteVillaMutation = useMutation({
+    mutationFn: async() => {
+      return await deleteAVillaService(id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Villa Deleted Successfully!"
+      });
+    },
+    onError: (error: unknown) => {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage
+      });
+    },
+  })
 
+  // Handler Function to Handle Delete Villa
   const handleDeleteVilla = async () => {
     setIsDeleting(true);
-    // Add your delete API call here
-    // For now, just simulate the process
+
+    deleteVillaMutation.mutate();
+    
     setTimeout(() => {
       navigate("/villas");
     }, 2000);
@@ -57,6 +77,19 @@ export default function SpecificVillaPage() {
     occupancyRate: "0%",
     averageStay: "0 days"
   };
+
+  if (!villa) {
+    return (
+      <div className="text-center py-12">
+        <h2 className="text-xl font-semibold mb-2">Villa not found</h2>
+        <p className="text-muted-foreground mb-4">The requested villa does not exist or may have been deleted.</p>
+        <Button onClick={() => navigate("/villas")} variant="outline">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Villas
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -93,3 +93,21 @@ export const updateAVillaService = async(formData: Villa_Data , id: number) : Pr
         };
     }
 }
+
+// Service to Update A Villa
+export const deleteAVillaService = async(id: string) : Promise<void> => {
+    try {
+        const response = await axios.delete(`${API_URL}/villas/v1/${id}` , {
+            withCredentials : true
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Deleting A Villa...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
