@@ -1,23 +1,42 @@
 import { Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddVillaFormComponent from "@/components/villa/AddVillaFormComponent";
 import VillaCardComponent from "@/components/villa/VillaCardComponent";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
+import { useQuery } from "@tanstack/react-query";
+import { getAllAmenityCategoriesService } from "@/services/villa.service";
+import { setAmenities } from "@/store/slices/amenitiesSlice";
 
 export default function VillasPage() {
   
   // useSelector
-  const villas = useSelector((state: RootState) => state.villas);
+  const villas = useSelector((state: RootState) => state.villas.listOfVilla);
+
+  // useDispatch 
+  const dispatch = useDispatch();
   
   // useNavigate
   const navigate = useNavigate();
 
   // State Variables
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // useQuery
+  const { data } = useQuery({
+    queryKey: ['amenities'],
+    queryFn: getAllAmenityCategoriesService,
+  });
+
+  // useEffect
+  useEffect(() => {
+    if(data){
+      dispatch(setAmenities(data));
+    }
+  }, [data , dispatch]);
 
   return (
     <div className="space-y-6">
@@ -27,7 +46,7 @@ export default function VillasPage() {
             Villa Management
           </h1>
           <p className="text-muted-foreground mt-2">
-            Manage your villa properties and track their performance ({villas.listOfVilla?.length || 0} villas)
+            Manage your villa properties and track their performance ({villas?.length || 0} villas)
           </p>
         </div>
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
@@ -47,7 +66,7 @@ export default function VillasPage() {
       </div>
 
       {
-        (villas.listOfVilla?.length === 0 )
+        (villas?.length === 0 )
         ? 
         (
           <div className="text-center py-12 text-muted-foreground">
@@ -58,7 +77,7 @@ export default function VillasPage() {
         (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {
-              villas.listOfVilla?.map((villa) => (
+              villas?.map((villa) => (
                 <VillaCardComponent 
                   key={villa.id} 
                   villa={villa}

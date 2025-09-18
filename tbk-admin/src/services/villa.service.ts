@@ -40,6 +40,24 @@ export const getAllVillasService = async() : Promise<[]> => {
     }
 }
 
+// Service to Get All Villas
+export const getAllAmenityCategoriesService = async() : Promise<[]> => {
+    try {
+        const response = await axios.get(`${API_URL}/villas/v1/amenities/categories` , {
+            withCredentials : true
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Getting All Amenities Category...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+
 // Service to Get Al Villas
 export const getAVillaService = async(id: number) : Promise<void> => {
     try {
