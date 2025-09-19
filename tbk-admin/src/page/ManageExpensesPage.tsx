@@ -13,8 +13,11 @@ import { RootState } from "@/store/store";
 import { Expense } from "@/types/expense/expenseData";
 
 export default function ManageExpensesPage() {
-  // useDispatch and useSelector
+  
+  // useDispatch 
   const dispatch = useDispatch();
+
+  // useSelector
   const expenses = useSelector((store: RootState) => store.expenses.listOfExpenses);
 
   // Modal State Variables
@@ -28,7 +31,7 @@ export default function ManageExpensesPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // useQuery for fetching expenses
-  const { data, isLoading, error } = useQuery({
+  const { data } = useQuery({
     queryKey: ['expenses'],
     queryFn: async () => getAllExpensesService()
   });
@@ -107,27 +110,6 @@ export default function ManageExpensesPage() {
     setIsDeleteModalOpen(false);
     setSelectedDeleteExpense(null);
   };
-
-  // Loading and error states
-  if (isLoading) {
-    return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading expenses...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex justify-center items-center h-64">
-          <div className="text-lg text-red-600">Error loading expenses</div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
