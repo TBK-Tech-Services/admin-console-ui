@@ -3,54 +3,55 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eye, Edit, Trash2 } from "lucide-react";
 
-interface Expense {
-  id: string;
-  title: string;
-  amount: number;
-  date: string;
-  category: string;
-  type: "individual" | "split";
-  villas?: string[];
-}
+export default function ExpenseRowComponent({ expense, onView, onEdit, onDelete }) {
+  
+  // Convert amount from paise to rupees for display
+  const displayAmount = expense.amount / 100;
+  
+  // Prepare villa names for display
+  const getVillaNames = () => {
+    if (expense.type === "INDIVIDUAL" && expense.villa) {
+      return [expense.villa.name];
+    } 
+    else if (expense.type === "SPLIT" && expense.villas) {
+      return expense.villas.map(v => v.villa.name);
+    }
+    return [];
+  };
 
-interface ExpenseRowComponentProps {
-  expense: Expense;
-  onView?: (expense: Expense) => void;
-  onEdit?: (expense: Expense) => void;
-  onDelete?: (expense: Expense) => void;
-}
+  const villaNames = getVillaNames();
 
-export default function ExpenseRowComponent({ 
-  expense, 
-  onView, 
-  onEdit, 
-  onDelete 
-}: ExpenseRowComponentProps) {
   return (
     <TableRow>
       <TableCell className="font-medium">{expense.title}</TableCell>
       <TableCell className="font-semibold text-foreground">
-        ₹{expense.amount.toLocaleString()}
-      </TableCell>
-      <TableCell>{new Date(expense.date).toLocaleDateString()}</TableCell>
-      <TableCell>
-        <Badge variant="secondary">{expense.category}</Badge>
+        ₹{displayAmount.toLocaleString()}
       </TableCell>
       <TableCell>
-        <Badge variant={expense.type === "individual" ? "default" : "outline"}>
-          {expense.type}
+        {new Date(expense.date).toLocaleDateString('en-IN', {
+          day: '2-digit',
+          month: '2-digit', 
+          year: 'numeric'
+        })}
+      </TableCell>
+      <TableCell>
+        <Badge variant="secondary">{expense.category.name}</Badge>
+      </TableCell>
+      <TableCell>
+        <Badge variant={expense.type === "INDIVIDUAL" ? "default" : "outline"}>
+          {expense.type.toLowerCase()}
         </Badge>
       </TableCell>
       <TableCell>
         <div className="flex gap-1 flex-wrap">
-          {expense.villas?.slice(0, 2).map((villa) => (
-            <Badge key={villa} variant="outline" className="text-xs">
-              {villa}
+          {villaNames.slice(0, 2).map((villaName, index) => (
+            <Badge key={index} variant="outline" className="text-xs">
+              {villaName}
             </Badge>
           ))}
-          {expense.villas && expense.villas.length > 2 && (
+          {villaNames.length > 2 && (
             <Badge variant="outline" className="text-xs">
-              +{expense.villas.length - 2}
+              +{villaNames.length - 2}
             </Badge>
           )}
         </div>

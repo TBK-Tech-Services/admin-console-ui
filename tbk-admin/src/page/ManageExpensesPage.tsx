@@ -4,70 +4,46 @@ import ViewExpenseModalComponent from "@/components/expense/ViewExpenseModalComp
 import DeleteExpenseModalComponent from "@/components/expense/DeleteExpenseModalComponent";
 import ExpensesPageHeaderComponent from "@/components/expense/ExpensesPageHeaderComponent";
 import ExpensesTableComponent from "@/components/expense/ExpensesTableComponent";
-import { useState } from "react";
-
-interface Expense {
-  id: string;
-  title: string;
-  amount: number;
-  date: string;
-  category: string;
-  type: "individual" | "split";
-  villas?: string[];
-}
-
-const mockExpenses: Expense[] = [
-  {
-    id: "1",
-    title: "Property Maintenance",
-    amount: 25000,
-    date: "2024-01-15",
-    category: "Maintenance",
-    type: "split",
-    villas: ["Villa 1", "Villa 2", "Villa 3"]
-  },
-  {
-    id: "2",
-    title: "Villa 1 Cleaning",
-    amount: 2500,
-    date: "2024-01-14",
-    category: "Cleaning",
-    type: "individual",
-    villas: ["Villa 1"]
-  },
-  {
-    id: "3",
-    title: "Marketing Campaign",
-    amount: 15000,
-    date: "2024-01-12",
-    category: "Marketing",
-    type: "split",
-    villas: ["Villa 1", "Villa 2", "Villa 3", "Villa 4"]
-  }
-];
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getAllExpensesService } from "@/services/expense.service";
+import { useDispatch, useSelector } from "react-redux";
+import { setExpensesList } from "@/store/slices/expensesSlice";
+import { RootState } from "@/store/store";
+import { Expense } from "@/types/expense/expenseData";
 
 export default function ManageExpensesPage() {
-  const [expenses, setExpenses] = useState<Expense[]>(mockExpenses);
-  
-  // Add Modal State
+  // useDispatch and useSelector
+  const dispatch = useDispatch();
+  const expenses = useSelector((store: RootState) => store.expenses.listOfExpenses);
+
+  // Modal State Variables
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  
-  // View Modal State
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedViewExpense, setSelectedViewExpense] = useState<Expense | null>(null);
-  
-  // Edit Modal State
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedEditExpense, setSelectedEditExpense] = useState<Expense | null>(null);
-  
-  // Delete Modal State
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedDeleteExpense, setSelectedDeleteExpense] = useState<Expense | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // useQuery for fetching expenses
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['expenses'],
+    queryFn: async () => getAllExpensesService()
+  });
+
+  // useEffect to update Redux store
+  useEffect(() => {
+    if (data) {
+      dispatch(setExpensesList(data));
+    }
+  }, [data, dispatch]);
+
   // Handlers
   const handleAddExpense = (newExpense: Expense) => {
-    setExpenses([newExpense, ...expenses]);
+    // Add to Redux store instead of local state
+    dispatch(setExpensesList([newExpense, ...expenses]));
     setIsAddModalOpen(false);
   };
 
@@ -82,9 +58,11 @@ export default function ManageExpensesPage() {
   };
 
   const handleUpdateExpense = (updatedExpense: Expense) => {
-    setExpenses(prev => prev.map(exp => 
+    // Update in Redux store
+    const updatedExpenses = expenses.map(exp => 
       exp.id === updatedExpense.id ? updatedExpense : exp
-    ));
+    );
+    dispatch(setExpensesList(updatedExpenses));
     setIsEditModalOpen(false);
     setSelectedEditExpense(null);
   };
@@ -97,13 +75,22 @@ export default function ManageExpensesPage() {
   const handleDeleteConfirm = async (expense: Expense) => {
     setIsDeleting(true);
     
-    // Simulate API call delay
-    setTimeout(() => {
-      setExpenses(prev => prev.filter(exp => exp.id !== expense.id));
+    try {
+      // TODO: Replace with actual API call
+      // await deleteExpenseService(expense.id);
+      
+      // Simulate API call for now
+      setTimeout(() => {
+        const filteredExpenses = expenses.filter(exp => exp.id !== expense.id);
+        dispatch(setExpensesList(filteredExpenses));
+        setIsDeleting(false);
+        setIsDeleteModalOpen(false);
+        setSelectedDeleteExpense(null);
+      }, 1000);
+    } catch (error) {
+      console.error('Error deleting expense:', error);
       setIsDeleting(false);
-      setIsDeleteModalOpen(false);
-      setSelectedDeleteExpense(null);
-    }, 1000);
+    }
   };
 
   const handleCloseViewModal = () => {
@@ -121,12 +108,32 @@ export default function ManageExpensesPage() {
     setSelectedDeleteExpense(null);
   };
 
+  // Loading and error states
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading expenses...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg text-red-600">Error loading expenses</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <ExpensesPageHeaderComponent onModalOpen={() => setIsAddModalOpen(true)} />
       
       <ExpensesTableComponent 
-        expenses={expenses}
         onViewExpense={handleViewExpense}
         onEditExpense={handleEditExpense}
         onDeleteExpense={handleDeleteExpense}
