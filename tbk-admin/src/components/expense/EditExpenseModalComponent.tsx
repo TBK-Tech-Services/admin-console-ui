@@ -5,35 +5,17 @@ import { Edit } from "lucide-react";
 import ExpenseVillaSelectionComponent from "./ExpenseVillaSelectionComponent";
 import ExpenseTypeSelectionComponent from "./ExpenseTypeSelectionComponent";
 import ExpenseBasicInfoComponent from "./ExpenseBasicInfoComponent";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
-interface Expense {
-  id: string;
-  title: string;
-  amount: number;
-  date: string;
-  category: string;
-  type: "individual" | "split";
-  villas?: string[];
-}
-
-interface EditExpenseModalComponentProps {
-  isOpen: boolean;
-  onClose: () => void;
-  expense: Expense | null;
-  onUpdateExpense?: (updatedExpense: Expense) => void;
-}
-
-const villas = ["Villa 1", "Villa 2", "Villa 3", "Villa 4"];
-
-export default function EditExpenseModalComponent({ 
-  isOpen, 
-  onClose, 
-  expense,
-  onUpdateExpense 
-}: EditExpenseModalComponentProps) {
+export default function EditExpenseModalComponent({ isOpen, onClose, expense, onUpdateExpense, isLoading = false }) {
+  
+  // useSelector
+  const villas = useSelector((store: RootState) => store.villas.listOfVilla);
+  
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");
   const [villaSelection, setVillaSelection] = useState<"all" | "specific">("all");
-  const [selectedVillas, setSelectedVillas] = useState<string[]>([]);
+  const [selectedVillas, setSelectedVillas] = useState<number[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [formData, setFormData] = useState({
     title: "",
@@ -46,55 +28,78 @@ export default function EditExpenseModalComponent({
   // Populate form when expense changes
   useEffect(() => {
     if (expense) {
+      // Convert amount from paise to rupees for form display
+      const displayAmount = expense.amount / 100;
+
+      // Format date for HTML input (YYYY-MM-DD)
+      const formattedDate = new Date(expense.date).toISOString().split('T')[0];
+
+      
       setFormData({
         title: expense.title,
-        amount: expense.amount.toString(),
-        date: expense.date,
-        category: expense.category,
-        villa: expense.type === "individual" && expense.villas?.[0] ? expense.villas[0] : "",
+        amount: displayAmount.toString(),
+        date: formattedDate,
+        category: expense.category.id.toString(),
+        villa: expense.type === "INDIVIDUAL" && expense.villa 
+          ? expense.villa.id.toString() 
+          : "",
       });
-      setExpenseType(expense.type);
       
-      if (expense.type === "split" && expense.villas) {
-        if (expense.villas.length === villas.length) {
+      // Set expense type (convert to lowercase for component)
+      setExpenseType(expense.type.toLowerCase() as "individual" | "split");
+      
+      // Handle villa selection for split expenses
+      if (expense.type === "SPLIT" && expense.villas) {
+        const villaIds = expense.villas.map(v => v.villa.id);
+        
+        // Check if all villas are selected
+        if (villaIds.length === villas.length) {
           setVillaSelection("all");
         } else {
           setVillaSelection("specific");
-          setSelectedVillas(expense.villas);
+          setSelectedVillas(villaIds);
         }
       }
     }
-  }, [expense]);
+  }, [expense, villas.length]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!expense) return;
 
-    const categoryToUse = formData.category === 'new-category-input' 
-      ? newCategoryName 
-      : formData.category;
-
-    const updatedExpense: Expense = {
-      ...expense,
+    // Prepare backend data format
+    const backendData = {
+      expenseType: expenseType.toUpperCase(),
       title: formData.title,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: categoryToUse,
-      type: expenseType,
-      villas: expenseType === "individual" 
-        ? [formData.villa]
-        : villaSelection === "all" 
-          ? villas 
-          : selectedVillas,
+      category: formData.category === 'new-category-input' 
+        ? newCategoryName 
+        : parseInt(formData.category),
     };
+
+    // Add villa data based on expense type
+    if (expenseType === "individual") {
+      backendData.villaId = parseInt(formData.villa);
+    } 
+    else {
+      // Split expense
+      if (villaSelection === "all") {
+        backendData.villaIds = villas.map(v => v.id);
+      } else {
+        backendData.villaIds = selectedVillas;
+      }
+    }
     
-    onUpdateExpense?.(updatedExpense);
+    onUpdateExpense?.(backendData, expense.id);
     handleClose();
   };
 
   const handleClose = () => {
-    resetForm();
-    onClose();
+    if (!isLoading) {
+      resetForm();
+      onClose();
+    }
   };
 
   const resetForm = () => {
@@ -105,11 +110,11 @@ export default function EditExpenseModalComponent({
     setSelectedVillas([]);
   };
 
-  const handleVillaToggle = (villa: string) => {
+  const handleVillaToggle = (villaId: number) => {
     setSelectedVillas(prev => 
-      prev.includes(villa) 
-        ? prev.filter(v => v !== villa)
-        : [...prev, villa]
+      prev.includes(villaId) 
+        ? prev.filter(id => id !== villaId)
+        : [...prev, villaId]
     );
   };
 
@@ -143,6 +148,7 @@ export default function EditExpenseModalComponent({
             villaSelection={villaSelection}
             selectedVillas={selectedVillas}
             formData={formData}
+            villas={villas}
             onVillaSelectionChange={setVillaSelection}
             onVillaToggle={handleVillaToggle}
             onFormDataChange={setFormData}
@@ -153,11 +159,16 @@ export default function EditExpenseModalComponent({
               type="button" 
               variant="outline" 
               onClick={handleClose}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" className="bg-gradient-primary hover:opacity-90">
-              Update Expense
+            <Button 
+              type="submit" 
+              className="bg-gradient-primary hover:opacity-90"
+              disabled={isLoading}
+            >
+              {isLoading ? "Updating..." : "Update Expense"}
             </Button>
           </div>
         </form>

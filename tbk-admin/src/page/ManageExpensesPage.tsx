@@ -6,7 +6,7 @@ import ExpensesPageHeaderComponent from "@/components/expense/ExpensesPageHeader
 import ExpensesTableComponent from "@/components/expense/ExpensesTableComponent";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { addExpenseService, deleteAExpenseService, getAllExpensesService } from "@/services/expense.service";
+import { addExpenseService, deleteAExpenseService, getAllExpensesService, getAllExpenseCategoriesService, updateExpenseService } from "@/services/expense.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setExpensesList } from "@/store/slices/expensesSlice";
 import { RootState } from "@/store/store";
@@ -37,26 +37,56 @@ export default function ManageExpensesPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // useQuery for fetching expenses
-  const { data, isLoading, refetch } = useQuery({
+  const { data: expensesData, isLoading: expensesLoading, refetch: refetchExpenses } = useQuery({
     queryKey: ['expenses'],
     queryFn: async () => getAllExpensesService()
   });
 
+  // useQuery for fetching expense categories (preload)
+  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+    queryKey: ['expense-categories'],
+    queryFn: async () => getAllExpenseCategoriesService(),
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
   // useEffect to update Redux store
   useEffect(() => {
-    if (data) {
-      dispatch(setExpensesList(data));
+    if (expensesData) {
+      dispatch(setExpensesList(expensesData));
     }
-  }, [data, dispatch]);
+  }, [expensesData, dispatch]);
 
   // Add Expense Mutation
   const addExpenseMutation = useMutation({
     mutationFn: (formData: any) => addExpenseService(formData),
-    onSuccess: (response) => {
-      refetch();
+    onSuccess: () => {
+      refetchExpenses();
       setIsAddModalOpen(false);
       toast({
         title: "Added Expense Successfully!"
+      });
+    },
+    onError: (error) => {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Update Expense Mutation
+  const updateExpenseMutation = useMutation({
+    mutationFn: ({ formData, expenseId }: { formData: any; expenseId: string }) => 
+      updateExpenseService({ formData, expenseId }),
+    onSuccess: () => {
+      refetchExpenses();
+      setIsEditModalOpen(false);
+      setSelectedEditExpense(null);
+      toast({
+        title: "Updated Expense Successfully!"
       });
     },
     onError: (error) => {
@@ -74,7 +104,7 @@ export default function ManageExpensesPage() {
   const deleteExpenseMutation = useMutation({
     mutationFn: (expenseId: string) => deleteAExpenseService(expenseId),
     onSuccess: () => {
-      refetch();
+      refetchExpenses();
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
       setSelectedDeleteExpense(null);
@@ -96,8 +126,12 @@ export default function ManageExpensesPage() {
 
   // Add Expense Handler
   const handleAddExpense = (formData: any) => {
-    // Pass form data to mutation - no Redux update here
     addExpenseMutation.mutate(formData);
+  };
+
+  // Update Expense Handler
+  const handleUpdateExpense = (formData: any, expenseId: string) => {
+    updateExpenseMutation.mutate({ formData, expenseId });
   };
 
   // Delete Expense Handler
@@ -114,16 +148,6 @@ export default function ManageExpensesPage() {
   const handleEditExpense = (expense: Expense) => {
     setSelectedEditExpense(expense);
     setIsEditModalOpen(true);
-  };
-
-  const handleUpdateExpense = (updatedExpense: Expense) => {
-    // Update in Redux store (TODO: Replace with API call)
-    const updatedExpenses = expenses.map(exp => 
-      exp.id === updatedExpense.id ? updatedExpense : exp
-    );
-    dispatch(setExpensesList(updatedExpenses));
-    setIsEditModalOpen(false);
-    setSelectedEditExpense(null);
   };
 
   const handleDeleteExpense = (expense: Expense) => {
@@ -147,7 +171,7 @@ export default function ManageExpensesPage() {
   };
 
   // Loading state
-  if (isLoading) {
+  if (expensesLoading || categoriesLoading) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex justify-center items-center h-64">
@@ -188,6 +212,7 @@ export default function ManageExpensesPage() {
         onClose={handleCloseEditModal}
         expense={selectedEditExpense}
         onUpdateExpense={handleUpdateExpense}
+        isLoading={updateExpenseMutation.isPending}
       />
 
       {/* Delete Expense Modal */}

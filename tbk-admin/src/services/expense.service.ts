@@ -92,3 +92,21 @@ export const deleteAExpenseService = async(expenseId) : Promise<void> => {
         };
     }
 }
+
+// Service to Get all Expense Categories
+export const getAllExpenseCategoriesService = async() : Promise<[]> => {
+    try {
+        const response = await axios.get(`${API_URL}/expenses/v1/categories` , {
+            withCredentials : true,
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Getting all Expense Categories...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}

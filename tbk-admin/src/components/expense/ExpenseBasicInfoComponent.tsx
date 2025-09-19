@@ -1,34 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { getAllExpenseCategoriesService } from "@/services/expense.service";
 
-interface FormData {
-  title: string;
-  amount: string;
-  date: string;
-  category: string;
-  villa: string;
-}
-
-interface ExpenseBasicInfoComponentProps {
-  formData: FormData;
-  onFormDataChange: (data: FormData) => void;
-  newCategoryName: string;
-  onNewCategoryNameChange: (name: string) => void;
-}
-
-// Mock categories - Replace with API call later
-const categories = ["Maintenance", "Cleaning", "Marketing", "Utilities", "Staff", "Supplies"];
-
-export default function ExpenseBasicInfoComponent({ 
-  formData, 
-  onFormDataChange,
-  newCategoryName,
-  onNewCategoryNameChange
-}: ExpenseBasicInfoComponentProps) {
-  const [categoryList, setCategoryList] = useState(categories);
+export default function ExpenseBasicInfoComponent({ formData, onFormDataChange,newCategoryName,onNewCategoryNameChange }) {
+  
+  // useQuery
+  const { data: categories = [], isLoading: categoriesLoading } = useQuery({
+    queryKey: ['expense-categories'],
+    queryFn: () => getAllExpenseCategoriesService()
+  });
 
   const updateFormData = (field: keyof FormData, value: string) => {
     onFormDataChange({ ...formData, [field]: value });
@@ -80,22 +64,26 @@ export default function ExpenseBasicInfoComponent({
             onValueChange={(value) => {
               if (value === "add-new") {
                 updateFormData('category', 'new-category-input');
-              } else {
+              } 
+              else {
                 updateFormData('category', value);
               }
             }}
+            disabled={categoriesLoading}
           >
             <SelectTrigger>
               <SelectValue placeholder={
-                formData.category === 'new-category-input' 
-                  ? "Adding new category..." 
-                  : "Select category"
+                categoriesLoading 
+                  ? "Loading categories..." 
+                  : formData.category === 'new-category-input' 
+                    ? "Adding new category..." 
+                    : "Select category"
               } />
             </SelectTrigger>
             <SelectContent>
-              {categoryList.map((category) => (
-                <SelectItem key={category} value={category}>
-                  {category}
+              {categories.map((category: ExpenseCategory) => (
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.name}
                 </SelectItem>
               ))}
               <SelectItem 
