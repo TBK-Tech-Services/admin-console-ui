@@ -6,7 +6,7 @@ import ExpensesPageHeaderComponent from "@/components/expense/ExpensesPageHeader
 import ExpensesTableComponent from "@/components/expense/ExpensesTableComponent";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteAExpenseService, getAllExpensesService } from "@/services/expense.service";
+import { addExpenseService, deleteAExpenseService, getAllExpensesService } from "@/services/expense.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setExpensesList } from "@/store/slices/expensesSlice";
 import { RootState } from "@/store/store";
@@ -37,7 +37,7 @@ export default function ManageExpensesPage() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // useQuery for fetching expenses
-  const { data } = useQuery({
+  const { data, isLoading, refetch } = useQuery({
     queryKey: ['expenses'],
     queryFn: async () => getAllExpensesService()
   });
@@ -49,10 +49,32 @@ export default function ManageExpensesPage() {
     }
   }, [data, dispatch]);
 
-  // useMutate
+  // Add Expense Mutation
+  const addExpenseMutation = useMutation({
+    mutationFn: (formData: any) => addExpenseService(formData),
+    onSuccess: (response) => {
+      refetch();
+      setIsAddModalOpen(false);
+      toast({
+        title: "Added Expense Successfully!"
+      });
+    },
+    onError: (error) => {
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage,
+        variant: "destructive"
+      });
+    }
+  });
+
+  // Delete Expense Mutation
   const deleteExpenseMutation = useMutation({
     mutationFn: (expenseId: string) => deleteAExpenseService(expenseId),
     onSuccess: () => {
+      refetch();
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
       setSelectedDeleteExpense(null);
@@ -66,22 +88,22 @@ export default function ManageExpensesPage() {
       const backendMessage = err.response?.data?.message || "Something went wrong!";
       toast({
         title: "Something went wrong",
-        description: backendMessage
+        description: backendMessage,
+        variant: "destructive"
       });
     }
   });
 
-  // Updated handler
+  // Add Expense Handler
+  const handleAddExpense = (formData: any) => {
+    // Pass form data to mutation - no Redux update here
+    addExpenseMutation.mutate(formData);
+  };
+
+  // Delete Expense Handler
   const handleDeleteConfirm = async (expense: Expense) => {
     setIsDeleting(true);
     deleteExpenseMutation.mutate(expense.id);
-  };
-
-  // Handlers
-  const handleAddExpense = (newExpense: Expense) => {
-    // Add to Redux store instead of local state
-    dispatch(setExpensesList([newExpense, ...expenses]));
-    setIsAddModalOpen(false);
   };
 
   const handleViewExpense = (expense: Expense) => {
@@ -95,7 +117,7 @@ export default function ManageExpensesPage() {
   };
 
   const handleUpdateExpense = (updatedExpense: Expense) => {
-    // Update in Redux store
+    // Update in Redux store (TODO: Replace with API call)
     const updatedExpenses = expenses.map(exp => 
       exp.id === updatedExpense.id ? updatedExpense : exp
     );
@@ -124,6 +146,17 @@ export default function ManageExpensesPage() {
     setSelectedDeleteExpense(null);
   };
 
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex justify-center items-center h-64">
+          <div className="text-lg">Loading expenses...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <ExpensesPageHeaderComponent onModalOpen={() => setIsAddModalOpen(true)} />
@@ -139,6 +172,7 @@ export default function ManageExpensesPage() {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddExpense={handleAddExpense}
+        isLoading={addExpenseMutation.isPending}
       />
 
       {/* View Expense Modal */}

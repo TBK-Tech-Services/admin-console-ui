@@ -5,33 +5,18 @@ import { Receipt } from "lucide-react";
 import ExpenseVillaSelectionComponent from "./ExpenseVillaSelectionComponent";
 import ExpenseTypeSelectionComponent from "./ExpenseTypeSelectionComponent";
 import ExpenseBasicInfoComponent from "./ExpenseBasicInfoComponent";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
-interface Expense {
-  id: string;
-  title: string;
-  amount: number;
-  date: string;
-  category: string;
-  type: "individual" | "split";
-  villas?: string[];
-}
+export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense,isLoading = false}) {
 
-interface AddExpenseModalComponentProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onAddExpense: (expense: Expense) => void;
-}
+  // useSelector
+  const villas = useSelector((store: RootState) => store.villas.listOfVilla);
 
-const villas = ["Villa 1", "Villa 2", "Villa 3", "Villa 4"];
-
-export default function AddExpenseModalComponent({ 
-  isOpen, 
-  onClose, 
-  onAddExpense 
-}: AddExpenseModalComponentProps) {
+  // State Variables
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");
   const [villaSelection, setVillaSelection] = useState<"all" | "specific">("all");
-  const [selectedVillas, setSelectedVillas] = useState<string[]>([]);
+  const [selectedVillas, setSelectedVillas] = useState<number[]>([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [formData, setFormData] = useState({
     title: "",
@@ -44,25 +29,30 @@ export default function AddExpenseModalComponent({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    const categoryToUse = formData.category === 'new-category-input' 
-      ? newCategoryName 
-      : formData.category;
-      
-    const newExpense: Expense = {
-      id: Date.now().toString(),
+    const backendData = {
+      expenseType: expenseType.toUpperCase(), 
       title: formData.title,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: categoryToUse,
-      type: expenseType,
-      villas: expenseType === "individual" 
-        ? [formData.villa]
-        : villaSelection === "all" 
-          ? villas 
-          : selectedVillas,
+      category: formData.category === 'new-category-input' 
+        ? newCategoryName 
+        : parseInt(formData.category),
     };
+
+    // Add villa data based on expense type
+    if (expenseType === "individual") {
+      backendData.villaId = parseInt(formData.villa);
+    } 
+    else {
+      if (villaSelection === "all") {
+        backendData.villaIds = villas.map(v => v.id);
+      } 
+      else {
+        backendData.villaIds = selectedVillas;
+      }
+    }
     
-    onAddExpense(newExpense);
+    onAddExpense(backendData);
     resetForm();
   };
 
@@ -74,16 +64,23 @@ export default function AddExpenseModalComponent({
     setSelectedVillas([]);
   };
 
-  const handleVillaToggle = (villa: string) => {
+  const handleVillaToggle = (villaId: number) => {
     setSelectedVillas(prev => 
-      prev.includes(villa) 
-        ? prev.filter(v => v !== villa)
-        : [...prev, villa]
+      prev.includes(villaId) 
+        ? prev.filter(id => id !== villaId)
+        : [...prev, villaId]
     );
   };
 
+  const handleClose = () => {
+    if (!isLoading) {
+      resetForm();
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -113,18 +110,24 @@ export default function AddExpenseModalComponent({
             onVillaSelectionChange={setVillaSelection}
             onVillaToggle={handleVillaToggle}
             onFormDataChange={setFormData}
+            villas={villas}
           />
 
           <div className="flex justify-end gap-3 pt-4">
             <Button 
               type="button" 
               variant="outline" 
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" className="bg-gradient-primary hover:opacity-90">
-              Add Expense
+            <Button 
+              type="submit" 
+              className="bg-gradient-primary hover:opacity-90"
+              disabled={isLoading}
+            >
+              {isLoading ? "Adding..." : "Add Expense"}
             </Button>
           </div>
         </form>

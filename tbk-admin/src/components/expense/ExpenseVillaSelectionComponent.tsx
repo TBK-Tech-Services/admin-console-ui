@@ -3,35 +3,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface FormData {
-  title: string;
-  amount: string;
-  date: string;
-  category: string;
-  villa: string;
-}
-
-interface ExpenseVillaSelectionComponentProps {
-  expenseType: "individual" | "split";
-  villaSelection: "all" | "specific";
-  selectedVillas: string[];
-  formData: FormData;
-  onVillaSelectionChange: (selection: "all" | "specific") => void;
-  onVillaToggle: (villa: string) => void;
-  onFormDataChange: (data: FormData) => void;
-}
-
-const villas = ["Villa 1", "Villa 2", "Villa 3", "Villa 4"];
-
-export default function ExpenseVillaSelectionComponent({
-  expenseType,
-  villaSelection,
-  selectedVillas,
-  formData,
-  onVillaSelectionChange,
-  onVillaToggle,
-  onFormDataChange
-}: ExpenseVillaSelectionComponentProps) {
+export default function ExpenseVillaSelectionComponent({ expenseType, villaSelection, selectedVillas, formData, villas, onVillaSelectionChange, onVillaToggle, onFormDataChange }) {
+  
   if (expenseType === "individual") {
     return (
       <div className="space-y-2">
@@ -45,8 +18,8 @@ export default function ExpenseVillaSelectionComponent({
           </SelectTrigger>
           <SelectContent>
             {villas.map((villa) => (
-              <SelectItem key={villa} value={villa}>
-                {villa}
+              <SelectItem key={villa.id} value={villa.id.toString()}>
+                {villa.name}
               </SelectItem>
             ))}
           </SelectContent>
@@ -65,7 +38,7 @@ export default function ExpenseVillaSelectionComponent({
       >
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="all" id="all-villas" />
-          <Label htmlFor="all-villas">Select All Villas</Label>
+          <Label htmlFor="all-villas">Select All Villas ({villas.length})</Label>
         </div>
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="specific" id="specific-villas" />
@@ -78,16 +51,23 @@ export default function ExpenseVillaSelectionComponent({
           <Label className="text-sm font-medium">Choose Villas:</Label>
           <div className="grid grid-cols-2 gap-3">
             {villas.map((villa) => (
-              <div key={villa} className="flex items-center space-x-2">
+              <div key={villa.id} className="flex items-center space-x-2">
                 <Checkbox
-                  id={villa}
-                  checked={selectedVillas.includes(villa)}
-                  onCheckedChange={() => onVillaToggle(villa)}
+                  id={villa.id.toString()}
+                  checked={selectedVillas.includes(villa.id)}
+                  onCheckedChange={() => onVillaToggle(villa.id)}
                 />
-                <Label htmlFor={villa} className="text-sm">{villa}</Label>
+                <Label htmlFor={villa.id.toString()} className="text-sm">
+                  {villa.name}
+                </Label>
               </div>
             ))}
           </div>
+          {selectedVillas.length > 0 && (
+            <div className="text-xs text-muted-foreground">
+              Selected: {selectedVillas.length} villa{selectedVillas.length > 1 ? 's' : ''}
+            </div>
+          )}
         </div>
       )}
     </div>
