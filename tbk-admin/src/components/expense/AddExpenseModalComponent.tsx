@@ -32,6 +32,7 @@ export default function AddExpenseModalComponent({
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");
   const [villaSelection, setVillaSelection] = useState<"all" | "specific">("all");
   const [selectedVillas, setSelectedVillas] = useState<string[]>([]);
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     amount: "",
@@ -42,12 +43,17 @@ export default function AddExpenseModalComponent({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const categoryToUse = formData.category === 'new-category-input' 
+      ? newCategoryName 
+      : formData.category;
+      
     const newExpense: Expense = {
       id: Date.now().toString(),
       title: formData.title,
       amount: parseFloat(formData.amount),
       date: formData.date,
-      category: formData.category,
+      category: categoryToUse,
       type: expenseType,
       villas: expenseType === "individual" 
         ? [formData.villa]
@@ -62,6 +68,7 @@ export default function AddExpenseModalComponent({
 
   const resetForm = () => {
     setFormData({ title: "", amount: "", date: "", category: "", villa: "" });
+    setNewCategoryName("");
     setExpenseType("individual");
     setVillaSelection("all");
     setSelectedVillas([]);
@@ -94,6 +101,8 @@ export default function AddExpenseModalComponent({
           <ExpenseBasicInfoComponent 
             formData={formData}
             onFormDataChange={setFormData}
+            newCategoryName={newCategoryName}
+            onNewCategoryNameChange={setNewCategoryName}
           />
 
           <ExpenseVillaSelectionComponent 
