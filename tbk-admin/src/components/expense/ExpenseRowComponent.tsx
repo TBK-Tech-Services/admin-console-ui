@@ -1,5 +1,7 @@
 import { TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Eye, Edit, Trash2 } from "lucide-react";
 
 interface Expense {
   id: string;
@@ -13,9 +15,17 @@ interface Expense {
 
 interface ExpenseRowComponentProps {
   expense: Expense;
+  onView?: (expense: Expense) => void;
+  onEdit?: (expense: Expense) => void;
+  onDelete?: (expense: Expense) => void;
 }
 
-export default function ExpenseRowComponent({ expense }: ExpenseRowComponentProps) {
+export default function ExpenseRowComponent({ 
+  expense, 
+  onView, 
+  onEdit, 
+  onDelete 
+}: ExpenseRowComponentProps) {
   return (
     <TableRow>
       <TableCell className="font-medium">{expense.title}</TableCell>
@@ -43,6 +53,34 @@ export default function ExpenseRowComponent({ expense }: ExpenseRowComponentProp
               +{expense.villas.length - 2}
             </Badge>
           )}
+        </div>
+      </TableCell>
+      <TableCell>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            onClick={() => onView?.(expense)}
+          >
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-50"
+            onClick={() => onEdit?.(expense)}
+          >
+            <Edit className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+            onClick={() => onDelete?.(expense)}
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </TableCell>
     </TableRow>

@@ -15,9 +15,17 @@ interface Expense {
 
 interface ExpensesTableComponentProps {
   expenses: Expense[];
+  onViewExpense?: (expense: Expense) => void;
+  onEditExpense?: (expense: Expense) => void;
+  onDeleteExpense?: (expense: Expense) => void;
 }
 
-export default function ExpensesTableComponent({ expenses }: ExpensesTableComponentProps) {
+export default function ExpensesTableComponent({ 
+  expenses, 
+  onViewExpense, 
+  onEditExpense, 
+  onDeleteExpense 
+}: ExpensesTableComponentProps) {
   return (
     <Card>
       <CardHeader>
@@ -36,11 +44,18 @@ export default function ExpensesTableComponent({ expenses }: ExpensesTableCompon
               <TableHead>Category</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Villas</TableHead>
+              <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {expenses.map((expense) => (
-              <ExpenseRowComponent key={expense.id} expense={expense} />
+              <ExpenseRowComponent 
+                key={expense.id} 
+                expense={expense}
+                onView={onViewExpense}
+                onEdit={onEditExpense}
+                onDelete={onDeleteExpense}
+              />
             ))}
           </TableBody>
         </Table>
