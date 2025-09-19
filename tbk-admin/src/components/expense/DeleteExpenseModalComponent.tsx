@@ -2,31 +2,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, Trash2, IndianRupee } from "lucide-react";
 
-interface Expense {
-  id: string;
-  title: string;
-  amount: number;
-  date: string;
-  category: string;
-  type: "individual" | "split";
-  villas?: string[];
-}
-
-interface DeleteExpenseModalComponentProps {
-  isOpen: boolean;
-  onClose: () => void;
-  expense: Expense | null;
-  onDeleteConfirm?: (expense: Expense) => void;
-  isDeleting?: boolean;
-}
-
-export default function DeleteExpenseModalComponent({ 
-  isOpen, 
-  onClose, 
-  expense,
-  onDeleteConfirm,
-  isDeleting = false
-}: DeleteExpenseModalComponentProps) {
+export default function DeleteExpenseModalComponent({ isOpen, onClose, expense, onDeleteConfirm, isDeleting = false }) {
+  
+  // Handler Function
   const handleDelete = () => {
     if (expense) {
       onDeleteConfirm?.(expense);
@@ -34,6 +12,21 @@ export default function DeleteExpenseModalComponent({
   };
 
   if (!expense) return null;
+
+  // Convert paise to rupees for display
+  const displayAmount = expense.amount / 100;
+
+  // Get villa names safely
+  const getVillaNames = () => {
+    if (expense.type === "INDIVIDUAL" && expense.villa) {
+      return [expense.villa.name];
+    } else if (expense.type === "SPLIT" && expense.villas) {
+      return expense.villas.map(v => v.villa.name);
+    }
+    return [];
+  };
+
+  const villaNames = getVillaNames();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -70,7 +63,7 @@ export default function DeleteExpenseModalComponent({
               
               <div className="flex items-center gap-2 text-red-600 font-semibold">
                 <IndianRupee className="h-4 w-4" />
-                {expense.amount.toLocaleString()}
+                {displayAmount.toLocaleString()}
               </div>
 
               <div className="text-sm text-gray-600">
@@ -82,12 +75,12 @@ export default function DeleteExpenseModalComponent({
               </div>
 
               <div className="text-sm text-gray-600">
-                Category: <span className="font-medium">{expense.category}</span>
+                Category: <span className="font-medium">{expense.category.name}</span>
               </div>
 
-              {expense.villas && expense.villas.length > 0 && (
+              {villaNames.length > 0 && (
                 <div className="text-sm text-gray-600">
-                  Villas: <span className="font-medium">{expense.villas.join(", ")}</span>
+                  Villas: <span className="font-medium">{villaNames.join(", ")}</span>
                 </div>
               )}
             </div>

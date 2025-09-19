@@ -5,14 +5,20 @@ import DeleteExpenseModalComponent from "@/components/expense/DeleteExpenseModal
 import ExpensesPageHeaderComponent from "@/components/expense/ExpensesPageHeaderComponent";
 import ExpensesTableComponent from "@/components/expense/ExpensesTableComponent";
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getAllExpensesService } from "@/services/expense.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteAExpenseService, getAllExpensesService } from "@/services/expense.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setExpensesList } from "@/store/slices/expensesSlice";
 import { RootState } from "@/store/store";
 import { Expense } from "@/types/expense/expenseData";
+import { useToast } from "@/hooks/use-toast";
+import { AxiosError } from "axios";
+import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 
 export default function ManageExpensesPage() {
+
+  // useToast
+  const { toast } = useToast();
   
   // useDispatch 
   const dispatch = useDispatch();
@@ -42,6 +48,34 @@ export default function ManageExpensesPage() {
       dispatch(setExpensesList(data));
     }
   }, [data, dispatch]);
+
+  // useMutate
+  const deleteExpenseMutation = useMutation({
+    mutationFn: (expenseId: string) => deleteAExpenseService(expenseId),
+    onSuccess: () => {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+      setSelectedDeleteExpense(null);
+      toast({
+        title: "Deleted Expense Successfully!"
+      });
+    },
+    onError: (error) => {
+      setIsDeleting(false);
+      const err = error as AxiosError<ApiErrorResponse>;
+      const backendMessage = err.response?.data?.message || "Something went wrong!";
+      toast({
+        title: "Something went wrong",
+        description: backendMessage
+      });
+    }
+  });
+
+  // Updated handler
+  const handleDeleteConfirm = async (expense: Expense) => {
+    setIsDeleting(true);
+    deleteExpenseMutation.mutate(expense.id);
+  };
 
   // Handlers
   const handleAddExpense = (newExpense: Expense) => {
@@ -73,27 +107,6 @@ export default function ManageExpensesPage() {
   const handleDeleteExpense = (expense: Expense) => {
     setSelectedDeleteExpense(expense);
     setIsDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async (expense: Expense) => {
-    setIsDeleting(true);
-    
-    try {
-      // TODO: Replace with actual API call
-      // await deleteExpenseService(expense.id);
-      
-      // Simulate API call for now
-      setTimeout(() => {
-        const filteredExpenses = expenses.filter(exp => exp.id !== expense.id);
-        dispatch(setExpensesList(filteredExpenses));
-        setIsDeleting(false);
-        setIsDeleteModalOpen(false);
-        setSelectedDeleteExpense(null);
-      }, 1000);
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-      setIsDeleting(false);
-    }
   };
 
   const handleCloseViewModal = () => {
