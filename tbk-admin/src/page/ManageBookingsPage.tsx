@@ -22,8 +22,6 @@ export default function ManageBookingsPage() {
     queryFn: () => searchAndFilterBookingsService(searchText , status),
   })
 
-  console.log(data);
-
   // useEffect
   useEffect(() => {
     if(data){

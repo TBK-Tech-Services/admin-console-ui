@@ -1,42 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import BookingActionsComponent from "./BookingActionsComponent";
+import { getBookingStatusColor } from "@/utils/getBookingStatusColor";
+import { getInitials } from "@/utils/getNameInitials";
 
-interface Booking {
-  id: string;
-  guestName: string;
-  villa: string;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  status: "confirmed" | "pending" | "cancelled";
-  amount: string;
-}
-
-interface BookingItemComponentProps {
-  booking: Booking;
-}
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "confirmed":
-      return "bg-success text-success-foreground";
-    case "pending":
-      return "bg-warning text-warning-foreground";
-    case "cancelled":
-      return "bg-destructive text-destructive-foreground";
-    default:
-      return "bg-secondary text-secondary-foreground";
-  }
-};
-
-export default function BookingItemComponent({ booking }: BookingItemComponentProps) {
+export default function BookingItemComponent({ booking }) {
   return (
     <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-all duration-200">
       <div className="flex items-center gap-4">
         <Avatar>
           <AvatarFallback className="bg-gradient-primary text-primary-foreground">
-            {booking.guestName.split(" ").map((n) => n[0]).join("")}
+            {/* {booking.guestName.split(" ").map((n) => n[0]).join("")} */}
+            {getInitials(booking.guestName)}
           </AvatarFallback>
         </Avatar>
         <div className="space-y-1">
@@ -56,7 +31,8 @@ export default function BookingItemComponent({ booking }: BookingItemComponentPr
           <div className="font-semibold text-foreground">
             {booking.amount}
           </div>
-          <Badge className={getStatusColor(booking.status)}>
+          
+          <Badge variant="outline" className={`ml-2 ${getBookingStatusColor(booking.status)}`}>
             {booking.status}
           </Badge>
         </div>
