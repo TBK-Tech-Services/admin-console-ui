@@ -14,8 +14,8 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             <span>Booking ID - {booking.id}</span>
-            <Badge variant="outline" className={`ml-2 ${getBookingStatusColor(booking.bookingStatus)}`}>
-              {booking.bookingStatus.replace('_', ' ').toUpperCase()}
+            <Badge variant="outline" className={`ml-2 ${getBookingStatusColor(booking?.bookingStatus || '')}`}>
+            {booking?.bookingStatus?.replace('_', ' ').toUpperCase()}
             </Badge>
           </DialogTitle>
         </DialogHeader>
@@ -104,8 +104,8 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Payment Status</p>
-                <Badge variant="outline" className={`text-xs ${getPaymentStatusColor(booking.paymentStatus)}`}>
-                  {booking.paymentStatus.replace('_', ' ').toUpperCase()}
+                <Badge variant="outline" className={`text-xs ${getPaymentStatusColor(booking?.paymentStatus || '')}`}>
+                  {booking?.paymentStatus?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
                 </Badge>
               </div>
               <div>

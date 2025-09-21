@@ -1,5 +1,9 @@
 
-export const getBookingStatusColor = (status: string) => {
+export const getBookingStatusColor = (status: string | undefined | null) => {
+  if (!status) {
+    return "bg-gray-100 text-gray-800 border-gray-200"; // default fallback
+  }
+  
   const statusLower = status.toLowerCase();
   switch (statusLower) {
     case "confirmed":

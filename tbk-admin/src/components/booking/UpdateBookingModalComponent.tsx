@@ -29,7 +29,7 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     guestName: booking?.guestName || "",
     guestEmail: booking?.guestEmail || "",
     guestPhone: booking?.guestPhone || "",
-    villaId: booking?.villaId.toString() || "",
+    villaId: booking?.villaId?.toString() || "",
     checkIn: formatDateForInput(booking?.checkIn) || "",
     checkOut: formatDateForInput(booking?.checkOut) || "",
     totalGuests: booking?.totalGuests || "",

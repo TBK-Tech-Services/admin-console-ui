@@ -8,16 +8,17 @@ export default function RecentBookingsComponent({recentBookingsData}) {
   // useNavigate
   const navigate = useNavigate();
 
-  // Convert API data to component format
+  // RecentBookingsComponent.tsx mein ye change karo:
   const formattedBookings = recentBookingsData?.map(booking => ({
     id: booking.id.toString(),
     guestName: booking.guestName,
-    villa: booking.villa.name,
+    villa: booking.villa.name, 
     checkIn: new Date(booking.checkIn).toLocaleDateString(),
     checkOut: new Date(booking.checkOut).toLocaleDateString(),
     guests: booking.totalGuests,
-    status: booking.bookingStatus, 
-    amount: `₹${(booking.totalPayableAmount).toLocaleString()}` 
+    status: booking.bookingStatus,
+    amount: `₹${booking.totalPayableAmount.toLocaleString()}`,
+    rawBookingData: booking
   })) || [];
 
   return (
