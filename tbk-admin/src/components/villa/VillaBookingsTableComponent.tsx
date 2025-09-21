@@ -1,30 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { getBookingStatusColor } from "@/utils/getBookingStatusColor";
 
-interface VillaBookingsTableComponentProps {
-  villa: any;
-  allBookings: any[];
-}
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "Available":
-      return "bg-success text-white border-success";
-    case "Occupied":
-      return "bg-warning text-white border-warning";
-    case "Confirmed":
-      return "bg-success text-white border-success";
-    case "Pending":
-      return "bg-warning text-white border-warning";
-    case "Cancelled":
-      return "bg-destructive text-white border-destructive";
-    default:
-      return "bg-muted text-muted-foreground";
-  }
-};
-
-export default function VillaBookingsTableComponent({ villa, allBookings }: VillaBookingsTableComponentProps) {
+export default function VillaBookingsTableComponent({ villa, allBookings }) {
   return (
     <Card>
       <CardHeader>
@@ -43,21 +22,21 @@ export default function VillaBookingsTableComponent({ villa, allBookings }: Vill
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allBookings.map((booking) => (
+            {allBookings?.map((booking) => (
               <TableRow key={booking.id}>
                 <TableCell className="font-medium">
                   <div>
-                    <p>{booking.guest}</p>
-                    <p className="text-sm text-muted-foreground">{booking.email}</p>
+                    <p>{booking.guestName}</p>
+                    <p className="text-sm text-muted-foreground">{booking.guestEmail}</p>
                   </div>
                 </TableCell>
-                <TableCell>{booking.phone}</TableCell>
-                <TableCell>{booking.checkIn}</TableCell>
-                <TableCell>{booking.checkOut}</TableCell>
-                <TableCell className="font-bold">{booking.amount}</TableCell>
+                <TableCell>{booking.guestPhone}</TableCell>
+                <TableCell>{new Date(booking.checkIn).toLocaleDateString()}</TableCell>
+                <TableCell>{new Date(booking.checkOut).toLocaleDateString()}</TableCell>
+                <TableCell className="font-bold">₹{booking.totalPayableAmount?.toLocaleString()}</TableCell>
                 <TableCell>
-                  <Badge className={getStatusColor(booking.status)}>
-                    {booking.status}
+                  <Badge className={getBookingStatusColor(booking.bookingStatus)}>
+                    {booking.bookingStatus}
                   </Badge>
                 </TableCell>
               </TableRow>

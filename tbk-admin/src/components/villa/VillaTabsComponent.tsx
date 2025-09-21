@@ -4,7 +4,7 @@ import VillaBookingsTabComponent from "./VillaBookingsTabComponent";
 import VillaRevenueTabComponent from "./VillaRevenueTabComponent";
 import VillaSettingsTabComponent from "./VillaSettingsTabComponent";
 
-export default function VillaTabsComponent({ villa }) {
+export default function VillaTabsComponent({ villa , bookingsData }) {
   
   return (
     <Tabs defaultValue="overview" className="w-full">
@@ -19,15 +19,15 @@ export default function VillaTabsComponent({ villa }) {
         <VillaOverviewTabComponent villa={villa} />
       </TabsContent>
 
-      {/* <TabsContent value="bookings">
-        <VillaBookingsTabComponent villa={villa} />
+      <TabsContent value="bookings">
+        <VillaBookingsTabComponent bookingsData={bookingsData}/>
       </TabsContent>
 
-      <TabsContent value="revenue">
+      {/* <TabsContent value="revenue">
         <VillaRevenueTabComponent villa={villa} />
-      </TabsContent>
+      </TabsContent> */}
 
-      <TabsContent value="settings">
+      {/* <TabsContent value="settings">
         <VillaSettingsTabComponent />
       </TabsContent> */}
     </Tabs>

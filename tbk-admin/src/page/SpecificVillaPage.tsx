@@ -9,8 +9,8 @@ import VillaTabsComponent from "@/components/villa/VillaTabsComponent";
 import EditVillaModalComponent from "@/components/villa/EditVillaModalComponent";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { useMutation } from "@tanstack/react-query";
-import { deleteAVillaService } from "@/services/villa.service";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { deleteAVillaService, getAllBookingsForVillaService, getRecentBookingsForVillaService } from "@/services/villa.service";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 import { useToast } from "@/hooks/use-toast";
@@ -38,6 +38,18 @@ export default function SpecificVillaPage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // useQuery
+  const { data: recentBookingsData } = useQuery({
+    queryKey: ['recent-bookings'],
+    queryFn: async() => getRecentBookingsForVillaService(id)
+  })
+
+  const { data: allBookingsData } = useQuery({
+    queryKey: ['all-bookings'],
+    queryFn: async() => getAllBookingsForVillaService(id)
+  })
+  
 
   // useMutate
   const deleteVillaMutation = useMutation({
@@ -133,15 +145,15 @@ export default function SpecificVillaPage() {
       <VillaStatsComponent stats={mockStats} />
 
       {/* All Bookings View - You'll need to fetch bookings for this villa */}
-      {/* {showAllBookings && (
+      {showAllBookings && (
         <VillaBookingsTableComponent 
           villa={villa}
-          allBookings={mockBookings}
+          allBookings={allBookingsData}
         />
-      )} */}
+      )}
 
       {/* Detailed Information */}
-      <VillaTabsComponent villa={villa} />
+      <VillaTabsComponent villa={villa} bookingsData={recentBookingsData}/>
 
       {/* Edit Modal */}
       <EditVillaModalComponent

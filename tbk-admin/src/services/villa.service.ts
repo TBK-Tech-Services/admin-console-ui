@@ -111,3 +111,39 @@ export const deleteAVillaService = async(id: string) : Promise<void> => {
         };
     }
 }
+
+// Service to Get Recent Bookings For a Villa
+export const getRecentBookingsForVillaService = async(id: string) : Promise<void> => {
+    try {
+        const response = await axios.get(`${API_URL}/villas/v1/${id}/recent-bookings` , {
+            withCredentials : true
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Getting Recent Bookings For a Villa...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+
+// Service to Get All Bookings For a Villa
+export const getAllBookingsForVillaService = async(id: string) : Promise<void> => {
+    try {
+        const response = await axios.get(`${API_URL}/villas/v1/${id}/bookings` , {
+            withCredentials : true
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Getting All Bookings For a Villa...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
