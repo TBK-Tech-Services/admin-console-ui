@@ -57,6 +57,24 @@ export const getUpcomingCheckinService = async() : Promise<void> => {
     }
 }
 
+// Service to Get Revenue Trends
+export const getRevenueTrendsService = async() : Promise<void> => {
+    try {
+        const response = await axios.get(`${API_URL}/dashboard/v1/revenue-trends` , {
+            withCredentials : true
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Getting Revenue Trends...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+
 // Service to Get Villas Occupancy
 export const getVillasOccupancyService = async() : Promise<void> => {
     try {
