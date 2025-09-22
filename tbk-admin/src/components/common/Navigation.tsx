@@ -13,13 +13,13 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { navigationItems } from "@/utils/navigationItems";
 import { useMutation } from "@tanstack/react-query";
 import { logoutService } from "@/services/auth.service";
 import { setIsAuthenticated, setUser } from "@/store/slices/authSlice";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { getNavigationItems } from "@/utils/navigationItems";
 
 export function Navigation() {
   // useLocation
@@ -33,6 +33,18 @@ export function Navigation() {
     (state : RootState) => state.auth.user
   );
 
+  // Extract role value (consistent with other components)
+  let userRole;
+  if (typeof user?.role === 'string') {
+    userRole = user?.role;
+  } else if (user?.role && user?.role.name) {
+    userRole = user?.role.name;
+  }
+
+  console.log("Navigation - User:", user);
+  console.log("Navigation - Raw role:", user?.role);
+  console.log("Navigation - Extracted userRole:", userRole);
+
   // useDispatch
   const dispatch = useDispatch();
 
@@ -40,7 +52,6 @@ export function Navigation() {
   const firstName = user?.firstName ?? "";
   const lastName = user?.lastName ?? "";
   const email = user?.email ?? "";
-
 
   // Checking Active Tab
   const isActive = (path: string) => {
@@ -72,27 +83,33 @@ export function Navigation() {
   }
 
   // Listing NavItems
-  const NavItems = () => (
-    <>
-      {navigationItems.map((item) => (
-        <NavLink
-          key={item.name}
-          to={item.href}
-          className={cn(
-            "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-            "hover:bg-secondary/80 hover:shadow-soft",
-            isActive(item.href)
-              ? "bg-gradient-primary text-primary-foreground shadow-medium"
-              : "text-foreground"
-          )}
-          onClick={() => setIsMobileMenuOpen(false)}
-        >
-          <item.icon className="h-5 w-5" />
-          <span className="font-medium">{item.name}</span>
-        </NavLink>
-      ))}
-    </>
-  );
+  const NavItems = () => {
+    const navigationItems = getNavigationItems(userRole);
+    console.log("NavItems - userRole:", userRole);
+    console.log("NavItems - navigationItems:", navigationItems);
+
+    return (
+      <>
+        {navigationItems.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.href}
+            className={cn(
+              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+              "hover:bg-secondary/80 hover:shadow-soft",
+              isActive(item.href)
+                ? "bg-gradient-primary text-primary-foreground shadow-medium"
+                : "text-foreground"
+            )}
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <item.icon className="h-5 w-5" />
+            <span className="font-medium">{item.name}</span>
+          </NavLink>
+        ))}
+      </>
+    )
+  };
 
   // Profile Section 
   const ProfileSection = () => (

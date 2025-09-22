@@ -32,6 +32,13 @@ export default function LoginPage() {
             return await loginService({ email, password });
         },
         onSuccess: (user: User) => {
+            console.log("=== DEBUG LOGIN RESPONSE ===");
+            console.log("Full user object:", user);
+            console.log("Role value:", user.role);
+            console.log("Role type:", typeof user.role);
+            console.log("Role keys:", user.role ? Object.keys(user.role) : "null");
+            console.log("============================");
+            
             dispatch(setIsAuthenticated(true));
             dispatch(setUser(user));
             setEmail("");
@@ -39,8 +46,28 @@ export default function LoginPage() {
             toast({
                 title: "Logged in successfully!"
             });
+            
             setTimeout(() => {
-                navigate("/");
+                // Try both formats
+                let roleValue;
+                if (typeof user.role === 'string') {
+                    roleValue = user.role;
+                } else if (user.role && user.role.name) {
+                    roleValue = user.role.name;
+                }
+                
+                console.log("Extracted role value:", roleValue);
+                
+                if (roleValue === 'Admin') {
+                    navigate("/");
+                } 
+                else if (roleValue === 'Owner') {
+                    navigate("/owner-dashboard");
+                }
+                else {
+                    console.log("Unknown role format:", user.role);
+                    navigate("/unauthorized");
+                }
             }, 1000);
         },
         onError: (error: unknown) => {

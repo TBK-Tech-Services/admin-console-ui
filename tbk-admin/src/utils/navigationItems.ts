@@ -6,9 +6,10 @@ import {
   MapPin,
   Receipt,
   TrendingUp,
+  Building2,
 } from "lucide-react";
 
-export const navigationItems = [
+export const adminNavigationItems = [
   {
     name: "Dashboard",
     href: "/",
@@ -45,3 +46,23 @@ export const navigationItems = [
     icon: Settings,
   },
 ];
+
+export const ownerNavigationItems = [
+  {
+    name: "Owner Dashboard",
+    href: "/owner-dashboard", 
+    icon: Building2,
+  },
+];
+
+export const getNavigationItems = (userRole: string | undefined) => {
+  console.log(userRole);
+  switch (userRole) {
+    case 'Admin':
+      return adminNavigationItems;
+    case 'Owner':
+      return ownerNavigationItems;
+    default:
+      return [];
+  }
+};
