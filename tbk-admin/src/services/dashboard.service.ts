@@ -56,3 +56,21 @@ export const getUpcomingCheckinService = async() : Promise<void> => {
         };
     }
 }
+
+// Service to Get Villas Occupancy
+export const getVillasOccupancyService = async() : Promise<void> => {
+    try {
+        const response = await axios.get(`${API_URL}/dashboard/v1/villas-occupancy` , {
+            withCredentials : true
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Getting Villas Occupancy...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}

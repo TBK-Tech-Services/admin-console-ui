@@ -1,7 +1,7 @@
 import DashboardGridComponent from "@/components/home/DashboardGridComponent";
 import DashboardHeaderComponent from "@/components/home/DashboardHeaderComponent";
 import DashboardStatsComponent from "@/components/home/DashboardStatsComponent";
-import { getDashboardStatsService, getRecentBookingsService, getUpcomingCheckinService } from "@/services/dashboard.service";
+import { getDashboardStatsService, getRecentBookingsService, getUpcomingCheckinService, getVillasOccupancyService } from "@/services/dashboard.service";
 import { useQuery } from "@tanstack/react-query";
 
 export default function HomePage() {
@@ -21,13 +21,16 @@ export default function HomePage() {
     queryFn : async () => getDashboardStatsService()
   });
 
-  console.log('Dashboard Stats:', dashboardStats);
+  const { data : villasOccupancy } = useQuery({
+    queryKey : ['villas-occupancy'],
+    queryFn : async () => getVillasOccupancyService()
+  });
 
   return (
     <div className="space-y-6">
       <DashboardHeaderComponent />
       <DashboardStatsComponent dashboardStatsData={dashboardStats}/>
-      <DashboardGridComponent upcomingCheckinsData={upcomingCheckins} recentBookingsData={recentBookings}/>
+      <DashboardGridComponent upcomingCheckinsData={upcomingCheckins} recentBookingsData={recentBookings} villasOccupancyData={villasOccupancy}/>
     </div>
   );
 }

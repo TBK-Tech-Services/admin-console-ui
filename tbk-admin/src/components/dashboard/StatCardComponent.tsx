@@ -17,16 +17,7 @@ const iconMap = {
   CalendarX,
 };
 
-interface StatCardProps {
-  title: string;
-  value: string;
-  change?: string;
-  icon: string;
-  gradient?: string;
-  trend?: "up" | "down" | "neutral";
-}
-
-export default function StatCardComponent({ title, value, change, icon, gradient, trend }: StatCardProps) {
+export default function StatCardComponent({ title, value, change, icon, gradient, trend }) {
   const IconComponent = iconMap[icon as keyof typeof iconMap] || DollarSign;
 
   return(

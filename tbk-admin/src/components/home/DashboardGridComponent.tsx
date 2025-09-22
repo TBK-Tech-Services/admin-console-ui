@@ -4,7 +4,7 @@ import UpcomingCheckinsComponent from "./UpcomingCheckinsComponent";
 import VillaOccupancyComponent from "./VillaOccupancyComponent";
 
 
-export default function DashboardGridComponent({upcomingCheckinsData , recentBookingsData}) {
+export default function DashboardGridComponent({upcomingCheckinsData , recentBookingsData , villasOccupancyData}) {
   return (
     <>
       {/* First Row - Recent Bookings and Upcoming Check-ins */}
@@ -16,7 +16,7 @@ export default function DashboardGridComponent({upcomingCheckinsData , recentBoo
       {/* Second Row - Revenue Trends and Villa Occupancy */}
       <div className="grid gap-6 lg:grid-cols-2">
         <RevenueTrendsComponent />
-        <VillaOccupancyComponent />
+        <VillaOccupancyComponent villasOccupancyData={villasOccupancyData}/>
       </div>
     </>
   );

@@ -1,11 +1,5 @@
 
-interface VillaOccupancyItemComponentProps {
-  villa: string;
-  occupancy: number;
-  color: string;
-}
-
-export default function VillaOccupancyItemComponent({ villa, occupancy, color }: VillaOccupancyItemComponentProps) {
+export default function VillaOccupancyItemComponent({ villa, occupancy, color }) {
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
