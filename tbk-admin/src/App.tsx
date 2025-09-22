@@ -18,6 +18,7 @@ import GlobalLoader from "./components/common/GlobalLoader";
 import { Layout } from "./components/common/Layout";
 import SettingsPage from "./page/SettingsPage";
 import NotFoundPage from "./page/NotFoundPage";
+import OwnerDashboardPage from "./page/OwnerDashboardPage";
 
 const App = () => (
     <TooltipProvider>
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="/expenses" element={<ManageExpensesPage />} />
                 <Route path="/finance" element={<ManageFinancePage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+                <Route path="/owner-dashboard" element={<OwnerDashboardPage />} />
               </Route>
             </Route>
 
