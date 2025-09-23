@@ -90,6 +90,46 @@ export const updateBookingService = async(formData: Booking_Data , id: number): 
     }
 }
 
+// Service to Update a Booking Status
+export const updateBookingStatusService = async(bookingStatus: string , id: number): Promise<void> => {
+    try {
+        const response = await axios.patch(`${API_URL}/bookings/v1/${id}/status`, {
+            bookingStatus
+        } , {
+            withCredentials : true,
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Updating a Booking Status...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+
+// Service to Update a Payment Status
+export const updatePaymentStatusService = async(paymentStatus: string , id: number): Promise<void> => {
+    try {
+        const response = await axios.patch(`${API_URL}/bookings/v1/${id}/payment-status`, {
+            paymentStatus
+        } , {
+            withCredentials : true,
+        });
+
+        return response.data.data;
+    }
+    catch (error) {
+        console.error("Error Updating a Payment Status...");
+        throw {
+            message: error.response?.data?.message || "Something went wrong",
+            status: error.response?.status,
+        };
+    }
+}
+
 // Service to Update a Booking
 export const deleteBookingService = async(id: number): Promise<void> => {
     try {

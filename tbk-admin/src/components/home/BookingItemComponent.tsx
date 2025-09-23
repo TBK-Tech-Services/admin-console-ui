@@ -1,4 +1,3 @@
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getBookingStatusColor } from "@/utils/getBookingStatusColor";
 import { getPaymentStatusColor } from "@/utils/getPaymentStatusColor";
@@ -13,46 +12,73 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { updateBookingStatusService, updatePaymentStatusService } from "@/services/booking.service";
 
 export default function BookingItemComponent({ booking }) {
+  
+  // useToast
   const { toast } = useToast();
+  
+  // Booking Status Update Mutation
+  const updateBookingStatusMutation = useMutation({
+    mutationFn: async(value) => {
+      return await updateBookingStatusService(value , booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Booking Status Updated Successfully!"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update booking status",
+        description: error.message || "Something went wrong",
+        variant: "destructive"
+      });
+    }
+  });
 
-  // // Mutation for status updates
-  // const updateStatusMutation = useMutation({
-  //   mutationFn: async({ field, value }) => {
-  //     return await updateBookingStatusService(booking.id, { [field]: value });
-  //   },
-  //   onSuccess: () => {
-  //     toast({
-  //       title: "Status Updated Successfully!"
-  //     });
-  //   },
-  //   onError: () => {
-  //     toast({
-  //       title: "Failed to update status",
-  //       variant: "destructive"
-  //     });
-  //   }
-  // });
+  const handleBookingStatusUpdate = (value) => {
+    updateBookingStatusMutation.mutate(value);
+  };
 
-  // const handleStatusUpdate = (field, value) => {
-  //   updateStatusMutation.mutate({ field, value });
-  // };
+  // Payment Status Update Mutation
+  const updatePaymentStatusMutation = useMutation({
+    mutationFn: async(value) => {
+      return await updatePaymentStatusService(value , booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Payment Status Updated Successfully!"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update payment status",
+        description: error.message || "Something went wrong",
+        variant: "destructive"
+      });
+    }
+  });
 
-  const statusIcons = {
+  const handlePaymentStatusUpdate = (value) => {
+    updatePaymentStatusMutation.mutate(value);
+  };
+
+  const bookingStatusIcons = {
     CONFIRMED: CheckCircle,
-    PENDING: Clock,
+    CHECKED_IN: CheckCircle, 
+    CHECKED_OUT: CheckCircle,
     CANCELLED: XCircle,
   };
 
-  const paymentIcons = {
+  const paymentStatusIcons = {
     PAID: CheckCircle,
     PENDING: Clock,
-    FAILED: XCircle,
   };
 
-  const StatusIcon = statusIcons[booking.status] || Clock;
-  const PaymentIcon = paymentIcons[booking.rawBookingData?.paymentStatus] || Clock;
+  const StatusIcon = bookingStatusIcons[booking.status] || Clock;
+  const PaymentIcon = paymentStatusIcons[booking.rawBookingData?.paymentStatus] || Clock;
 
   return (
     <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-all duration-200">
@@ -86,7 +112,9 @@ export default function BookingItemComponent({ booking }) {
             {/* Booking Status Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className={`${getBookingStatusColor(booking.status)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs`}>
+                <div className={`${getBookingStatusColor(booking.status)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${
+                  updateBookingStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
+                }`}>
                   <StatusIcon className="h-3 w-3" />
                   <span className="font-medium">{booking.status}</span>
                   <ChevronDown className="h-2 w-2 opacity-60" />
@@ -94,22 +122,33 @@ export default function BookingItemComponent({ booking }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[130px]">
                 <DropdownMenuItem 
-                  // onClick={() => handleStatusUpdate('bookingStatus', 'CONFIRMED')}
+                  onClick={() => handleBookingStatusUpdate('CONFIRMED')}
                   className="cursor-pointer text-xs"
+                  disabled={updateBookingStatusMutation.isPending}
                 >
                   <CheckCircle className="h-3 w-3 mr-2 text-green-600" />
                   Confirmed
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  // onClick={() => handleStatusUpdate('bookingStatus', 'PENDING')}
+                  onClick={() => handleBookingStatusUpdate('CHECKED_IN')}
                   className="cursor-pointer text-xs"
+                  disabled={updateBookingStatusMutation.isPending}
                 >
-                  <Clock className="h-3 w-3 mr-2 text-yellow-600" />
-                  Pending
+                  <CheckCircle className="h-3 w-3 mr-2 text-blue-600" />
+                  Checked In
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  // onClick={() => handleStatusUpdate('bookingStatus', 'CANCELLED')}
+                  onClick={() => handleBookingStatusUpdate('CHECKED_OUT')}
                   className="cursor-pointer text-xs"
+                  disabled={updateBookingStatusMutation.isPending}
+                >
+                  <CheckCircle className="h-3 w-3 mr-2 text-purple-600" />
+                  Checked Out
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={() => handleBookingStatusUpdate('CANCELLED')}
+                  className="cursor-pointer text-xs"
+                  disabled={updateBookingStatusMutation.isPending}
                 >
                   <XCircle className="h-3 w-3 mr-2 text-red-600" />
                   Cancelled
@@ -120,7 +159,9 @@ export default function BookingItemComponent({ booking }) {
             {/* Payment Status Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className={`${getPaymentStatusColor(booking.rawBookingData?.paymentStatus)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs`}>
+                <div className={`${getPaymentStatusColor(booking.rawBookingData?.paymentStatus)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${
+                  updatePaymentStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
+                }`}>
                   <PaymentIcon className="h-3 w-3" />
                   <span className="font-medium">{booking.rawBookingData?.paymentStatus || 'PENDING'}</span>
                   <ChevronDown className="h-2 w-2 opacity-60" />
@@ -128,25 +169,20 @@ export default function BookingItemComponent({ booking }) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[120px]">
                 <DropdownMenuItem 
-                  // onClick={() => handleStatusUpdate('paymentStatus', 'PAID')}
+                  onClick={() => handlePaymentStatusUpdate('PAID')}
                   className="cursor-pointer text-xs"
+                  disabled={updatePaymentStatusMutation.isPending}
                 >
                   <CheckCircle className="h-3 w-3 mr-2 text-green-600" />
                   Paid
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  // onClick={() => handleStatusUpdate('paymentStatus', 'PENDING')}
+                  onClick={() => handlePaymentStatusUpdate('PENDING')}
                   className="cursor-pointer text-xs"
+                  disabled={updatePaymentStatusMutation.isPending}
                 >
                   <Clock className="h-3 w-3 mr-2 text-yellow-600" />
                   Pending
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  // onClick={() => handleStatusUpdate('paymentStatus', 'FAILED')}
-                  className="cursor-pointer text-xs"
-                >
-                  <XCircle className="h-3 w-3 mr-2 text-red-600" />
-                  Failed
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
