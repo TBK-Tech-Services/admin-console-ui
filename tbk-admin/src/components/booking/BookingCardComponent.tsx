@@ -5,31 +5,58 @@ import BookingHeaderInfoComponent from './BookingHeaderInfoComponent';
 import BookingInfoComponent from './BookingInfoComponent';
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
+import { updateBookingStatusService, updatePaymentStatusService } from '@/services/booking.service';
 
 export default function BookingCardComponent({ booking }) {
-  // const { toast } = useToast();
+  
+  // useToast
+  const { toast } = useToast();
 
-  // Mutation for status updates
-  // const updateStatusMutation = useMutation({
-  //   mutationFn: async({ field, value }) => {
-  //     return await updateBookingStatusService(booking.id, { [field]: value });
-  //   },
-  //   onSuccess: () => {
-  //     toast({
-  //       title: "Status Updated Successfully!"
-  //     });
-  //   },
-  //   onError: () => {
-  //     toast({
-  //       title: "Failed to update status",
-  //       variant: "destructive"
-  //     });
-  //   }
-  // });
-
-  // const handleStatusUpdate = (field, value) => {
-  //   updateStatusMutation.mutate({ field, value });
-  // };
+  // Booking Status Update Mutation
+  const updateBookingStatusMutation = useMutation({
+    mutationFn: async(value) => {
+      return await updateBookingStatusService(value, booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Booking Status Updated Successfully!"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update booking status",
+        description: error.message || "Something went wrong",
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const handleBookingStatusUpdate = (value) => {
+    updateBookingStatusMutation.mutate(value);
+  };
+  
+  // Payment Status Update Mutation
+  const updatePaymentStatusMutation = useMutation({
+    mutationFn: async(value) => {
+      return await updatePaymentStatusService(value, booking.id);
+    },
+    onSuccess: () => {
+      toast({
+        title: "Payment Status Updated Successfully!"
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Failed to update payment status",
+        description: error.message || "Something went wrong",
+        variant: "destructive"
+      });
+    }
+  });
+  
+  const handlePaymentStatusUpdate = (value) => {
+    updatePaymentStatusMutation.mutate(value);
+  };
 
   return (
     <div className="group relative bg-card border border-border rounded-xl p-5 hover:shadow-lg hover:border-border/60 transition-all duration-200">
@@ -45,7 +72,8 @@ export default function BookingCardComponent({ booking }) {
               guestName={booking.guestName}
               status={booking.bookingStatus}
               booking={booking}
-              // onStatusUpdate={handleStatusUpdate}
+              onStatusUpdate={handleBookingStatusUpdate}
+              isLoading={updateBookingStatusMutation.isPending}
             />
             
             <BookingInfoComponent 
@@ -65,7 +93,8 @@ export default function BookingCardComponent({ booking }) {
             amount={booking.totalPayableAmount}
             bookedOn={booking.updatedAt}
             paymentStatus={booking.paymentStatus}
-            // onStatusUpdate={handleStatusUpdate}
+            onStatusUpdate={handlePaymentStatusUpdate}
+            isLoading={updatePaymentStatusMutation.isPending}
           />
           
           {/* Actions - Only show on hover for cleaner look */}

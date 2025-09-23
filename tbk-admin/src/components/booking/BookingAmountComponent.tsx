@@ -1,8 +1,6 @@
 import { formatDate } from "@/utils/modifyDates";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { getPaymentStatusColor } from "@/utils/getPaymentStatusColor";
-import { CreditCard, Clock, CheckCircle, XCircle, ChevronDown } from "lucide-react";
+import { Clock, CheckCircle, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,11 +8,10 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function BookingAmountComponent({ amount, bookedOn, paymentStatus }) {
+export default function BookingAmountComponent({ amount, bookedOn, paymentStatus, onStatusUpdate, isLoading }) {
   const paymentIcons = {
     PAID: CheckCircle,
     PENDING: Clock,
-    FAILED: XCircle,
   };
 
   const PaymentIcon = paymentIcons[paymentStatus] || Clock;
@@ -28,7 +25,9 @@ export default function BookingAmountComponent({ amount, bookedOn, paymentStatus
       {/* Payment Status Dropdown with enhanced clickable appearance */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className={`${getPaymentStatusColor(paymentStatus)} px-3 py-1 rounded-full cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-gray-300 flex items-center gap-1 ml-auto w-fit`}>
+          <div className={`${getPaymentStatusColor(paymentStatus)} px-3 py-1 rounded-full cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-gray-300 flex items-center gap-1 ml-auto w-fit ${
+            isLoading ? 'opacity-50 cursor-not-allowed' : ''
+          }`}>
             <PaymentIcon className="h-3 w-3" />
             <span className="text-xs font-medium">{paymentStatus || 'PENDING'}</span>
             <ChevronDown className="h-3 w-3 opacity-60" />
@@ -36,25 +35,20 @@ export default function BookingAmountComponent({ amount, bookedOn, paymentStatus
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[140px]">
           <DropdownMenuItem 
-            onClick={() => onStatusUpdate('paymentStatus', 'PAID')}
+            onClick={() => onStatusUpdate('PAID')}
             className="cursor-pointer"
+            disabled={isLoading}
           >
             <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
             Paid
           </DropdownMenuItem>
           <DropdownMenuItem 
-            onClick={() => onStatusUpdate('paymentStatus', 'PENDING')}
+            onClick={() => onStatusUpdate('PENDING')}
             className="cursor-pointer"
+            disabled={isLoading}
           >
             <Clock className="h-4 w-4 mr-2 text-yellow-600" />
             Pending
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => onStatusUpdate('paymentStatus', 'FAILED')}
-            className="cursor-pointer"
-          >
-            <XCircle className="h-4 w-4 mr-2 text-red-600" />
-            Failed
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
