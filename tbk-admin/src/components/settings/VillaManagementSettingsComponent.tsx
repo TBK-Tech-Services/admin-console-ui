@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Building } from "lucide-react";
 import VillaListComponent from "./VillaListComponent";
 
-export default function VillaManagementSettingsComponent() {
+export default function VillaManagementSettingsComponent({villasData}) {
   return (
     <Card>
       <CardHeader>
@@ -13,7 +13,7 @@ export default function VillaManagementSettingsComponent() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <VillaListComponent />
+        <VillaListComponent villasData={villasData}/>
         <Button variant="outline">
           Add New Villa
         </Button>
