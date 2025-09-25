@@ -4,6 +4,7 @@ import SettingsPageHeaderComponent from "@/components/settings/SettingsPageHeade
 import UserManagementSettingsComponent from "@/components/settings/UserManagementSettingsComponent";
 import VillaManagementSettingsComponent from "@/components/settings/VillaManagementSettingsComponent";
 import VillaOwnerManagementSettingsComponent from "@/components/settings/VillaOwnerManagementSettingsComponent";
+import { getGeneralSettingsService } from "@/services/generalSettings.service";
 import { getAllVillasService } from "@/services/villa.service";
 import { RootState } from "@/store/store";
 import { useQuery } from "@tanstack/react-query";
@@ -22,14 +23,19 @@ export default function SettingsPage() {
     queryFn: async() => getAllVillasService()
   });
 
-  console.log(villasData);
-  
+  const { data: generalSettingsData } = useQuery({
+    queryKey: ['generalSettings'],
+    queryFn: async() => getGeneralSettingsService()
+  });
+
+  // useMutation
+
   return (
     <div className="space-y-6 max-w-4xl">
       <SettingsPageHeaderComponent />
 
       <div className="grid gap-6">
-        <GeneralSettingsComponent />
+        <GeneralSettingsComponent generalSettingsData={generalSettingsData}/>
         <VillaManagementSettingsComponent villasData={villasData}/>
         {userRole === "Admin" && <UserManagementSettingsComponent />}
         {userRole === "Admin" && <VillaOwnerManagementSettingsComponent />}

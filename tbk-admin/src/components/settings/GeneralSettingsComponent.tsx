@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Settings as SettingsIcon } from "lucide-react";
 import GeneralSettingsFormComponent from "./GeneralSettingsFormComponent";
 
-export default function GeneralSettingsComponent() {
+export default function GeneralSettingsComponent({generalSettingsData}) {
   return (
     <Card>
       <CardHeader>
@@ -13,7 +13,7 @@ export default function GeneralSettingsComponent() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <GeneralSettingsFormComponent />
+        <GeneralSettingsFormComponent generalSettingsData={generalSettingsData}/>
         <Button className="bg-gradient-primary hover:opacity-90">
           Save Changes
         </Button>

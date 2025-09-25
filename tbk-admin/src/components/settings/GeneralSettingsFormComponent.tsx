@@ -1,7 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function GeneralSettingsFormComponent() {
+export default function GeneralSettingsFormComponent({generalSettingsData}) {
+
+  // Get Data
+  const name = generalSettingsData?.[0]?.businessName;
+  const email = generalSettingsData?.[0]?.contactEmail;
+  const phone = generalSettingsData?.[0]?.phoneNumber;
+
   return (
     <>
       <div className="grid gap-4 md:grid-cols-2">
@@ -9,7 +15,7 @@ export default function GeneralSettingsFormComponent() {
           <Label htmlFor="businessName">Business Name</Label>
           <Input
             id="businessName"
-            value="Goa Villa Retreats"
+            value={name}
             className="h-12"
           />
         </div>
@@ -18,7 +24,7 @@ export default function GeneralSettingsFormComponent() {
           <Input
             id="contactEmail"
             type="email"
-            value="info@goavillareats.com"
+            value={email}
             className="h-12"
           />
         </div>
@@ -28,15 +34,7 @@ export default function GeneralSettingsFormComponent() {
           <Label htmlFor="phone">Phone Number</Label>
           <Input
             id="phone"
-            value="+91 98765 43210"
-            className="h-12"
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="timezone">Timezone</Label>
-          <Input
-            id="timezone"
-            value="Asia/Kolkata (IST)"
+            value={phone}
             className="h-12"
           />
         </div>
