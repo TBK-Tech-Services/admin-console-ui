@@ -40,7 +40,7 @@ export const getAllVillasService = async() : Promise<[]> => {
     }
 }
 
-// Service to Get All Villas
+// Service to Get All Amenities
 export const getAllAmenityCategoriesService = async() : Promise<[]> => {
     try {
         const response = await axios.get(`${API_URL}/villas/v1/amenities/categories` , {
@@ -58,7 +58,7 @@ export const getAllAmenityCategoriesService = async() : Promise<[]> => {
     }
 }
 
-// Service to Get Al Villas
+// Service to Get A Villa
 export const getAVillaService = async(id: number) : Promise<void> => {
     try {
         const response = await axios.get(`${API_URL}/villas/v1/${id}` , {
@@ -94,7 +94,7 @@ export const updateAVillaService = async(formData: Villa_Data , id: number) : Pr
     }
 }
 
-// Service to Update A Villa
+// Service to Delete A Villa
 export const deleteAVillaService = async(id: string) : Promise<void> => {
     try {
         const response = await axios.delete(`${API_URL}/villas/v1/${id}` , {
