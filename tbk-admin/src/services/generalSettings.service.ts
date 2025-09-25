@@ -22,16 +22,16 @@ export const getGeneralSettingsService = async() : Promise<any[]> => {
 }
 
 // Service to Get General Settings
-export const updateGeneralSettingsService = async({formData , id}) : Promise<any> => {
+export const updateGeneralSettingsService = async(id: number, formData: any): Promise<any> => {
     try {
-        const response = await axios.put(`${API_URL}/settings/v1/general/${id}` , formData ,  {
-            withCredentials : true
+        const response = await axios.put(`${API_URL}/settings/v1/general/${id}`, formData, {
+            withCredentials: true
         });
-
+        
         return response.data.data;
     }
     catch (error) {
-        console.error("Error getting all general settings...");
+        console.error("Error updating general settings...");
         throw {
             message: error.response?.data?.message || "Something went wrong",
             status: error.response?.status,

@@ -1,12 +1,65 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useEffect, useState } from "react";
 
-export default function GeneralSettingsFormComponent({generalSettingsData}) {
+export default function GeneralSettingsFormComponent({generalSettingsData , onFormChange}) {
 
   // Get Data
   const name = generalSettingsData?.[0]?.businessName;
   const email = generalSettingsData?.[0]?.contactEmail;
   const phone = generalSettingsData?.[0]?.phoneNumber;
+
+  // State Variables 
+  const [formData , setFormData] = useState({
+    businessName: "",
+    contactEmail: "",
+    phoneNumber: "",
+  });
+
+  const [originalData, setOriginalData] = useState({
+    businessName: "",
+    contactEmail: "",
+    phoneNumber: "",
+  });
+
+  // Initialize form when data loads
+  useEffect(() => {
+    if (generalSettingsData && generalSettingsData.length > 0) {
+      const data = {
+        businessName: generalSettingsData[0]?.businessName || "",
+        contactEmail: generalSettingsData[0]?.contactEmail || "",
+        phoneNumber: generalSettingsData[0]?.phoneNumber || "",
+      };
+      setFormData(data);
+      setOriginalData(data);
+      onFormChange(data, false);
+    }
+  }, [generalSettingsData]);
+
+  const handleInputChange = (field: string, value: string) => {
+    const newFormData = { ...formData, [field]: value };
+    setFormData(newFormData);
+
+    // Check if data changed
+    const hasChanges = 
+      newFormData.businessName !== originalData.businessName ||
+      newFormData.contactEmail !== originalData.contactEmail ||
+      newFormData.phoneNumber !== originalData.phoneNumber;
+    
+    onFormChange(newFormData, hasChanges);
+  };
+
+  // Reset form after successful update
+  useEffect(() => {
+    if (generalSettingsData && generalSettingsData.length > 0) {
+      const newData = {
+        businessName: generalSettingsData[0]?.businessName || "",
+        contactEmail: generalSettingsData[0]?.contactEmail || "",
+        phoneNumber: generalSettingsData[0]?.phoneNumber || "",
+      };
+      setOriginalData(newData);
+    }
+  }, [generalSettingsData]);
 
   return (
     <>
@@ -15,7 +68,8 @@ export default function GeneralSettingsFormComponent({generalSettingsData}) {
           <Label htmlFor="businessName">Business Name</Label>
           <Input
             id="businessName"
-            value={name}
+            value={formData.businessName}
+            onChange={(e) => handleInputChange("businessName", e.target.value)}
             className="h-12"
           />
         </div>
@@ -24,7 +78,8 @@ export default function GeneralSettingsFormComponent({generalSettingsData}) {
           <Input
             id="contactEmail"
             type="email"
-            value={email}
+            value={formData.contactEmail}
+            onChange={(e) => handleInputChange("contactEmail", e.target.value)}
             className="h-12"
           />
         </div>
@@ -34,7 +89,8 @@ export default function GeneralSettingsFormComponent({generalSettingsData}) {
           <Label htmlFor="phone">Phone Number</Label>
           <Input
             id="phone"
-            value={phone}
+            value={formData.phoneNumber}
+            onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
             className="h-12"
           />
         </div>
