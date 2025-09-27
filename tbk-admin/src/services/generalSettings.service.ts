@@ -1,40 +1,13 @@
-import axios from "axios";
-
-// API URL Endpoint
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiService } from "./api.service";
 
 // Service to Get General Settings
 export const getGeneralSettingsService = async() : Promise<any[]> => {
-    try {
-        const response = await axios.get(`${API_URL}/settings/v1/general` , {
-            withCredentials : true
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error getting all general settings...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.get('/settings/v1/general');
+    return response.data;
 }
 
 // Service to Get General Settings
 export const updateGeneralSettingsService = async(id: number, formData: any): Promise<any> => {
-    try {
-        const response = await axios.put(`${API_URL}/settings/v1/general/${id}`, formData, {
-            withCredentials: true
-        });
-        
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error updating general settings...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.put(`/settings/v1/general/${id}` , formData);
+    return response.data;
 }

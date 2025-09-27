@@ -1,112 +1,37 @@
-import axios from "axios";
-
-// API URL Endpoint
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiService } from "./api.service";
 
 // Service to Add an Expense
 export const addExpenseService = async(formData) : Promise<void> => {
-    try {
-        const response = await axios.post(`${API_URL}/expenses/v1`, formData , {
-            withCredentials : true
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Adding an Expense...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.post('/expenses/v1' , formData);
+    return response.data;
 }
 
 // Service to Update an Expense
 export const updateExpenseService = async({formData , expenseId}) : Promise<void> => {
-    try {
-        const response = await axios.put(`${API_URL}/expenses/v1/${expenseId}`, formData , {
-            withCredentials : true,
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Updating an Expense...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.put(`/expenses/v1/${expenseId}` , formData);
+    return response.data;
 }
 
 // Service to Get an Expense
 export const getAExpenseService = async(expenseId) : Promise<void> => {
-    try {
-        const response = await axios.get(`${API_URL}/expenses/v1/${expenseId}` , {
-            withCredentials : true,
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Getting an Expense...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.get(`/expenses/v1/${expenseId}`);
+    return response.data;
 }
 
 // Service to Get all Expenses
 export const getAllExpensesService = async() : Promise<[]> => {
-    try {
-        const response = await axios.get(`${API_URL}/expenses/v1` , {
-            withCredentials : true,
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Getting all Expenses...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.get('/expenses/v1/');
+    return response.data;
 }
 
 // Service to Delete an Expense
 export const deleteAExpenseService = async(expenseId) : Promise<void> => {
-    try {
-        const response = await axios.delete(`${API_URL}/expenses/v1/${expenseId}` , {
-            withCredentials : true,
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Deleting an Expense...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.delete(`/expenses/v1/${expenseId}`);
+    return response.data;
 }
 
 // Service to Get all Expense Categories
 export const getAllExpenseCategoriesService = async() : Promise<[]> => {
-    try {
-        const response = await axios.get(`${API_URL}/expenses/v1/categories` , {
-            withCredentials : true,
-        });
-
-        return response.data.data;
-    }
-    catch (error) {
-        console.error("Error Getting all Expense Categories...");
-        throw {
-            message: error.response?.data?.message || "Something went wrong",
-            status: error.response?.status,
-        };
-    }
+    const response = await apiService.delete('/expenses/v1/categories');
+    return response.data;
 }

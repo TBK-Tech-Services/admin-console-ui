@@ -2,21 +2,18 @@ import GeneralSettingsComponent from "@/components/settings/GeneralSettingsCompo
 import SecurityAndBackupSettingsComponent from "@/components/settings/SecurityAndBackupSettingsComponent";
 import SettingsPageHeaderComponent from "@/components/settings/SettingsPageHeaderComponent";
 import UserManagementSettingsComponent from "@/components/settings/UserManagementSettingsComponent";
-import VillaManagementSettingsComponent from "@/components/settings/VillaManagementSettingsComponent";
 import VillaOwnerManagementSettingsComponent from "@/components/settings/VillaOwnerManagementSettingsComponent";
-import { useToast } from "@/hooks/use-toast";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { getGeneralSettingsService, updateGeneralSettingsService } from "@/services/generalSettings.service";
 import { getAllVillasService } from "@/services/villa.service";
 import { RootState } from "@/store/store";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
 import { useSelector } from "react-redux";
 
 export default function SettingsPage() {
 
-  // useToast
-  const { toast } = useToast();
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // useQueryClient
   const queryClient = useQueryClient();
@@ -40,25 +37,15 @@ export default function SettingsPage() {
 
   // Update General Settings Mutation
   const updateGeneralSettingsMutation = useMutation({
-    mutationFn: async (formData: any) => {
+    mutationFn: (formData: any) => {
       const settingId = generalSettingsData?.[0]?.id;
-      if (!settingId) throw new Error("Settings ID not found");
-      return await updateGeneralSettingsService(settingId, formData);
+      return updateGeneralSettingsService(settingId, formData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['generalSettings'] });
-      toast({
-        title: "Settings updated successfully!"
-      });
+      handleSuccess("Updated General Settings Successfully!");
     },
-    onError: (error: AxiosError<ApiErrorResponse>) => {
-      const backendMessage = error.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Update failed",
-        description: backendMessage,
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
 
   // Handle Update General Settings
@@ -76,7 +63,6 @@ export default function SettingsPage() {
           onUpdateSettings={handleUpdateGeneralSettings}
           isUpdating={updateGeneralSettingsMutation.isPending}
         />
-        <VillaManagementSettingsComponent villasData={villasData}/>
         {userRole === "Admin" && <UserManagementSettingsComponent />}
         {userRole === "Admin" && <VillaOwnerManagementSettingsComponent />}
         <SecurityAndBackupSettingsComponent />

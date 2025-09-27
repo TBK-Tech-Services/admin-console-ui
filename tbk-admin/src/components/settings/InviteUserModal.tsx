@@ -4,18 +4,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { Copy, Check } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getAllPermissionsService, getAllRolesService, inviteUserService } from "@/services/userManagementSettings.service";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, newUserCredentials, setNewUserCredentials }) {
     
-    // useToast
-    const { toast } = useToast();
+    // useErrorHanlder
+    const { handleMutationError, handleSuccess } = useErrorHandler();
 
     // State Variables
     const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -40,8 +38,8 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
 
     // Invite User Mutation
     const inviteUserMutation = useMutation({
-        mutationFn: async (payload: any) => {
-            return await inviteUserService(payload);
+        mutationFn: (payload: any) => {
+            return inviteUserService(payload);
         },
         onSuccess: (_data, payload) => {
             setFirstName("");
@@ -53,32 +51,14 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
             setSelectedPermissions([]);
             setIsCreatingNewRole(false);
             setNewUserCredentials({ email: payload.email, password: payload.password });
-            toast({
-            title: "User invited successfully",
-            description: "The new user has been created."
-            });
+            handleSuccess("User Invited Successfully!");
         },
-        onError: (error: unknown) => {
-            const err = error as AxiosError<ApiErrorResponse>;
-            const backendMessage = err.response?.data?.message || "Something went wrong!";
-            toast({
-                title: "Something went wrong",
-                description: backendMessage
-            });
-        }
+        onError: handleMutationError
     });
 
     // Handler Function to Handle Form Submition
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        if (!firstName || !lastName || !email || !password) {
-            toast({ 
-                title: "Please fill all required fields" 
-            });
-            return;
-        }
-
         const payload: any = {
             firstName: firstName,
             lastName: lastName,
@@ -87,22 +67,10 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         };
 
         if (isCreatingNewRole) {
-            if (!customRole?.trim() || selectedPermissions.length === 0) {
-                toast({ 
-                    title: "Provide role name and at least one permission" 
-                });
-                return;
-            }
             payload.role = customRole.trim();
             payload.permissions = selectedPermissions;
         } 
         else {
-            if (!selectedRole) {
-                toast({ 
-                    title: "Select an existing role" 
-                });
-                return;
-            }
             payload.role = Number(selectedRole);
         }
 
@@ -131,11 +99,10 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
     };
 
     // Handler Function to Handle Copy to Clipboard
-    const copyToClipboard = async (text, field) => {
-        await navigator.clipboard.writeText(text);
+    const copyToClipboard = (text, field) => {
+        navigator.clipboard.writeText(text);
         setCopiedField(field);
         setTimeout(() => setCopiedField(null), 2000);
-        toast({ title: "Copied to clipboard", description: `${field} has been copied to clipboard.` });
     };
 
     return (
