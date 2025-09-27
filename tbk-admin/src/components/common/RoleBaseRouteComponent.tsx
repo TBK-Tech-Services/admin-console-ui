@@ -14,12 +14,10 @@ export default function RoleBasedRouteComponent({ allowedRoles, redirectTo = "/u
   let userRole;
   if (typeof userRoleData === 'string') {
     userRole = userRoleData;
-  } else if (userRoleData && userRoleData.name) {
+  } 
+  else if (userRoleData && userRoleData.name) {
     userRole = userRoleData.name;
   }
-
-  console.log("RoleBasedRoute - Raw role data:", userRoleData);
-  console.log("RoleBasedRoute - Extracted role:", userRole);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

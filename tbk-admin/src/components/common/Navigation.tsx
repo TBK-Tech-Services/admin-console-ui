@@ -37,13 +37,10 @@ export function Navigation() {
   let userRole;
   if (typeof user?.role === 'string') {
     userRole = user?.role;
-  } else if (user?.role && user?.role.name) {
+  } 
+  else if (user?.role && user?.role.name) {
     userRole = user?.role.name;
   }
-
-  console.log("Navigation - User:", user);
-  console.log("Navigation - Raw role:", user?.role);
-  console.log("Navigation - Extracted userRole:", userRole);
 
   // useDispatch
   const dispatch = useDispatch();
@@ -77,7 +74,7 @@ export function Navigation() {
       toast.error(backendMessage);
     }
   })
- 
+
   const handleLogout = () => {
     logoutMutation.mutate();
   }
@@ -85,8 +82,6 @@ export function Navigation() {
   // Listing NavItems
   const NavItems = () => {
     const navigationItems = getNavigationItems(userRole);
-    console.log("NavItems - userRole:", userRole);
-    console.log("NavItems - navigationItems:", navigationItems);
 
     return (
       <>

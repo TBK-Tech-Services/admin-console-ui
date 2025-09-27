@@ -4,31 +4,23 @@ import BookingAvatarComponent from './BookingAvatarComponent';
 import BookingHeaderInfoComponent from './BookingHeaderInfoComponent';
 import BookingInfoComponent from './BookingInfoComponent';
 import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
 import { updateBookingStatusService, updatePaymentStatusService } from '@/services/booking.service';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 
 export default function BookingCardComponent({ booking }) {
-  
-  // useToast
-  const { toast } = useToast();
+
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // Booking Status Update Mutation
   const updateBookingStatusMutation = useMutation({
-    mutationFn: async(value) => {
-      return await updateBookingStatusService(value, booking.id);
+    mutationFn: (value) => {
+      return updateBookingStatusService(value, booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Booking Status Updated Successfully!"
-      });
+      handleSuccess("Booking Status updated successfully!");
     },
-    onError: (error) => {
-      toast({
-        title: "Failed to update booking status",
-        description: error.message || "Something went wrong",
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
   
   // Handler Function to Update Booking Status
@@ -38,21 +30,13 @@ export default function BookingCardComponent({ booking }) {
   
   // Payment Status Update Mutation
   const updatePaymentStatusMutation = useMutation({
-    mutationFn: async(value) => {
-      return await updatePaymentStatusService(value, booking.id);
+    mutationFn: (value) => {
+      return updatePaymentStatusService(value, booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Payment Status Updated Successfully!"
-      });
+      handleSuccess("Payment Status updated successfully!");
     },
-    onError: (error) => {
-      toast({
-        title: "Failed to update payment status",
-        description: error.message || "Something went wrong",
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
   
   // Handler Function to Update Payment Status

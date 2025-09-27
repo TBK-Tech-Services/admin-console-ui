@@ -16,9 +16,7 @@ import BookingDetailsModalComponent from "./BookingDetailsModalComponent";
 import UpdateBookingModalComponent from "./UpdateBookingModalComponent";
 import { useMutation } from "@tanstack/react-query";
 import { deleteBookingService, getABookingService } from "@/services/booking.service";
-import { useToast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 // WhatsApp Icon Component
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -33,8 +31,8 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
 
 export default function BookingActionsMenuComponent({ booking }) {
 
-  // useToast
-  const { toast } = useToast();
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // State Variables
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -42,22 +40,13 @@ export default function BookingActionsMenuComponent({ booking }) {
 
   // Get Booking Mutation
   const getBookingMutation = useMutation({
-    mutationFn: async() => {
-      return await getABookingService(booking.id);
+    mutationFn: () => {
+      return getABookingService(booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Deleted Booking Successfully!"
-      });
+      handleSuccess("Successfully Got Booking Details!");
     },
-    onError: (error: unknown) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage
-      });
-    }
+    onError: handleMutationError
   })
 
   // Handler Function to View Booking Details
@@ -73,22 +62,13 @@ export default function BookingActionsMenuComponent({ booking }) {
   
   // Delete Mutation
   const deleteMutation = useMutation({
-    mutationFn: async() => {
-      return await deleteBookingService(booking.id);
+    mutationFn: () => {
+      return deleteBookingService(booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Deleted Booking Successfully!"
-      });
+      handleSuccess("Deleted Booking Successfully!");
     },
-    onError: (error: unknown) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage
-      });
-    },
+    onError: handleMutationError
   })
 
   // Handler Function to Delete Booking

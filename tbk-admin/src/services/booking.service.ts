@@ -40,13 +40,17 @@ export const updateBookingService = async(formData: Booking_Data , id: number): 
 
 // Service to Update a Booking Status
 export const updateBookingStatusService = async(bookingStatus: string , id: number): Promise<void> => {
-    const response = await apiService.patch(`/bookings/v1/${id}/status` , bookingStatus);
+    const response = await apiService.patch(`/bookings/v1/${id}/status` , {
+        bookingStatus: bookingStatus
+    });
     return response.data;
 }
 
 // Service to Update a Payment Status
 export const updatePaymentStatusService = async(paymentStatus: string , id: number): Promise<void> => {
-    const response = await apiService.patch(`/bookings/v1/${id}/payment-status` , paymentStatus);
+    const response = await apiService.patch(`/bookings/v1/${id}/payment-status` , {
+        paymentStatus: paymentStatus
+    });
     return response.data;
 }
 

@@ -56,7 +56,6 @@ export const ownerNavigationItems = [
 ];
 
 export const getNavigationItems = (userRole: string | undefined) => {
-  console.log(userRole);
   switch (userRole) {
     case 'Admin':
       return adminNavigationItems;
