@@ -7,17 +7,15 @@ import { getAllVillasService } from "@/services/villa.service";
 import { useDispatch } from "react-redux";
 import { setVillas } from "@/store/slices/villasSlice";
 import { addBookingService } from "@/services/booking.service";
-import { useToast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function NewBookingPage() {
 
-  // useToast
-  const { toast } = useToast();
-  
   // useDispatch
   const dispatch = useDispatch();
+
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // useQuery
   const { data } = useQuery({
@@ -48,8 +46,8 @@ export default function NewBookingPage() {
 
   // Add Booking Mutation
   const addBookingMutation = useMutation({
-    mutationFn: async() => {
-      return await addBookingService(formData);
+    mutationFn: () => {
+      return addBookingService(formData);
     },
     onSuccess: () => {
       setFormData({
@@ -63,18 +61,9 @@ export default function NewBookingPage() {
         specialRequest: "",
         isGSTIncluded: false
       });
-      toast({
-        title: "Booking Created Successfully!"
-      });
+      handleSuccess("Booking created successfully!");
     },
-    onError: (error: unknown) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage
-      });
-    },
+    onError: handleMutationError
   });
 
   // Handler Function to Handle Form Submission
