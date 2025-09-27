@@ -5,7 +5,6 @@ import { getInitials } from "@/utils/getNameInitials";
 import BookingActionsMenuComponent from "../booking/BookingActionsMenuComponent";
 import { CheckCircle, Clock, XCircle, ChevronDown } from "lucide-react";
 import { useMutation } from "@tanstack/react-query";
-import { useToast } from "@/hooks/use-toast";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,58 +12,46 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { updateBookingStatusService, updatePaymentStatusService } from "@/services/booking.service";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function BookingItemComponent({ booking }) {
-  
-  // useToast
-  const { toast } = useToast();
-  
+
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
+
   // Booking Status Update Mutation
   const updateBookingStatusMutation = useMutation({
-    mutationFn: async(value) => {
-      return await updateBookingStatusService(value , booking.id);
+    mutationFn: (value) => {
+      return updateBookingStatusService(value , booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Booking Status Updated Successfully!"
-      });
+      handleSuccess("Booking Status Updated Successfully!");
     },
-    onError: (error) => {
-      toast({
-        title: "Failed to update booking status",
-        description: error.message || "Something went wrong",
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
 
+  // Handler Function to Update Booking Status
   const handleBookingStatusUpdate = (value) => {
     updateBookingStatusMutation.mutate(value);
   };
 
   // Payment Status Update Mutation
   const updatePaymentStatusMutation = useMutation({
-    mutationFn: async(value) => {
-      return await updatePaymentStatusService(value , booking.id);
+    mutationFn: (value) => {
+      return updatePaymentStatusService(value , booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Payment Status Updated Successfully!"
-      });
+      handleSuccess("Payment Status Updated Successfully!");
     },
-    onError: (error) => {
-      toast({
-        title: "Failed to update payment status",
-        description: error.message || "Something went wrong",
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
 
+  // Handler Function to Update Payment Status
   const handlePaymentStatusUpdate = (value) => {
     updatePaymentStatusMutation.mutate(value);
   };
 
+  // Mapping Booking Status Icons
   const bookingStatusIcons = {
     CONFIRMED: CheckCircle,
     CHECKED_IN: CheckCircle, 
@@ -72,11 +59,13 @@ export default function BookingItemComponent({ booking }) {
     CANCELLED: XCircle,
   };
 
+  // Mapping Payment Status Icons
   const paymentStatusIcons = {
     PAID: CheckCircle,
     PENDING: Clock,
   };
 
+  // Getting Icons For Booking Status & Payment Status
   const StatusIcon = bookingStatusIcons[booking.status] || Clock;
   const PaymentIcon = paymentStatusIcons[booking.rawBookingData?.paymentStatus] || Clock;
 
