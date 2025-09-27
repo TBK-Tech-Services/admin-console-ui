@@ -1,20 +1,16 @@
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
 import { useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { loginService } from '@/services/auth.service';
 import { setIsAuthenticated, setUser } from '@/store/slices/authSlice';
-import { ApiErrorResponse } from '@/types/global/apiErrorResponse';
 import { User } from '@/types/global/user';
 import HeroSectionComponent from '@/components/auth/HeroSectionComponent';
 import LoginFormComponent from '@/components/auth/LoginFormComponent';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { LoginData } from '@/types/auth/loginData';
 
 export default function LoginPage() {
-    
-    // useToast
-    const { toast } = useToast();
 
     // useNavigate
     const navigate = useNavigate();
@@ -22,23 +18,24 @@ export default function LoginPage() {
     // useDispatch
     const dispatch = useDispatch();
 
+    // useErrorHanlder
+    const { handleMutationError, handleSuccess } = useErrorHandler();
+
     // State Variables
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     // Login Mutation
     const loginMutation = useMutation({
-        mutationFn: async (): Promise<User> => {
-            return await loginService({ email, password });
+        mutationFn: (loginData: LoginData): Promise<User> => {
+            return loginService(loginData);
         },
         onSuccess: (user: User) => {
             dispatch(setIsAuthenticated(true));
             dispatch(setUser(user));
             setEmail("");
             setPassword("");
-            toast({
-                title: "Logged in successfully!"
-            });
+            handleSuccess("Logged in successfully!");
             
             setTimeout(() => {
                 let roleValue;
@@ -61,20 +58,13 @@ export default function LoginPage() {
                 }
             }, 1000);
         },
-        onError: (error: unknown) => {
-            const err = error as AxiosError<ApiErrorResponse>;
-            const backendMessage = err.response?.data?.message || "Something went wrong!";
-            toast({
-                title: "Something went wrong",
-                description: backendMessage
-            });
-        }
+        onError: handleMutationError
     });
 
     // Handler Function to Handle Login
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        loginMutation.mutate();
+        loginMutation.mutate({ email, password });
     };
 
     // Handler Function to Handle Input Change

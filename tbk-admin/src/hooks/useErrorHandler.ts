@@ -5,12 +5,20 @@ import { useQueryClient } from "@tanstack/react-query"
 export const useErrorHandler = () => {
     const queryClient = useQueryClient();
 
-    const handleError = (error: any , customMessage?: string) => {
-        ErrorHandlingService.showError(error , customMessage);
+    const handleError = (error: any, customMessage?: string) => {
+        ErrorHandlingService.showError(error, customMessage);
 
         if (error.response?.status === 401) {
             queryClient.clear();
         }
+    };
+
+    const handleMutationError = (error: any) => {
+        handleError(error);
+    };
+
+    const handleQueryError = (error: any) => {
+        handleError(error);
     };
 
     const handleSuccess = (message: string) => {
@@ -19,6 +27,8 @@ export const useErrorHandler = () => {
 
     return {
         handleError,
+        handleMutationError,
+        handleQueryError,
         handleSuccess
     };
 };
