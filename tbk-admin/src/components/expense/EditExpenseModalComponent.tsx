@@ -84,7 +84,8 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
       // Split expense
       if (villaSelection === "all") {
         backendData.villaIds = villas.map(v => v.id);
-      } else {
+      } 
+      else {
         backendData.villaIds = selectedVillas;
       }
     }

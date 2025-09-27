@@ -11,14 +11,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { setExpensesList } from "@/store/slices/expensesSlice";
 import { RootState } from "@/store/store";
 import { Expense } from "@/types/expense/expenseData";
-import { useToast } from "@/hooks/use-toast";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function ManageExpensesPage() {
 
-  // useToast
-  const { toast } = useToast();
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
   
   // useDispatch 
   const dispatch = useDispatch();
@@ -43,7 +41,7 @@ export default function ManageExpensesPage() {
   });
 
   // useQuery
-  const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
+  const { data, isLoading: categoriesLoading } = useQuery({
     queryKey: ['expense-categories'],
     queryFn: async () => getAllExpenseCategoriesService(),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
@@ -58,70 +56,44 @@ export default function ManageExpensesPage() {
 
   // Add Expense Mutation
   const addExpenseMutation = useMutation({
-    mutationFn: (formData: any) => addExpenseService(formData),
+    mutationFn: (formData: any) => {
+      return addExpenseService(formData)
+    },
     onSuccess: () => {
       refetchExpenses();
       setIsAddModalOpen(false);
-      toast({
-        title: "Added Expense Successfully!"
-      });
+      handleSuccess("New Expense Created Successfully!");
     },
-    onError: (error) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage,
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
 
   // Update Expense Mutation
   const updateExpenseMutation = useMutation({
-    mutationFn: ({ formData, expenseId }: { formData: any; expenseId: string }) => 
-      updateExpenseService({ formData, expenseId }),
+    mutationFn: ({ formData, expenseId }: {formData: any; expenseId: string}) => {
+      return updateExpenseService({ formData, expenseId })
+    },
     onSuccess: () => {
       refetchExpenses();
       setIsEditModalOpen(false);
       setSelectedEditExpense(null);
-      toast({
-        title: "Updated Expense Successfully!"
-      });
+      handleSuccess("Expense Updated Successfully!");
     },
-    onError: (error) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage,
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
 
   // Delete Expense Mutation
   const deleteExpenseMutation = useMutation({
-    mutationFn: (expenseId: string) => deleteAExpenseService(expenseId),
+    mutationFn: (expenseId: string) => {
+      return deleteAExpenseService(expenseId)
+    },
     onSuccess: () => {
       refetchExpenses();
       setIsDeleting(false);
       setIsDeleteModalOpen(false);
       setSelectedDeleteExpense(null);
-      toast({
-        title: "Deleted Expense Successfully!"
-      });
+      handleSuccess("Expense Deleted Successfully!");
     },
-    onError: (error) => {
-      setIsDeleting(false);
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage,
-        variant: "destructive"
-      });
-    }
+    onError: handleMutationError
   });
 
   // Handler Function to Add Expense
