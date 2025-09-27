@@ -11,14 +11,12 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { deleteAVillaService, getAllBookingsForVillaService, getRecentBookingsForVillaService } from "@/services/villa.service";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
-import { useToast } from "@/hooks/use-toast";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function SpecificVillaPage() {
 
-  // useToast
-  const { toast } = useToast();
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // useParams
   const { id } = useParams();
@@ -51,22 +49,13 @@ export default function SpecificVillaPage() {
 
   // Delete Villa Mutation
   const deleteVillaMutation = useMutation({
-    mutationFn: async() => {
-      return await deleteAVillaService(id);
+    mutationFn: () => {
+      return deleteAVillaService(id);
     },
     onSuccess: () => {
-      toast({
-        title: "Villa Deleted Successfully!"
-      });
+      handleSuccess("Villa Deleted Successfully!");
     },
-    onError: (error: unknown) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage
-      });
-    },
+    onError: handleMutationError
   })
 
   // Handler Function to Delete Villa
