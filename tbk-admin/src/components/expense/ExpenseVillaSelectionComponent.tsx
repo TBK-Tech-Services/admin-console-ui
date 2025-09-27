@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 export default function ExpenseVillaSelectionComponent({ expenseType, villaSelection, selectedVillas, formData, villas, onVillaSelectionChange, onVillaToggle, onFormDataChange }) {
   
+  // Render Villa Selection Based on Expense Type
   if (expenseType === "individual") {
     return (
       <div className="space-y-2">

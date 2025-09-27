@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import VillaOccupancyItemComponent from "./VillaOccupancyItemComponent";
 
 export default function VillaOccupancyComponent({ villasOccupancyData }) {
-  // Color palette for progress bars
+
+  // Colors for the occupancy bars
   const colors = [
     "bg-gradient-primary",
     "bg-gradient-accent", 
@@ -11,6 +12,7 @@ export default function VillaOccupancyComponent({ villasOccupancyData }) {
     "bg-orange-500"
   ];
 
+  // Handle case when there's no data
   if (!villasOccupancyData || villasOccupancyData.length === 0) {
     return (
       <Card>

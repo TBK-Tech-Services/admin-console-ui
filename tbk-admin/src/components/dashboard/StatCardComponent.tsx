@@ -18,6 +18,8 @@ const iconMap = {
 };
 
 export default function StatCardComponent({ title, value, change, icon, gradient, trend }) {
+
+  // Determine the icon component to use
   const IconComponent = iconMap[icon as keyof typeof iconMap] || DollarSign;
 
   return(

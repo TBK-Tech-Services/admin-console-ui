@@ -45,10 +45,13 @@ export default function EditUserModal({
   roles, 
   setRoles 
 }: EditUserModalProps) {
+
+  // State Variables
   const [isCreatingNewRoleEdit, setIsCreatingNewRoleEdit] = useState(false);
   const [customRoleEdit, setCustomRoleEdit] = useState("");
   const { toast } = useToast();
 
+  // Handler Function to Edit Form
   const editForm = useForm<z.infer<typeof editUserSchema>>({
     resolver: zodResolver(editUserSchema),
     defaultValues: {
@@ -61,6 +64,7 @@ export default function EditUserModal({
     }
   });
 
+  // useEffect
   useEffect(() => {
     if (selectedUser) {
       editForm.setValue("firstName", selectedUser.firstName);
@@ -71,8 +75,8 @@ export default function EditUserModal({
     }
   }, [selectedUser, editForm]);
 
+  // Handler Function for Form Submission
   const onEditSubmit = (data: z.infer<typeof editUserSchema>) => {
-    console.log("Edit user:", data);
     toast({
       title: "User updated successfully",
       description: "The user details have been updated."
@@ -81,6 +85,7 @@ export default function EditUserModal({
     editForm.reset();
   };
 
+  // Handler Function to Handler Role Selection
   const handleRoleSelect = (value: string) => {
     if (value === "create_new_role") {
       setIsCreatingNewRoleEdit(true);
@@ -91,6 +96,7 @@ export default function EditUserModal({
     }
   };
 
+  // Handler Function to Add Custom Role
   const handleAddCustomRole = () => {
     if (customRoleEdit.trim() && !roles.includes(customRoleEdit.trim())) {
       const updatedRoles = [...roles, customRoleEdit.trim()];

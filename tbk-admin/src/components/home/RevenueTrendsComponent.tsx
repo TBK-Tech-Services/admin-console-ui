@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp } from "lucide-react";
 
 export default function RevenueTrendsComponent({ revenueTrendsData }) {
+
+  // Handle loading state
   if (!revenueTrendsData) {
     return <div>Loading...</div>;
   }

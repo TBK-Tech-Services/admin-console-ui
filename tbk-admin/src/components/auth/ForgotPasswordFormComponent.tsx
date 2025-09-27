@@ -3,13 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import ForgotPasswordHeaderComponent from './ForgotPasswordHeaderComponent';
 import BackToLoginComponent from './BackToLoginComponent';
-
-interface ForgotPasswordFormComponentProps {
-    email: string;
-    onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    isLoading?: boolean;
-}
+import { ForgotPasswordFormComponentProps } from '@/types/auth/forgotPasswordFormProps';
 
 export default function ForgotPasswordFormComponent({ 
     email, 

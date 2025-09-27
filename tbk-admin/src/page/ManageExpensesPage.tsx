@@ -26,7 +26,7 @@ export default function ManageExpensesPage() {
   // useSelector
   const expenses = useSelector((store: RootState) => store.expenses.listOfExpenses);
 
-  // Modal State Variables
+  // State Variables
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedViewExpense, setSelectedViewExpense] = useState<Expense | null>(null);
@@ -36,20 +36,20 @@ export default function ManageExpensesPage() {
   const [selectedDeleteExpense, setSelectedDeleteExpense] = useState<Expense | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // useQuery for fetching expenses
+  // useQuery
   const { data: expensesData, isLoading: expensesLoading, refetch: refetchExpenses } = useQuery({
     queryKey: ['expenses'],
     queryFn: async () => getAllExpensesService()
   });
 
-  // useQuery for fetching expense categories (preload)
+  // useQuery
   const { data: categoriesData, isLoading: categoriesLoading } = useQuery({
     queryKey: ['expense-categories'],
     queryFn: async () => getAllExpenseCategoriesService(),
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
   });
 
-  // useEffect to update Redux store
+  // useEffect
   useEffect(() => {
     if (expensesData) {
       dispatch(setExpensesList(expensesData));
@@ -124,47 +124,53 @@ export default function ManageExpensesPage() {
     }
   });
 
-  // Add Expense Handler
+  // Handler Function to Add Expense
   const handleAddExpense = (formData: any) => {
     addExpenseMutation.mutate(formData);
   };
 
-  // Update Expense Handler
+  // Handler Function to Update Expense
   const handleUpdateExpense = (formData: any, expenseId: string) => {
     updateExpenseMutation.mutate({ formData, expenseId });
   };
 
-  // Delete Expense Handler
+  // Handler Function to Delete Expense
   const handleDeleteConfirm = async (expense: Expense) => {
     setIsDeleting(true);
     deleteExpenseMutation.mutate(expense.id);
   };
 
+  // Handler Function to View Expense
   const handleViewExpense = (expense: Expense) => {
     setSelectedViewExpense(expense);
     setIsViewModalOpen(true);
   };
 
+  // Handler Function to Edit Expense
   const handleEditExpense = (expense: Expense) => {
     setSelectedEditExpense(expense);
     setIsEditModalOpen(true);
   };
 
+  // Handler Function to Delete Expense
   const handleDeleteExpense = (expense: Expense) => {
     setSelectedDeleteExpense(expense);
     setIsDeleteModalOpen(true);
   };
 
+  // Handler Functions to Close View Modal
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
     setSelectedViewExpense(null);
   };
 
+  // Handler Functions to Close Edit Modal
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setSelectedEditExpense(null);
   };
 
+  // Handler Functions to Close Delete Modal
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setSelectedDeleteExpense(null);

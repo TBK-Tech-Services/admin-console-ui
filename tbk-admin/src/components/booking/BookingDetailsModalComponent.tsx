@@ -6,7 +6,11 @@ import { getBookingStatusColor } from "@/utils/getBookingStatusColor";
 import { getPaymentStatusColor } from "@/utils/getPaymentStatusColor";
 
 export default function BookingDetailsModalComponent({ isOpen, onClose, booking }) {
-  if (!booking) return null;
+
+  // Return null if no booking data
+  if (!booking){
+    return null;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

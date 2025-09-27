@@ -10,11 +10,13 @@ export default function GeneralSettingsComponent({generalSettingsData , onUpdate
   const [currentFormData, setCurrentFormData] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
 
+  // Handler Function to Handle Form Changes
   const handleFormChange = (data: any, changesDetected: boolean) => {
     setCurrentFormData(data);
     setHasChanges(changesDetected);
   };
 
+  // Handler Function to Save Changes
   const handleSave = () => {
     onUpdateSettings(currentFormData);
   };

@@ -9,11 +9,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function BookingAmountComponent({ amount, bookedOn, paymentStatus, onStatusUpdate, isLoading }) {
+
+  // Icons for Payment Status
   const paymentIcons = {
     PAID: CheckCircle,
     PENDING: Clock,
   };
 
+  // Select the appropriate icon based on payment status
   const PaymentIcon = paymentIcons[paymentStatus] || Clock;
 
   return (

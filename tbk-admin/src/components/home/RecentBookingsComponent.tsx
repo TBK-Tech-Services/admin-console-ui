@@ -8,7 +8,7 @@ export default function RecentBookingsComponent({recentBookingsData}) {
   // useNavigate
   const navigate = useNavigate();
 
-  // RecentBookingsComponent.tsx mein ye change karo:
+  // Format Bookings Data for display
   const formattedBookings = recentBookingsData?.map(booking => ({
     id: booking.id.toString(),
     guestName: booking.guestName,

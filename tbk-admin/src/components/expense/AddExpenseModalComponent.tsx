@@ -26,6 +26,7 @@ export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense
     villa: "",
   });
 
+  // Handler Function to Handle Form Submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -39,7 +40,6 @@ export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense
         : parseInt(formData.category),
     };
 
-    // Add villa data based on expense type
     if (expenseType === "individual") {
       backendData.villaId = parseInt(formData.villa);
     } 
@@ -56,6 +56,7 @@ export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense
     resetForm();
   };
 
+  // Handler Function to Reset Form
   const resetForm = () => {
     setFormData({ title: "", amount: "", date: "", category: "", villa: "" });
     setNewCategoryName("");
@@ -64,6 +65,7 @@ export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense
     setSelectedVillas([]);
   };
 
+  // Hander Function to Toggle Villa Selection
   const handleVillaToggle = (villaId: number) => {
     setSelectedVillas(prev => 
       prev.includes(villaId) 
@@ -72,6 +74,7 @@ export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense
     );
   };
 
+  // Handler Function to Close Modal
   const handleClose = () => {
     if (!isLoading) {
       resetForm();

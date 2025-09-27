@@ -7,6 +7,8 @@ interface BookingsStatusFilterComponentProps {
 }
 
 export default function BookingsStatusFilterComponent({ statusFilter, onStatusFilterChange }: BookingsStatusFilterComponentProps) {
+
+  // Status Options
   const statusOptions = [
     { value: "CONFIRMED", label: "Confirmed" },
     { value: "CHECKED_IN", label: "Checked In" },

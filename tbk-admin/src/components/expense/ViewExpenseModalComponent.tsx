@@ -5,6 +5,7 @@ import { Eye, Calendar, IndianRupee, Building2, Tag } from "lucide-react";
 
 export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) {
   
+  // Return null if no expense is provided
   if (!expense){
     return null;
   };
@@ -35,6 +36,7 @@ export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) 
     };
   };
 
+  // Get villa info
   const villaInfo = getVillaInfo();
 
   return (

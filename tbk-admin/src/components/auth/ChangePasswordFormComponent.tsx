@@ -2,17 +2,9 @@ import { Button } from '@/components/ui/button';
 import ChangePasswordHeaderComponent from '@/components/auth/ChangePasswordHeaderComponent';
 import BackToLoginComponent from '@/components/auth/BackToLoginComponent';
 import PasswordInputFieldComponent from './PasswordInputFieldComponent';
+import { ChangePasswordFormComponentProps } from '@/types/auth/changePasswordFormProps';
 
-interface ChangePasswordFormComponentProps {
-    currentPassword: string;
-    newPassword: string;
-    confirmPassword: string;
-    onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    isLoading?: boolean;
-}
-
-export default function ChangePasswordFormComponent({ 
+export default function ChangePasswordFormComponent({
     currentPassword,
     newPassword,
     confirmPassword,

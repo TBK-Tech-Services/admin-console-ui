@@ -18,6 +18,7 @@ import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 import { useToast } from "@/hooks/use-toast";
 
 export default function UpdateBookingModalComponent({ isOpen, onClose, booking }) {
+  
   // useToast
   const { toast } = useToast();
 
@@ -45,7 +46,7 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     }));
   };
 
-  // useMutate
+  // Update Booking Mutation
   const updateBookingMutation = useMutation({
     mutationFn: async() => {
       return await updateBookingService(formData , booking.id);
@@ -66,7 +67,7 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     }
   })
 
-  // Handler Function to Handle Form Submission
+  // Handler Function to Update Booking
   const handleUpdateBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     updateBookingMutation.mutate();

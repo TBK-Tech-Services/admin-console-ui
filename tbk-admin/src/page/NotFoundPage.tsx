@@ -6,19 +6,25 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
 export default function NotFoundPage() {
+
+  // useNaviagte
   const navigate = useNavigate();
+  
+  // useSelector
   const userRoleData = useSelector(
     (state: RootState) => state.auth.user?.role
   );
 
-  // Extract role value
+  // Extract User Role
   let userRole;
   if (typeof userRoleData === 'string') {
     userRole = userRoleData;
-  } else if (userRoleData && userRoleData.name) {
+  } 
+  else if (userRoleData && userRoleData.name) {
     userRole = userRoleData.name;
   }
 
+  // Handler Function to Go Home based on Role
   const handleGoHome = () => {
     if (userRole === 'Admin') {
       navigate("/");

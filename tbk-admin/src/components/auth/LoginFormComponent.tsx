@@ -3,14 +3,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import LoginHeaderComponent from './LoginHeaderComponent';
 import LoginLinksComponent from './LoginLinksComponent';
-
-interface LoginFormComponentProps {
-    email: string;
-    password: string;
-    onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-    isLoading?: boolean;
-}
+import { LoginFormComponentProps } from '@/types/auth/loginFormProps';
 
 export default function LoginFormComponent({ 
     email, 

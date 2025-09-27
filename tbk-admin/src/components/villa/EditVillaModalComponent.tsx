@@ -15,23 +15,21 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
 
   // useSelector
   const amenities = useSelector((state: RootState) => state.amenities.listOfAmenities);
-  console.log(amenities);
 
   // State Variables
   const [selectedAmenities, setSelectedAmenities] = useState<number[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
 
-  // Initialize selected amenities when villa data changes
+  // useEffect
   useEffect(() => {
     if (villa && villa.amenities) {
-      // Extract amenity IDs from villa.amenities array
-      // Assuming villa.amenities is array of amenity objects with id field
       const amenityIds = villa.amenities.map((amenity: any) => amenity.amenity?.id || amenity.id);
       setSelectedAmenities(amenityIds);
     }
   }, [villa]);
 
+  // Handler Function to Handle Image Upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -39,10 +37,12 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
     }
   };
 
+  // Handler Function to Remove Selected Image
   const removeImage = (index: number) => {
     setSelectedImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Handler Function to Toggle Category Expansion
   const toggleCategory = (categoryId: number) => {
     setExpandedCategories(prev => 
       prev.includes(categoryId) 
@@ -51,6 +51,7 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
     );
   };
 
+  // Handler Function to Handle Amenity Change
   const handleAmenityChange = (amenityId: number, checked: boolean) => {
     if (checked) {
       setSelectedAmenities([...selectedAmenities, amenityId]);
@@ -59,6 +60,7 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
     }
   };
 
+  // Helper Functions for Category Selection States
   const getCategorySelectedCount = (categoryId: number) => {
     const category = amenities.find(cat => cat.id === categoryId);
     if (!category) return 0;
@@ -68,26 +70,32 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
     ).length;
   };
 
+  // Handler Functions to check if Category is Partially or Fully Selected
   const isCategoryPartiallySelected = (categoryId: number) => {
     const selectedCount = getCategorySelectedCount(categoryId);
     const category = amenities.find(cat => cat.id === categoryId);
     return selectedCount > 0 && selectedCount < (category?.amenities.length || 0);
   };
 
+  // Handler Functions to check if Category is Fully Selected
   const isCategoryFullySelected = (categoryId: number) => {
     const selectedCount = getCategorySelectedCount(categoryId);
     const category = amenities.find(cat => cat.id === categoryId);
     return selectedCount === (category?.amenities.length || 0) && selectedCount > 0;
   };
 
+  // Handler Function to Handle Select All in a Category
   const handleCategorySelectAll = (categoryId: number, checked: boolean) => {
     const category = amenities.find(cat => cat.id === categoryId);
-    if (!category) return;
+    if (!category){
+      return;
+    };
 
     if (checked) {
       const newAmenities = category.amenities.map(amenity => amenity.id);
       setSelectedAmenities(prev => [...prev, ...newAmenities.filter(id => !prev.includes(id))]);
-    } else {
+    } 
+    else {
       const amenityIds = category.amenities.map(amenity => amenity.id);
       setSelectedAmenities(prev => prev.filter(id => !amenityIds.includes(id)));
     }

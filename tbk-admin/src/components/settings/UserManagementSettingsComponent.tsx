@@ -24,7 +24,7 @@ export default function UserManagementSettingsComponent() {
     queryFn: getAllUsersService,
   });
 
-  // Handler Function to Handle Edit User
+  // Handler Function to Edit User
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
     setEditModalOpen(true);

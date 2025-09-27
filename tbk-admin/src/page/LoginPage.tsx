@@ -26,7 +26,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    // useMutation
+    // Login Mutation
     const loginMutation = useMutation({
         mutationFn: async (): Promise<User> => {
             return await loginService({ email, password });
@@ -41,7 +41,6 @@ export default function LoginPage() {
             });
             
             setTimeout(() => {
-                // Try both formats
                 let roleValue;
                 if (typeof user.role === 'string') {
                     roleValue = user.role;
@@ -72,13 +71,13 @@ export default function LoginPage() {
         }
     });
 
-    // Handler to Handle Login
+    // Handler Function to Handle Login
     const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         loginMutation.mutate();
     };
 
-    // Handler to Handle Input Change
+    // Handler Function to Handle Input Change
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
 

@@ -38,10 +38,9 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         queryFn: getAllPermissionsService 
     });
 
-    // useMutation
+    // Invite User Mutation
     const inviteUserMutation = useMutation({
         mutationFn: async (payload: any) => {
-            console.log(">>> Sending payload to API:", payload);
             return await inviteUserService(payload);
         },
         onSuccess: (_data, payload) => {
@@ -53,9 +52,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
             setCustomRole("");
             setSelectedPermissions([]);
             setIsCreatingNewRole(false);
-
             setNewUserCredentials({ email: payload.email, password: payload.password });
-
             toast({
             title: "User invited successfully",
             description: "The new user has been created."
@@ -71,7 +68,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         }
     });
 
-    // Handler to Handle Invite User Submission
+    // Handler Function to Handle Form Submition
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -109,12 +106,10 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
             payload.role = Number(selectedRole);
         }
 
-        console.log("Invite user payload:", payload, { isCreatingNewRole, customRole, selectedRole, selectedPermissions });
-
         inviteUserMutation.mutate(payload);
     };
 
-    // Handler to Handle Role Selection
+    // Handler Function to Handler Role Selection
     const handleRoleSelect = (value: string) => {
         if (value === "create_new_role") { 
             setIsCreatingNewRole(true); 
@@ -125,7 +120,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         }
     };
 
-    // Handler to Handle Permission Change
+    // Handler Function to Handle Permission Change
     const handlePermissionChange = (permissionId, checked) => {
         if (checked){
             setSelectedPermissions([...selectedPermissions, permissionId]);
@@ -135,7 +130,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         };
     };
 
-    // Handler to Handle Copy to Clipboard
+    // Handler Function to Handle Copy to Clipboard
     const copyToClipboard = async (text, field) => {
         await navigator.clipboard.writeText(text);
         setCopiedField(field);

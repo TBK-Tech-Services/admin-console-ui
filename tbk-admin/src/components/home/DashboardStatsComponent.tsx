@@ -2,6 +2,7 @@ import StatCardComponent from "../dashboard/StatCardComponent";
 
 export default function DashboardStatsComponent({ dashboardStatsData }) {
   
+  // Render nothing if no stats available
   if (!dashboardStatsData?.stats || dashboardStatsData.stats.length === 0) {
     return null;
   }

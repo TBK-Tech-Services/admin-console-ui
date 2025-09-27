@@ -7,7 +7,7 @@ import { RootState } from "@/store/store";
 
 export default function ExpensesTableComponent({ onViewExpense, onEditExpense, onDeleteExpense }) {
   
-  // Get expenses from Redux store
+  // useSelector
   const expenses = useSelector((store: RootState) => store.expenses.listOfExpenses);
 
   return (

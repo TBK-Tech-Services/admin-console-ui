@@ -15,14 +15,13 @@ export default function GeneralSettingsFormComponent({generalSettingsData , onFo
     contactEmail: "",
     phoneNumber: "",
   });
-
   const [originalData, setOriginalData] = useState({
     businessName: "",
     contactEmail: "",
     phoneNumber: "",
   });
 
-  // Initialize form when data loads
+  // useEffect
   useEffect(() => {
     if (generalSettingsData && generalSettingsData.length > 0) {
       const data = {
@@ -36,11 +35,11 @@ export default function GeneralSettingsFormComponent({generalSettingsData , onFo
     }
   }, [generalSettingsData]);
 
+  // Handler Function to Handle Input Changes
   const handleInputChange = (field: string, value: string) => {
     const newFormData = { ...formData, [field]: value };
     setFormData(newFormData);
 
-    // Check if data changed
     const hasChanges = 
       newFormData.businessName !== originalData.businessName ||
       newFormData.contactEmail !== originalData.contactEmail ||
@@ -49,7 +48,7 @@ export default function GeneralSettingsFormComponent({generalSettingsData , onFo
     onFormChange(newFormData, hasChanges);
   };
 
-  // Reset form after successful update
+  // useEffect
   useEffect(() => {
     if (generalSettingsData && generalSettingsData.length > 0) {
       const newData = {

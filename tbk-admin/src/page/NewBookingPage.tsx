@@ -46,7 +46,7 @@ export default function NewBookingPage() {
   });
   const [showModal, setShowModal] = useState(false);
 
-  // useMutation
+  // Add Booking Mutation
   const addBookingMutation = useMutation({
     mutationFn: async() => {
       return await addBookingService(formData);
@@ -90,7 +90,6 @@ export default function NewBookingPage() {
       [field]: value
     }));
   };
-
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">

@@ -8,6 +8,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export default function BookingHeaderInfoComponent({ guestName, status, booking, onStatusUpdate, isLoading }) {
+
+  // Status Icons Mapping
   const statusIcons = {
     CONFIRMED: CheckCircle,
     CHECKED_IN: CheckCircle,
@@ -15,6 +17,7 @@ export default function BookingHeaderInfoComponent({ guestName, status, booking,
     CANCELLED: XCircle,
   };
 
+  // Determine the appropriate icon based on status, default to Clock if status is unrecognized
   const StatusIcon = statusIcons[status] || Clock;
 
   return (

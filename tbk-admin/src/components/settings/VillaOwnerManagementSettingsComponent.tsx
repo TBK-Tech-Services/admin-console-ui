@@ -78,6 +78,8 @@ const mockVillas = [
 ];
 
 export default function VillaOwnerManagementSettingsComponent() {
+
+  // State Variables
   const [owners, setOwners] = useState(mockOwners);
   const [villas, setVillas] = useState(mockVillas);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
@@ -87,9 +89,11 @@ export default function VillaOwnerManagementSettingsComponent() {
   const [ownerToUpdate, setOwnerToUpdate] = useState<any>(null);
   const [ownerToDelete, setOwnerToDelete] = useState<any>(null);
 
+  // Derived Data
   const unassignedVillas = villas.filter(villa => !villa.ownerId);
-  const allVillas = villas; // For update dialog, show all villas
+  const allVillas = villas;
 
+  // Handler Function to Handle Villa Selection
   const handleVillaSelection = (villaId: string, checked: boolean) => {
     setSelectedVillas(prev => 
       checked 
@@ -98,44 +102,46 @@ export default function VillaOwnerManagementSettingsComponent() {
     );
   };
 
+  // Handler Function Handle Assign Villas
   const handleAssignVillas = () => {
-    console.log(`Assigning villas ${selectedVillas} to owner ${selectedOwner}`);
     setIsAssignDialogOpen(false);
     setSelectedOwner("");
     setSelectedVillas([]);
   };
 
+  // Handler Function Handler to Update Owner
   const handleUpdateOwner = (owner: any) => {
     setOwnerToUpdate(owner);
     setSelectedOwner(owner.id.toString());
-    // Pre-select currently owned villas
     setSelectedVillas(owner.ownedVillas.map((villa: any) => villa.id.toString()));
     setIsUpdateDialogOpen(true);
   };
 
+  // Handler Function to Update Villas for Owner
   const handleUpdateVillas = () => {
-    console.log(`Updating owner ${selectedOwner} with villas ${selectedVillas}`);
     setIsUpdateDialogOpen(false);
     setOwnerToUpdate(null);
     setSelectedOwner("");
     setSelectedVillas([]);
   };
 
+  // Handler Function to Delete Owner
   const handleDeleteOwner = (owner: any) => {
-    console.log(`Deleting owner ${owner.id}`);
-    // Logic to delete owner will go here
     setOwnerToDelete(null);
   };
 
+  // Handler Function to Unassign Villa from Owner
   const handleUnassignVilla = (villaId: number, ownerId: number) => {
     console.log(`Unassigning villa ${villaId} from owner ${ownerId}`);
   };
 
+  // Handler Function to Reset Dialogs
   const resetAssignDialog = () => {
     setSelectedOwner("");
     setSelectedVillas([]);
   };
 
+  // Handler Function to Reset Update Dialog
   const resetUpdateDialog = () => {
     setOwnerToUpdate(null);
     setSelectedOwner("");

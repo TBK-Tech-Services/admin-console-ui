@@ -4,14 +4,17 @@ import { AlertTriangle, Trash2, IndianRupee } from "lucide-react";
 
 export default function DeleteExpenseModalComponent({ isOpen, onClose, expense, onDeleteConfirm, isDeleting = false }) {
   
-  // Handler Function
+  // Handler Function to Confirm Deletion
   const handleDelete = () => {
     if (expense) {
       onDeleteConfirm?.(expense);
     }
   };
 
-  if (!expense) return null;
+  // If no expense is provided, do not render the modal
+  if (!expense){
+    return null;
+  };
 
   // Convert paise to rupees for display
   const displayAmount = expense.amount / 100;
@@ -26,6 +29,7 @@ export default function DeleteExpenseModalComponent({ isOpen, onClose, expense, 
     return [];
   };
 
+  // Get villa names
   const villaNames = getVillaNames();
 
   return (

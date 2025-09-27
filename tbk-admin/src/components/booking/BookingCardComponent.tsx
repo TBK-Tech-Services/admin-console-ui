@@ -31,6 +31,7 @@ export default function BookingCardComponent({ booking }) {
     }
   });
   
+  // Handler Function to Update Booking Status
   const handleBookingStatusUpdate = (value) => {
     updateBookingStatusMutation.mutate(value);
   };
@@ -54,6 +55,7 @@ export default function BookingCardComponent({ booking }) {
     }
   });
   
+  // Handler Function to Update Payment Status
   const handlePaymentStatusUpdate = (value) => {
     updatePaymentStatusMutation.mutate(value);
   };

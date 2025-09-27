@@ -9,20 +9,22 @@ export default function ChangePasswordPage() {
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
 
-    // Handler to Handle Input Change
+    // Handler Function to Handle Input Change
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         
         if (id === "current-password") {
             setCurrentPassword(value);
-        } else if (id === "new-password") {
+        } 
+        else if (id === "new-password") {
             setNewPassword(value);
-        } else if (id === "confirm-password") {
+        } 
+        else if (id === "confirm-password") {
             setConfirmPassword(value);
         }
     };
 
-    // Handler to Handle Form Submission
+    // Handler Function to Handle Form Submission
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         

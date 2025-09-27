@@ -3,6 +3,8 @@ import { Navigate } from "react-router-dom";
 import { RootState } from "@/store/store";
 
 export default function RoleBasedHomeRedirectComponent() {
+
+  // useSelector
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
@@ -10,14 +12,16 @@ export default function RoleBasedHomeRedirectComponent() {
     (state: RootState) => state.auth.user?.role
   );
 
-  // Extract role value
+  // Extract User Role
   let userRole;
   if (typeof userRoleData === 'string') {
     userRole = userRoleData;
-  } else if (userRoleData && userRoleData.name) {
+  } 
+  else if (userRoleData && userRoleData.name) {
     userRole = userRoleData.name;
   }
 
+  // Redirect based on Role
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

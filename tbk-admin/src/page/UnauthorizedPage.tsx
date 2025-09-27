@@ -6,11 +6,15 @@ import { setIsAuthenticated, setUser } from "@/store/slices/authSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function UnauthorizedPage() {
+
+  // useDispatch
   const dispatch = useDispatch();
+
+  // useNaviagte
   const navigate = useNavigate();
 
+  // Handler Function to go to Login Page
   const handleGoToLogin = () => {
-    // Clear auth state to prevent loop
     dispatch(setIsAuthenticated(false));
     dispatch(setUser(null));
     navigate("/login");

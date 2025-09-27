@@ -15,11 +15,16 @@ import { useSelector } from "react-redux";
 
 export default function SettingsPage() {
 
+  // useToast
   const { toast } = useToast();
+
+  // useQueryClient
   const queryClient = useQueryClient();
 
   // useSelector
   const user = useSelector((state: RootState) => state.auth.user);
+
+  // Get User Role
   const userRole = user?.role;
 
   // useQuery
@@ -33,7 +38,7 @@ export default function SettingsPage() {
     queryFn: async() => getGeneralSettingsService()
   });
 
-  // useMutation for updating general settings
+  // Update General Settings Mutation
   const updateGeneralSettingsMutation = useMutation({
     mutationFn: async (formData: any) => {
       const settingId = generalSettingsData?.[0]?.id;
@@ -56,6 +61,7 @@ export default function SettingsPage() {
     }
   });
 
+  // Handle Update General Settings
   const handleUpdateGeneralSettings = (formData: any) => {
     updateGeneralSettingsMutation.mutate(formData);
   };

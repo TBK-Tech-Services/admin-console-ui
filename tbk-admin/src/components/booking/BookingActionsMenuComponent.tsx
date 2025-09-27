@@ -40,7 +40,7 @@ export default function BookingActionsMenuComponent({ booking }) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
 
-  // useMutate
+  // Get Booking Mutation
   const getBookingMutation = useMutation({
     mutationFn: async() => {
       return await getABookingService(booking.id);
@@ -60,19 +60,18 @@ export default function BookingActionsMenuComponent({ booking }) {
     }
   })
 
-  // Handler Function to Handle View Booking Details
+  // Handler Function to View Booking Details
   const handleViewDetails = () => {
     setShowDetailsModal(true);
     getBookingMutation.mutate();
   };
 
-  // Handler Function to Handle Update Booking
+  // Handler Function to Update Booking
   const handleEditBooking = () => {
     setShowUpdateModal(true);
   };
   
-  
-  // useMutate
+  // Delete Mutation
   const deleteMutation = useMutation({
     mutationFn: async() => {
       return await deleteBookingService(booking.id);
@@ -92,7 +91,7 @@ export default function BookingActionsMenuComponent({ booking }) {
     },
   })
 
-  // Handler Function to Handle Delete Booking
+  // Handler Function to Delete Booking
   const handleDeleteBooking = () => {
     deleteMutation.mutate();
   };

@@ -13,6 +13,7 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
   // useSelector
   const villas = useSelector((store: RootState) => store.villas.listOfVilla);
   
+  // State Variables
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");
   const [villaSelection, setVillaSelection] = useState<"all" | "specific">("all");
   const [selectedVillas, setSelectedVillas] = useState<number[]>([]);
@@ -25,15 +26,11 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
     villa: "",
   });
 
-  // Populate form when expense changes
+  // useEffect
   useEffect(() => {
     if (expense) {
-      // Convert amount from paise to rupees for form display
       const displayAmount = expense.amount / 100;
-
-      // Format date for HTML input (YYYY-MM-DD)
       const formattedDate = new Date(expense.date).toISOString().split('T')[0];
-
       
       setFormData({
         title: expense.title,
@@ -45,17 +42,15 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
           : "",
       });
       
-      // Set expense type (convert to lowercase for component)
       setExpenseType(expense.type.toLowerCase() as "individual" | "split");
       
-      // Handle villa selection for split expenses
       if (expense.type === "SPLIT" && expense.villas) {
         const villaIds = expense.villas.map(v => v.villa.id);
         
-        // Check if all villas are selected
         if (villaIds.length === villas.length) {
           setVillaSelection("all");
-        } else {
+        } 
+        else {
           setVillaSelection("specific");
           setSelectedVillas(villaIds);
         }
@@ -63,9 +58,12 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
     }
   }, [expense, villas.length]);
 
+  // Handler Function to Handle Form Submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!expense) return;
+    if (!expense){
+      return;
+    };
 
     // Prepare backend data format
     const backendData = {
@@ -95,6 +93,7 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
     handleClose();
   };
 
+  // Handler Function to Close Modal
   const handleClose = () => {
     if (!isLoading) {
       resetForm();
@@ -102,6 +101,7 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
     }
   };
 
+  // Handler Function to Reset Form
   const resetForm = () => {
     setFormData({ title: "", amount: "", date: "", category: "", villa: "" });
     setNewCategoryName("");
@@ -110,6 +110,7 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
     setSelectedVillas([]);
   };
 
+  // Handler Function to Toggle Villa Selection
   const handleVillaToggle = (villaId: number) => {
     setSelectedVillas(prev => 
       prev.includes(villaId) 
@@ -118,7 +119,9 @@ export default function EditExpenseModalComponent({ isOpen, onClose, expense, on
     );
   };
 
-  if (!expense) return null;
+  if (!expense){
+    return null;
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>

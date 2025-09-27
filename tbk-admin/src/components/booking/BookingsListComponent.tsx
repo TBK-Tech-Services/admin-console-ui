@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 
 export default function BookingsListComponent() {
+  
   // useSelector
   const bookings = useSelector((state: RootState) => state.bookings);
 

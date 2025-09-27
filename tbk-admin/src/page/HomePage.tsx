@@ -5,6 +5,7 @@ import { getDashboardStatsService, getRecentBookingsService, getRevenueTrendsSer
 import { useQuery } from "@tanstack/react-query";
 
 export default function HomePage() {
+  
   // useQuery
   const { data : upcomingCheckins } = useQuery({
     queryKey : ['upcoming-checkins'],

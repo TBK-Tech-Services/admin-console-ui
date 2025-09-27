@@ -22,8 +22,6 @@ export default function SpecificVillaPage() {
 
   // useParams
   const { id } = useParams();
-  console.log(id);
-  console.log(typeof id);
   
   // useSelector
   const villas = useSelector((state: RootState) => state.villas);
@@ -51,7 +49,7 @@ export default function SpecificVillaPage() {
   })
   
 
-  // useMutate
+  // Delete Villa Mutation
   const deleteVillaMutation = useMutation({
     mutationFn: async() => {
       return await deleteAVillaService(id);
@@ -71,7 +69,7 @@ export default function SpecificVillaPage() {
     },
   })
 
-  // Handler Function to Handle Delete Villa
+  // Handler Function to Delete Villa
   const handleDeleteVilla = async () => {
     setIsDeleting(true);
 
@@ -90,6 +88,7 @@ export default function SpecificVillaPage() {
     averageStay: "0 days"
   };
 
+  // If villa not found, show error message
   if (!villa) {
     return (
       <div className="text-center py-12">

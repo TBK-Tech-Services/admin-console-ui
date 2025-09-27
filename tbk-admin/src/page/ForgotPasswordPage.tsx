@@ -7,12 +7,12 @@ export default function ForgotPasswordPage() {
     // State Variables
     const [email, setEmail] = useState("");
 
-    // Handler to Handle Email Change
+    // Handler Function to Handle Email Change
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
     };
 
-    // Handler to Handle Form Submission
+    // Handler Function to Handle Form Submission
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         console.log("Reset password for:", email);

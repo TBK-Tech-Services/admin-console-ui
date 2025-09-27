@@ -3,7 +3,8 @@ import { Calendar } from "lucide-react";
 import CheckinItemComponent from "./CheckinItemComponent";
 
 export default function UpcomingCheckinsComponent({upcomingCheckinsData}) {
-  // Convert API data to display format
+
+  // Prepare Checkin Data for display
   const checkinsData = upcomingCheckinsData ? [
     { 
       label: "Today", 
