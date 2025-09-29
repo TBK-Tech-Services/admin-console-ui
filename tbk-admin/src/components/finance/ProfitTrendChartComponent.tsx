@@ -2,10 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface ProfitTrendChartComponentProps {
-  monthlyData: any[];
+  profitTrendData: Array<{
+    month: string;
+    profit: number;
+  }>;
 }
 
-export default function ProfitTrendChartComponent({ monthlyData }: ProfitTrendChartComponentProps) {
+export default function ProfitTrendChartComponent({ profitTrendData }: ProfitTrendChartComponentProps) {
   return (
     <Card className="bg-gradient-to-br from-card to-card/50 border-0 shadow-lg">
       <CardHeader className="pb-4">
@@ -15,7 +18,7 @@ export default function ProfitTrendChartComponent({ monthlyData }: ProfitTrendCh
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={320}>
-          <LineChart data={monthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <LineChart data={profitTrendData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="2 4" stroke="hsl(var(--muted))" strokeOpacity={0.3} />
             <XAxis 
               dataKey="month" 

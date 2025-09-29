@@ -2,8 +2,18 @@ import ExpenseDistributionChartComponent from "./ExpenseDistributionChartCompone
 import VillaPerformanceListComponent from "./VillaPerformanceListComponent";
 
 interface FinanceVillaPerformanceComponentProps {
-  villaData: any[];
-  expenseCategories: any[];
+  villaData: Array<{
+    villaId: number;
+    villaName: string;
+    income: number;
+    profit: number;
+    profitMargin: number;
+  }>;
+  expenseCategories: Array<{
+    category: string;
+    amount: number;
+    percentage: number;
+  }>;
 }
 
 export default function FinanceVillaPerformanceComponent({ 

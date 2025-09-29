@@ -3,6 +3,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BarChart3 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getAllVillasService } from "@/services/villa.service";
 
 interface FinanceFiltersComponentProps {
   selectedVilla: string;
@@ -21,6 +23,23 @@ export default function FinanceFiltersComponent({
   onMonthChange,
   onDateRangeChange
 }: FinanceFiltersComponentProps) {
+  const [villas, setVillas] = useState<any[]>([]);
+
+  // Fetch villas for dropdown
+  useEffect(() => {
+    const fetchVillas = async () => {
+      try {
+        const response = await getAllVillasService();
+        if (response.success) {
+          setVillas(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching villas:', error);
+      }
+    };
+    fetchVillas();
+  }, []);
+
   return (
     <Card>
       <CardHeader>
@@ -35,14 +54,15 @@ export default function FinanceFiltersComponent({
             <Label htmlFor="villa-filter">Villa</Label>
             <Select value={selectedVilla} onValueChange={onVillaChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select villa" />
+                <SelectValue placeholder="All Villas" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Villas</SelectItem>
-                <SelectItem value="sunset-villa">Sunset Villa</SelectItem>
-                <SelectItem value="ocean-view">Ocean View</SelectItem>
-                <SelectItem value="palm-paradise">Palm Paradise</SelectItem>
-                <SelectItem value="coconut-grove">Coconut Grove</SelectItem>
+                {villas.map((villa) => (
+                  <SelectItem key={villa.id} value={villa.id.toString()}>
+                    {villa.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -51,16 +71,22 @@ export default function FinanceFiltersComponent({
             <Label htmlFor="month-filter">Month</Label>
             <Select value={selectedMonth} onValueChange={onMonthChange}>
               <SelectTrigger>
-                <SelectValue placeholder="Select month" />
+                <SelectValue placeholder="All Months" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Months</SelectItem>
-                <SelectItem value="jan">January</SelectItem>
-                <SelectItem value="feb">February</SelectItem>
-                <SelectItem value="mar">March</SelectItem>
-                <SelectItem value="apr">April</SelectItem>
-                <SelectItem value="may">May</SelectItem>
-                <SelectItem value="jun">June</SelectItem>
+                <SelectItem value="1">January</SelectItem>
+                <SelectItem value="2">February</SelectItem>
+                <SelectItem value="3">March</SelectItem>
+                <SelectItem value="4">April</SelectItem>
+                <SelectItem value="5">May</SelectItem>
+                <SelectItem value="6">June</SelectItem>
+                <SelectItem value="7">July</SelectItem>
+                <SelectItem value="8">August</SelectItem>
+                <SelectItem value="9">September</SelectItem>
+                <SelectItem value="10">October</SelectItem>
+                <SelectItem value="11">November</SelectItem>
+                <SelectItem value="12">December</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -72,6 +98,7 @@ export default function FinanceFiltersComponent({
               type="date"
               value={dateRange.start}
               onChange={(e) => onDateRangeChange({ ...dateRange, start: e.target.value })}
+              disabled={!!selectedMonth}
             />
           </div>
 
@@ -82,6 +109,7 @@ export default function FinanceFiltersComponent({
               type="date"
               value={dateRange.end}
               onChange={(e) => onDateRangeChange({ ...dateRange, end: e.target.value })}
+              disabled={!!selectedMonth}
             />
           </div>
         </div>
