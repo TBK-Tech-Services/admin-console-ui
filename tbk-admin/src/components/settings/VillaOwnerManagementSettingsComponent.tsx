@@ -1,145 +1,151 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UserCog } from "lucide-react";
+import { UserCog, Loader2 } from "lucide-react";
 import { VillaOwnerStatsComponent } from "./VillaOwnerStatsComponent";
 import { UpdateVillaAssignmentsDialogComponent } from "./UpdateVillaAssignmentsDialogComponent";
 import { OwnersTableComponent } from "./OwnersTableComponent";
 import { AssignVillasDialogComponent } from "./AssignVillasDialogComponent";
-
-// Mock data - replace with actual API data
-const mockOwners: Owner[] = [
-  {
-    id: 1,
-    name: "Rajesh Kumar",
-    email: "rajesh@example.com",
-    ownedVillas: [
-      { id: 1, name: "Sunset Villa", location: "Anjuna Beach", ownerId: 1 },
-      { id: 2, name: "Ocean View", location: "Baga Beach", ownerId: 1 },
-    ]
-  },
-  {
-    id: 2,
-    name: "Priya Sharma",
-    email: "priya@example.com",
-    ownedVillas: [
-      { id: 3, name: "Palm Paradise", location: "Calangute", ownerId: 2 },
-    ]
-  },
-  {
-    id: 3,
-    name: "Amit Patel",
-    email: "amit@example.com",
-    ownedVillas: []
-  }
-];
-
-const mockVillas: Villa[] = [
-  { id: 1, name: "Sunset Villa", location: "Anjuna Beach", ownerId: 1 },
-  { id: 2, name: "Ocean View", location: "Baga Beach", ownerId: 1 },
-  { id: 3, name: "Palm Paradise", location: "Calangute", ownerId: 2 },
-  { id: 4, name: "Coconut Grove", location: "Morjim Beach", ownerId: null },
-  { id: 5, name: "Beachside Retreat", location: "Palolem Beach", ownerId: null },
-  { id: 6, name: "Serenity Villa", location: "Arambol Beach", ownerId: null },
-];
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { 
+  assignVillasToOwnerService, 
+  getAllOwnersWithVillasService, 
+  getOwnerVillaManagementStatsService, 
+  unassignAllVillasToOwnerService, 
+  unassignSpecificVillaToOwnerService, 
+  updateVillaAssignmentToOwnerService 
+} from "@/services/villaOwnerManagementSettings.service";
 
 export default function VillaOwnerManagementSettingsComponent() {
+  const { handleMutationError, handleSuccess } = useErrorHandler();
+
   // State Variables
-  const [owners, setOwners] = useState<Owner[]>(mockOwners);
-  const [villas, setVillas] = useState<Villa[]>(mockVillas);
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
-  const [selectedOwner, setSelectedOwner] = useState<string>("");
-  const [selectedVillas, setSelectedVillas] = useState<string[]>([]);
-  const [ownerToUpdate, setOwnerToUpdate] = useState<Owner | null>(null);
+  const [selectedOwner, setSelectedOwner] = useState("");
+  const [selectedVillas, setSelectedVillas] = useState([]);
+  const [ownerToUpdate, setOwnerToUpdate] = useState(null);
 
-  // Derived Data
-  const unassignedVillas = villas.filter(villa => !villa.ownerId);
-  const allVillas = villas;
+  // useQuery - Fetch All Owners with Villas
+  const { data: ownersResponse, isLoading: isLoadingOwners } = useQuery({
+    queryKey: ['villa-owner-management', 'owners'],
+    queryFn: getAllOwnersWithVillasService
+  });
 
-  // Calculate Stats
-  const stats = {
-    totalOwners: owners.length,
-    totalAssignedVillas: villas.filter(v => v.ownerId).length,
-    totalUnassignedVillas: unassignedVillas.length
+  // useQuery - Fetch Stats
+  const { data: statsResponse, isLoading: isLoadingStats } = useQuery({
+    queryKey: ['villa-owner-management', 'stats'],
+    queryFn: getOwnerVillaManagementStatsService
+  });
+
+  // Extract data from responses
+  const owners = ownersResponse || [];
+  const stats = statsResponse || {
+    totalOwners: 0,
+    totalAssignedVillas: 0,
+    totalUnassignedVillas: 0
   };
 
-  // Handler: Villa Selection Toggle
-  const handleVillaSelection = (villaId: string, checked: boolean) => {
-    setSelectedVillas(prev => 
-      checked 
+  // Assign Villas Mutation
+  const assignVillasMutation = useMutation({
+    mutationFn: (assignData) => assignVillasToOwnerService(assignData),
+    onSuccess: () => {
+      handleSuccess("Villas assigned successfully!");
+    },
+    onError: handleMutationError
+  });
+
+  // Update Assignments Mutation
+  const updateAssignmentsMutation = useMutation({
+    mutationFn: (updateData) => updateVillaAssignmentToOwnerService(updateData),
+    onSuccess: () => {
+      handleSuccess("Villa assignments updated successfully!");
+    },
+    onError: handleMutationError
+  });
+
+  // Unassign Specific Villa Mutation
+  const unassignSpecificVillaMutation = useMutation({
+    mutationFn: (unassignData) => unassignSpecificVillaToOwnerService(unassignData),
+    onSuccess: () => {
+      handleSuccess("Villa unassigned successfully!");
+    },
+    onError: handleMutationError
+  });
+
+  // Unassign All Villas Mutation
+  const unassignAllVillasMutation = useMutation({
+    mutationFn: (deleteData) => unassignAllVillasToOwnerService(deleteData),
+    onSuccess: () => {
+      handleSuccess("All villas unassigned successfully!");
+    },
+    onError: handleMutationError
+  });
+
+  // Derived Data - Get all unique villas
+  const allVillas = owners.flatMap((owner) => owner.ownedVillas);
+  const unassignedVillas = allVillas.filter(villa => !villa.ownerId);
+
+  // Handler Function to Handle Villa Selection Toggle
+  const handleVillaSelection = (villaId, checked) => {
+    setSelectedVillas(prev =>
+      checked
         ? [...prev, villaId]
         : prev.filter(id => id !== villaId)
     );
   };
 
-  // Handler: Assign Villas
-  const handleAssignVillas = async () => {
-    try {
-      // TODO: API call to assign villas
-      console.log("Assigning villas:", {
-        ownerId: selectedOwner,
-        villaIds: selectedVillas
-      });
-      
-      // Close dialog and reset
-      setIsAssignDialogOpen(false);
-      resetAssignDialog();
-      
-      // TODO: Refresh data after successful assignment
-    } catch (error) {
-      console.error("Failed to assign villas:", error);
-    }
+  // Handler Function to Assign Villas
+  const handleAssignVillas = () => {
+    const assignData = {
+      ownerId: parseInt(selectedOwner),
+      villaIds: selectedVillas.map(id => parseInt(id))
+    };
+
+    assignVillasMutation.mutate(assignData);
+
+    setIsAssignDialogOpen(false);
+    resetAssignDialog();
   };
 
-  // Handler: Open Update Dialog
-  const handleUpdateOwner = (owner: Owner) => {
+  // Handler Function to Open Update Dialog
+  const handleUpdateOwner = (owner) => {
     setOwnerToUpdate(owner);
     setSelectedOwner(owner.id.toString());
     setSelectedVillas(owner.ownedVillas.map(villa => villa.id.toString()));
     setIsUpdateDialogOpen(true);
   };
 
-  // Handler: Update Villa Assignments
-  const handleUpdateVillas = async () => {
-    try {
-      // TODO: API call to update assignments
-      console.log("Updating assignments:", {
-        ownerId: selectedOwner,
-        villaIds: selectedVillas
-      });
-      
-      // Close dialog and reset
-      setIsUpdateDialogOpen(false);
-      resetUpdateDialog();
-      
-      // TODO: Refresh data after successful update
-    } catch (error) {
-      console.error("Failed to update assignments:", error);
-    }
+  // Handler Function to Update Villa Assignments
+  const handleUpdateVillas = () => {
+    const updateData = {
+      ownerId: parseInt(selectedOwner),
+      villaIds: selectedVillas.map(id => parseInt(id))
+    };
+
+    updateAssignmentsMutation.mutate(updateData);
+
+    setIsUpdateDialogOpen(false);
+    resetUpdateDialog();
   };
 
-  // Handler: Delete Owner (Unassign All Villas)
-  const handleDeleteOwner = async (owner: Owner) => {
-    try {
-      // TODO: API call to unassign all villas from owner
-      console.log("Deleting owner assignments:", owner.id);
-      
-      // TODO: Refresh data after successful deletion
-    } catch (error) {
-      console.error("Failed to delete owner assignments:", error);
-    }
+  // Handler Function to Delete Owner (Unassign All Villas)
+  const handleDeleteOwner = (owner) => {
+    const deleteData = {
+      ownerId: owner.id
+    };
+
+    unassignAllVillasMutation.mutate(deleteData);
   };
 
-  // Handler: Unassign Specific Villa
-  const handleUnassignVilla = async (villaId: number, ownerId: number) => {
-    try {
-      // TODO: API call to unassign specific villa
-      console.log(`Unassigning villa ${villaId} from owner ${ownerId}`);
-      
-      // TODO: Refresh data after successful unassignment
-    } catch (error) {
-      console.error("Failed to unassign villa:", error);
-    }
+  // Handler Function to Unassign Specific Villa
+  const handleUnassignVilla = (villaId, ownerId) => {
+    const unassignData = {
+      villaId,
+      ownerId
+    };
+
+    unassignSpecificVillaMutation.mutate(unassignData);
   };
 
   // Reset Functions
@@ -153,6 +159,28 @@ export default function VillaOwnerManagementSettingsComponent() {
     setSelectedOwner("");
     setSelectedVillas([]);
   };
+
+  // Loading State
+  if (isLoadingOwners || isLoadingStats) {
+    return (
+      <Card className="shadow-soft border-border/40">
+        <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-muted/10">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <UserCog className="h-5 w-5 text-primary" />
+            </div>
+            <CardTitle className="text-foreground">Villa Owner Management</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-3 text-muted-foreground">Loading...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="shadow-soft border-border/40">
@@ -179,6 +207,7 @@ export default function VillaOwnerManagementSettingsComponent() {
             onVillaToggle={handleVillaSelection}
             onAssign={handleAssignVillas}
             onReset={resetAssignDialog}
+            isLoading={assignVillasMutation.isPending}
           />
         </div>
 
@@ -188,6 +217,7 @@ export default function VillaOwnerManagementSettingsComponent() {
           onUpdateOwner={handleUpdateOwner}
           onDeleteOwner={handleDeleteOwner}
           onUnassignVilla={handleUnassignVilla}
+          isUnassigningVilla={unassignSpecificVillaMutation.isPending}
         />
 
         {/* Update Dialog */}
@@ -200,6 +230,7 @@ export default function VillaOwnerManagementSettingsComponent() {
           onVillaToggle={handleVillaSelection}
           onUpdate={handleUpdateVillas}
           onReset={resetUpdateDialog}
+          isLoading={updateAssignmentsMutation.isPending}
         />
 
         {/* Quick Stats */}
