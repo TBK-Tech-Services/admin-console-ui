@@ -1,13 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, Users, Star, Calendar, DollarSign } from "lucide-react";
+import { Building2, MapPin, Users, Calendar, IndianRupee } from "lucide-react";
 
 interface Villa {
   id: string;
   name: string;
   location: string;
   capacity: number;
-  rating: number;
   status: "active" | "maintenance" | "blocked";
   currentBookings: number;
   monthlyRevenue: string;
@@ -20,7 +19,6 @@ const mockVillas: Villa[] = [
     name: "Sunset Paradise Villa",
     location: "Candolim, Goa",
     capacity: 8,
-    rating: 4.9,
     status: "active",
     currentBookings: 3,
     monthlyRevenue: "₹85,000",
@@ -30,7 +28,6 @@ const mockVillas: Villa[] = [
     name: "Ocean Breeze Resort",
     location: "Baga Beach, Goa",
     capacity: 12,
-    rating: 4.7,
     status: "active",
     currentBookings: 5,
     monthlyRevenue: "₹1,20,000",
@@ -40,7 +37,6 @@ const mockVillas: Villa[] = [
     name: "Royal Heritage Villa",
     location: "Anjuna, Goa",
     capacity: 6,
-    rating: 4.8,
     status: "maintenance",
     currentBookings: 0,
     monthlyRevenue: "₹0",
@@ -50,7 +46,6 @@ const mockVillas: Villa[] = [
     name: "Coastal Dreams Villa",
     location: "Calangute, Goa",
     capacity: 10,
-    rating: 4.6,
     status: "active",
     currentBookings: 4,
     monthlyRevenue: "₹95,000",
@@ -108,15 +103,10 @@ export default function OwnerVillasComponent() {
               </Badge>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+            <div className="grid grid-cols-3 gap-3 text-sm">
               <div className="flex items-center gap-2">
                 <Users className="h-4 w-4 text-muted-foreground" />
                 <span className="text-foreground">{villa.capacity} guests</span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-warning" />
-                <span className="text-foreground">{villa.rating}</span>
               </div>
               
               <div className="flex items-center gap-2">
@@ -125,7 +115,7 @@ export default function OwnerVillasComponent() {
               </div>
               
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                <IndianRupee className="h-4 w-4 text-muted-foreground" />
                 <span className="text-foreground">{villa.monthlyRevenue}</span>
               </div>
             </div>

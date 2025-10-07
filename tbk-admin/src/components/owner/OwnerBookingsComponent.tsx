@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, User, MapPin, DollarSign, Clock } from "lucide-react";
+import { Calendar, User, MapPin, Clock, CreditCard } from "lucide-react";
 
 interface Booking {
   id: string;
@@ -12,6 +12,7 @@ interface Booking {
   status: "confirmed" | "pending" | "checked-in" | "checked-out" | "cancelled";
   amount: string;
   bookedDate: string;
+  paymentStatus: "paid" | "pending";
 }
 
 const mockBookings: Booking[] = [
@@ -25,6 +26,7 @@ const mockBookings: Booking[] = [
     status: "confirmed",
     amount: "₹32,000",
     bookedDate: "2024-01-10",
+    paymentStatus: "paid",
   },
   {
     id: "2",
@@ -36,6 +38,7 @@ const mockBookings: Booking[] = [
     status: "checked-in",
     amount: "₹65,000",
     bookedDate: "2024-01-05",
+    paymentStatus: "paid",
   },
   {
     id: "3",
@@ -47,6 +50,7 @@ const mockBookings: Booking[] = [
     status: "checked-out",
     amount: "₹18,000",
     bookedDate: "2024-01-08",
+    paymentStatus: "paid",
   },
   {
     id: "4",
@@ -58,6 +62,7 @@ const mockBookings: Booking[] = [
     status: "pending",
     amount: "₹28,500",
     bookedDate: "2024-01-12",
+    paymentStatus: "pending",
   },
   {
     id: "5",
@@ -69,6 +74,7 @@ const mockBookings: Booking[] = [
     status: "confirmed",
     amount: "₹52,000",
     bookedDate: "2024-01-11",
+    paymentStatus: "paid",
   },
 ];
 
@@ -84,6 +90,17 @@ const getStatusColor = (status: string) => {
       return "bg-muted/50 text-muted-foreground border-muted";
     case "cancelled":
       return "bg-destructive/10 text-destructive border-destructive/20";
+    default:
+      return "bg-muted text-muted-foreground";
+  }
+};
+
+const getPaymentStatusColor = (status: string) => {
+  switch (status) {
+    case "paid":
+      return "bg-success/10 text-success border-success/20";
+    case "pending":
+      return "bg-warning/10 text-warning border-warning/20";
     default:
       return "bg-muted text-muted-foreground";
   }
@@ -177,11 +194,19 @@ export default function OwnerBookingsComponent() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
-                <Clock className="h-3 w-3 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">
-                  Booked on {formatDate(booking.bookedDate)}
-                </span>
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-3 w-3 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
+                    Booked on {formatDate(booking.bookedDate)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CreditCard className="h-3 w-3 text-muted-foreground" />
+                  <Badge variant="outline" className={getPaymentStatusColor(booking.paymentStatus)}>
+                    {booking.paymentStatus}
+                  </Badge>
+                </div>
               </div>
             </div>
           ))}

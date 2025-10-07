@@ -1,11 +1,13 @@
 import OwnerBookingsComponent from "@/components/owner/OwnerBookingsComponent";
-import OwnerFinancesComponent from "@/components/owner/OwnerFinancesComponent";
 import OwnerStatsComponent from "@/components/owner/OwnerStatsComponent";
 import OwnerVillasComponent from "@/components/owner/OwnerVillasComponent";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Building2, Calendar, TrendingUp, MapPin } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function OwnerDashboardPage() {
+  const navigate = useNavigate();
+
   return (
     <div className="flex-1 space-y-6 p-6">
       {/* Header */}
@@ -30,9 +32,8 @@ export default function OwnerDashboardPage() {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Villas Section */}
-        <div className="space-y-6">
+        <div>
           <OwnerVillasComponent />
-          <OwnerFinancesComponent />
         </div>
 
         {/* Bookings Section */}
@@ -53,18 +54,11 @@ export default function OwnerDashboardPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 rounded-lg bg-gradient-secondary hover:shadow-medium transition-all duration-200 cursor-pointer">
-              <div className="flex items-center gap-3">
-                <Building2 className="h-8 w-8 text-primary" />
-                <div>
-                  <h3 className="font-semibold text-foreground">Manage Villas</h3>
-                  <p className="text-sm text-muted-foreground">Update villa details</p>
-                </div>
-              </div>
-            </div>
-            
-            <div className="p-4 rounded-lg bg-gradient-accent hover:shadow-medium transition-all duration-200 cursor-pointer">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div 
+              onClick={() => navigate('/owner/calendar')}
+              className="p-4 rounded-lg bg-gradient-accent hover:shadow-medium transition-all duration-200 cursor-pointer"
+            >
               <div className="flex items-center gap-3">
                 <Calendar className="h-8 w-8 text-accent-foreground" />
                 <div>
@@ -74,7 +68,10 @@ export default function OwnerDashboardPage() {
               </div>
             </div>
             
-            <div className="p-4 rounded-lg bg-gradient-sunset hover:shadow-medium transition-all duration-200 cursor-pointer">
+            <div 
+              onClick={() => navigate('/owner/analytics')}
+              className="p-4 rounded-lg bg-gradient-sunset hover:shadow-medium transition-all duration-200 cursor-pointer"
+            >
               <div className="flex items-center gap-3">
                 <TrendingUp className="h-8 w-8 text-primary-foreground" />
                 <div>

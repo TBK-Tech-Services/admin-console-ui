@@ -21,6 +21,8 @@ import OwnerDashboardPage from "./page/OwnerDashboardPage";
 import RoleBasedRouteComponent from "./components/common/RoleBaseRouteComponent";
 import UnauthorizedPage from "./page/UnauthorizedPage";
 import RoleBasedHomeRedirectComponent from "./components/common/RoleBasedHomeRedirectComponent";
+import OwnerCalenderPage from "./page/OwnerCalenderPage";
+import OwnerAnalyticsPage from "./page/OwnerAnalyticsPage";
 
 const App = () => (
   <TooltipProvider>
@@ -57,6 +59,8 @@ const App = () => (
         <Route element={<RoleBasedRouteComponent allowedRoles={['Owner']} />}>
           <Route element={<Layout />}>
             <Route path="/owner-dashboard" element={<OwnerDashboardPage />} />
+            <Route path="/owner/calendar" element={<OwnerCalenderPage />} />
+            <Route path="/owner/analytics" element={<OwnerAnalyticsPage />} />
           </Route>
         </Route>
 

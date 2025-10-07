@@ -53,6 +53,16 @@ export const ownerNavigationItems = [
     href: "/owner-dashboard", 
     icon: Building2,
   },
+  {
+    name: "Calendar",
+    href: "/owner/calendar",
+    icon: Calendar,
+  },
+  {
+    name: "Analytics",
+    href: "/owner/analytics",
+    icon: TrendingUp,
+  },
 ];
 
 export const getNavigationItems = (userRole: string | undefined) => {
