@@ -1,8 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Home, Edit, Trash2, Loader2 } from "lucide-react";
+import { Home, Edit } from "lucide-react";
 import { DeleteOwnerDialogComponent } from "./DeleteOwnerDialogComponent";
+import { UnassignVillaDialogComponent } from "./UnassignVillaDialogComponent";
 
 export function OwnerTableRowComponent({
     owner,
@@ -36,19 +37,14 @@ export function OwnerTableRowComponent({
                                         {villa.location}
                                     </Badge>
                                 </div>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => onUnassignVilla(villa.id, owner.id)}
-                                    disabled={isUnassigningVilla}
-                                    className="h-6 w-6 p-0 text-muted-foreground hover:text-destructive"
-                                >
-                                    {isUnassigningVilla ? (
-                                        <Loader2 className="h-3 w-3 animate-spin" />
-                                    ) : (
-                                        <Trash2 className="h-3 w-3" />
-                                    )}
-                                </Button>
+
+                                {/* Unassign Villa Dialog */}
+                                <UnassignVillaDialogComponent
+                                    villa={villa}
+                                    owner={owner}
+                                    onUnassign={onUnassignVilla}
+                                    isLoading={isUnassigningVilla}
+                                />
                             </div>
                         ))
                     ) : (

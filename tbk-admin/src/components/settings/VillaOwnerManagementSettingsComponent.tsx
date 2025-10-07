@@ -5,11 +5,12 @@ import { VillaOwnerStatsComponent } from "./VillaOwnerStatsComponent";
 import { UpdateVillaAssignmentsDialogComponent } from "./UpdateVillaAssignmentsDialogComponent";
 import { OwnersTableComponent } from "./OwnersTableComponent";
 import { AssignVillasDialogComponent } from "./AssignVillasDialogComponent";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { 
   assignVillasToOwnerService, 
   getAllOwnersWithVillasService, 
+  getAllUnAssignedVillasService, 
   getOwnerVillaManagementStatsService, 
   unassignAllVillasToOwnerService, 
   unassignSpecificVillaToOwnerService, 
@@ -17,6 +18,7 @@ import {
 } from "@/services/villaOwnerManagementSettings.service";
 
 export default function VillaOwnerManagementSettingsComponent() {
+  const queryClient = useQueryClient();
   const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // State Variables
@@ -25,6 +27,12 @@ export default function VillaOwnerManagementSettingsComponent() {
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedVillas, setSelectedVillas] = useState([]);
   const [ownerToUpdate, setOwnerToUpdate] = useState(null);
+
+  // useQuery - Fetch All Un-Assigned Villas
+  const { data: unAssignedVillasList, isLoading: isLoadingUnassignedVillas } = useQuery({
+    queryKey: ['villa-owner-management', 'unassignedVillas'],
+    queryFn: getAllUnAssignedVillasService
+  });
 
   // useQuery - Fetch All Owners with Villas
   const { data: ownersResponse, isLoading: isLoadingOwners } = useQuery({
@@ -45,12 +53,16 @@ export default function VillaOwnerManagementSettingsComponent() {
     totalAssignedVillas: 0,
     totalUnassignedVillas: 0
   };
+  const unassignedVillas = unAssignedVillasList || [];
 
   // Assign Villas Mutation
   const assignVillasMutation = useMutation({
     mutationFn: (assignData) => assignVillasToOwnerService(assignData),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['villa-owner-management'] });
       handleSuccess("Villas assigned successfully!");
+      setIsAssignDialogOpen(false);
+      resetAssignDialog();
     },
     onError: handleMutationError
   });
@@ -59,7 +71,10 @@ export default function VillaOwnerManagementSettingsComponent() {
   const updateAssignmentsMutation = useMutation({
     mutationFn: (updateData) => updateVillaAssignmentToOwnerService(updateData),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['villa-owner-management'] });
       handleSuccess("Villa assignments updated successfully!");
+      setIsUpdateDialogOpen(false);
+      resetUpdateDialog();
     },
     onError: handleMutationError
   });
@@ -68,6 +83,7 @@ export default function VillaOwnerManagementSettingsComponent() {
   const unassignSpecificVillaMutation = useMutation({
     mutationFn: (unassignData) => unassignSpecificVillaToOwnerService(unassignData),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['villa-owner-management'] });
       handleSuccess("Villa unassigned successfully!");
     },
     onError: handleMutationError
@@ -77,14 +93,17 @@ export default function VillaOwnerManagementSettingsComponent() {
   const unassignAllVillasMutation = useMutation({
     mutationFn: (deleteData) => unassignAllVillasToOwnerService(deleteData),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['villa-owner-management'] });
       handleSuccess("All villas unassigned successfully!");
     },
     onError: handleMutationError
   });
 
-  // Derived Data - Get all unique villas
-  const allVillas = owners.flatMap((owner) => owner.ownedVillas);
-  const unassignedVillas = allVillas.filter(villa => !villa.ownerId);
+  // Derived Data
+  const allVillas = [
+    ...owners.flatMap((owner) => owner.ownedVillas), 
+    ...unassignedVillas                              
+  ];
 
   // Handler Function to Handle Villa Selection Toggle
   const handleVillaSelection = (villaId, checked) => {
@@ -103,9 +122,6 @@ export default function VillaOwnerManagementSettingsComponent() {
     };
 
     assignVillasMutation.mutate(assignData);
-
-    setIsAssignDialogOpen(false);
-    resetAssignDialog();
   };
 
   // Handler Function to Open Update Dialog
@@ -124,9 +140,6 @@ export default function VillaOwnerManagementSettingsComponent() {
     };
 
     updateAssignmentsMutation.mutate(updateData);
-
-    setIsUpdateDialogOpen(false);
-    resetUpdateDialog();
   };
 
   // Handler Function to Delete Owner (Unassign All Villas)
@@ -161,7 +174,7 @@ export default function VillaOwnerManagementSettingsComponent() {
   };
 
   // Loading State
-  if (isLoadingOwners || isLoadingStats) {
+  if (isLoadingOwners || isLoadingStats || isLoadingUnassignedVillas) {
     return (
       <Card className="shadow-soft border-border/40">
         <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-muted/10">
