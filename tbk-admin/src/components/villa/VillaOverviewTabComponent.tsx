@@ -1,7 +1,40 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Download, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
 
 export default function VillaOverviewTabComponent({ villa }) {
+  const { toast } = useToast();
+  const [isDownloading, setIsDownloading] = useState(false);
+
+  // Handler to download villa voucher
+  const handleDownloadVoucher = async () => {
+    setIsDownloading(true);
+    try {
+      // TODO: Call your backend API to generate villa voucher PDF
+      // const response = await downloadVillaVoucherService(villa.id);
+      
+      // Temporary mock
+      setTimeout(() => {
+        toast({
+          title: "Voucher Downloaded",
+          description: `Villa voucher for ${villa.name} has been downloaded`,
+        });
+        setIsDownloading(false);
+      }, 2000);
+    } catch (error) {
+      console.error("Error downloading voucher:", error);
+      toast({
+        title: "Download Failed",
+        description: "Failed to download villa voucher",
+        variant: "destructive",
+      });
+      setIsDownloading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -32,18 +65,42 @@ export default function VillaOverviewTabComponent({ villa }) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Gallery</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>Villa Voucher</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadVoucher}
+              disabled={isDownloading}
+              className="gap-2"
+            >
+              {isDownloading ? (
+                <>
+                  <Download className="h-4 w-4 animate-bounce" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <FileText className="h-4 w-4" />
+                  Download Voucher
+                </>
+              )}
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {villa.images.map((imageObj, index) => (
-              <img 
-                key={imageObj.id}
-                src={imageObj.link} 
-                alt={`${villa.name} ${index + 1}`}
-                className="w-full h-40 object-cover rounded-lg"
-              />
-            ))}
+          <div className="bg-muted/30 border border-border rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium text-foreground">Villa Information Document</h4>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Download a comprehensive PDF containing villa details, amenities, pricing, and contact information
+                </p>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>
