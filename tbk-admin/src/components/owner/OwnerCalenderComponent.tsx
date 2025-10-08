@@ -9,35 +9,12 @@ interface BookedDate {
     status: "booked" | "available";
 }
 
-// Mock data - backend se actual data aayega
-const mockBookings: BookedDate[] = [
-    {
-        date: "2025-11-15",
-        villaName: "Sunset Paradise Villa",
-        guestName: "Rahul Sharma",
-        status: "booked",
-    },
-    {
-        date: "2025-11-16",
-        villaName: "Sunset Paradise Villa",
-        guestName: "Rahul Sharma",
-        status: "booked",
-    },
-    {
-        date: "2025-11-20",
-        villaName: "Ocean Breeze Resort",
-        guestName: "Priya Patel",
-        status: "booked",
-    },
-    {
-        date: "2025-11-25",
-        villaName: "Coastal Dreams Villa",
-        guestName: "Blocked",
-        status: "booked",
-    },
-];
+interface OwnerCalendarComponentProps {
+    data: any;
+    isLoading: boolean;
+}
 
-export default function OwnerCalendarComponent() {
+export default function OwnerCalendarComponent({ data, isLoading }: OwnerCalendarComponentProps) {
     const [currentDate, setCurrentDate] = useState(new Date());
 
     const monthNames = [
@@ -57,8 +34,10 @@ export default function OwnerCalendarComponent() {
     };
 
     const getBookingStatus = (day: number) => {
+        if (!data?.data?.bookings) return [];
+        
         const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        return mockBookings.filter(b => b.date === dateStr);
+        return data.data.bookings.filter((b: BookedDate) => b.date === dateStr);
     };
 
     const previousMonth = () => {
@@ -77,6 +56,14 @@ export default function OwnerCalendarComponent() {
     const isCurrentMonth =
         currentDate.getMonth() === today.getMonth() &&
         currentDate.getFullYear() === today.getFullYear();
+
+    if (isLoading) {
+        return (
+            <Card className="border-border shadow-soft">
+                <CardContent className="py-8 text-center">Loading calendar...</CardContent>
+            </Card>
+        );
+    }
 
     return (
         <Card className="border-border shadow-soft">
@@ -128,7 +115,6 @@ export default function OwnerCalendarComponent() {
                         const bookings = getBookingStatus(day);
                         const isToday = isCurrentMonth && day === today.getDate();
                         const hasBookings = bookings.length > 0;
-                        const isBooked = bookings.some(b => b.status === "booked");
 
                         return (
                             <div
@@ -150,16 +136,10 @@ export default function OwnerCalendarComponent() {
                                         {day}
                                     </span>
                                     <div className="flex-1 space-y-1">
-                                        {bookings.slice(0, 2).map((booking, idx) => (
+                                        {bookings.slice(0, 2).map((booking: any, idx: number) => (
                                             <div
                                                 key={idx}
-                                                className={`
-                                                    text-xs px-1.5 py-0.5 rounded truncate
-                                                    ${booking.status === "booked"
-                                                        ? "bg-success/10 text-success border border-success/20"
-                                                        : "bg-warning/10 text-warning border border-warning/20"
-                                                    }
-                                                `}
+                                                className="text-xs px-1.5 py-0.5 rounded truncate bg-success/10 text-success border border-success/20"
                                             >
                                                 {booking.villaName.split(" ")[0]}
                                             </div>

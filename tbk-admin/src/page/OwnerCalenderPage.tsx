@@ -1,9 +1,24 @@
 import OwnerCalendarComponent from "@/components/owner/OwnerCalenderComponent";
+import { getOwnerCalendarAvailabilityService } from "@/services/ownerCalendar.service";
+import { RootState } from "@/store/store";
+import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Calendar } from "lucide-react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function OwnerCalendarPage() {
+
+    // useNavigate
     const navigate = useNavigate();
+
+    // useSelector
+    const ownerId = useSelector((state: RootState) => state?.auth?.user?.id);
+
+    // Query for Calendar Availability
+    const { data: calendarData, isLoading: calendarLoading } = useQuery({
+        queryKey: ["ownerCalendarAvailability", ownerId],
+        queryFn: () => getOwnerCalendarAvailabilityService({ ownerId }),
+    });
 
     return (
         <div className="flex-1 space-y-6 p-4 md:p-6">
@@ -33,7 +48,7 @@ export default function OwnerCalendarPage() {
             </div>
 
             {/* Calendar */}
-            <OwnerCalendarComponent />
+            <OwnerCalendarComponent data={calendarData} isLoading={calendarLoading}/>
         </div>
     );
 }

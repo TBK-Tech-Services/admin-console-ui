@@ -4,55 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import OwnerMonthlySummaryCardComponent from "@/components/owner/OwnerMonthlySummaryCardComponent";
 import OwnerVillaPerformanceCardComponent from "@/components/owner/OwnerVillaPerformanceCardComponent";
 import OwnerMonthlyTrendCardComponent from "@/components/owner/OwnerMonthlyTrendCardComponent";
-
-interface FinanceData {
-    month: string;
-    revenue: number;
-    bookings: number;
-    avgBookingValue: number;
-}
-
-interface VillaFinance {
-    villaId: string;
-    villaName: string;
-    monthlyRevenue: number;
-    totalBookings: number;
-    avgNightlyRate: number;
-    occupancyRate: number;
-}
-
-const mockFinanceData: FinanceData[] = [
-    { month: "Dec 2023", revenue: 285000, bookings: 18, avgBookingValue: 15833 },
-    { month: "Jan 2024", revenue: 245000, bookings: 15, avgBookingValue: 16333 },
-    { month: "Feb 2024", revenue: 320000, bookings: 22, avgBookingValue: 14545 },
-];
-
-const mockVillaFinances: VillaFinance[] = [
-    {
-        villaId: "1",
-        villaName: "Sunset Paradise Villa",
-        monthlyRevenue: 85000,
-        totalBookings: 6,
-        avgNightlyRate: 4500,
-        occupancyRate: 78,
-    },
-    {
-        villaId: "2",
-        villaName: "Ocean Breeze Resort",
-        monthlyRevenue: 120000,
-        totalBookings: 8,
-        avgNightlyRate: 6000,
-        occupancyRate: 85,
-    },
-    {
-        villaId: "3",
-        villaName: "Coastal Dreams Villa",
-        monthlyRevenue: 95000,
-        totalBookings: 7,
-        avgNightlyRate: 5200,
-        occupancyRate: 72,
-    },
-];
+import { useQuery } from "@tanstack/react-query";
+import { 
+    getAnalyticsSummaryService, 
+    getVillaPerformanceService, 
+    getMonthlyRevenueService 
+} from "@/services/ownerAnalytics.service";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/store";
 
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-IN', {
@@ -65,12 +24,32 @@ const formatCurrency = (amount: number) => {
 
 export default function OwnerAnalyticsPage() {
     const navigate = useNavigate();
+    const ownerId = useSelector((state: RootState) => state?.auth?.user?.id);
 
-    const currentMonth = mockFinanceData[mockFinanceData.length - 1];
-    const previousMonth = mockFinanceData[mockFinanceData.length - 2];
+    // Query for Analytics Summary
+    const { data: summaryData, isLoading: summaryLoading } = useQuery({
+        queryKey: ["analyticsSummary", ownerId],
+        queryFn: () => getAnalyticsSummaryService({ ownerId }),
+    });
 
-    const revenueChange = ((currentMonth.revenue - previousMonth.revenue) / previousMonth.revenue) * 100;
-    const bookingsChange = ((currentMonth.bookings - previousMonth.bookings) / previousMonth.bookings) * 100;
+    // Query for Villa Performance
+    const { data: performanceData, isLoading: performanceLoading } = useQuery({
+        queryKey: ["villaPerformance", ownerId],
+        queryFn: () => getVillaPerformanceService({ ownerId }),
+    });
+
+    // Query for Monthly Revenue
+    const { data: revenueData, isLoading: revenueLoading } = useQuery({
+        queryKey: ["monthlyRevenue", ownerId],
+        queryFn: () => getMonthlyRevenueService({ ownerId }),
+    });
+
+    // Extract data - Same level for all
+    const summary = summaryData || {};
+    const currentMonth = summary.currentMonth || {};
+    const changes = summary.changes || {};
+    const villas = performanceData?.villas || [];
+    const months = revenueData?.months || [];
 
     return (
         <div className="flex-1 space-y-6 p-4 md:p-6">
@@ -100,24 +79,35 @@ export default function OwnerAnalyticsPage() {
             </div>
 
             {/* Monthly Summary Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <OwnerMonthlySummaryCardComponent
-                    title="Monthly Revenue"
-                    value={formatCurrency(currentMonth.revenue)}
-                    change={revenueChange}
-                    subtitle={currentMonth.month}
-                    icon={DollarSign}
-                    gradientClass="bg-gradient-primary/10 text-primary"
-                />
-                <OwnerMonthlySummaryCardComponent
-                    title="Total Bookings"
-                    value={currentMonth.bookings.toString()}
-                    change={bookingsChange}
-                    subtitle={`Avg: ${formatCurrency(currentMonth.avgBookingValue)} per booking`}
-                    icon={Calendar}
-                    gradientClass="bg-gradient-accent/10 text-accent"
-                />
-            </div>
+            {summaryLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="border-border shadow-soft">
+                        <CardContent className="py-8 text-center">Loading...</CardContent>
+                    </Card>
+                    <Card className="border-border shadow-soft">
+                        <CardContent className="py-8 text-center">Loading...</CardContent>
+                    </Card>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <OwnerMonthlySummaryCardComponent
+                        title="Monthly Revenue"
+                        value={formatCurrency(currentMonth.revenue || 0)}
+                        change={changes.revenueChangePercent || 0}
+                        subtitle={`Avg: ${formatCurrency(currentMonth.avgBookingValue || 0)} per booking`}
+                        icon={DollarSign}
+                        gradientClass="bg-gradient-primary/10 text-primary"
+                    />
+                    <OwnerMonthlySummaryCardComponent
+                        title="Total Bookings"
+                        value={String(currentMonth.bookings || 0)}
+                        change={changes.bookingsChangePercent || 0}
+                        subtitle={`${currentMonth.bookings || 0} bookings this month`}
+                        icon={Calendar}
+                        gradientClass="bg-gradient-accent/10 text-accent"
+                    />
+                </div>
+            )}
 
             {/* Villa Performance Section */}
             <Card className="border-border shadow-soft">
@@ -131,16 +121,22 @@ export default function OwnerAnalyticsPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    {mockVillaFinances.map((villa) => (
-                        <OwnerVillaPerformanceCardComponent
-                            key={villa.villaId}
-                            villaName={villa.villaName}
-                            monthlyRevenue={formatCurrency(villa.monthlyRevenue)}
-                            totalBookings={villa.totalBookings}
-                            avgNightlyRate={formatCurrency(villa.avgNightlyRate)}
-                            occupancyRate={villa.occupancyRate}
-                        />
-                    ))}
+                    {performanceLoading ? (
+                        <div className="text-center py-8">Loading villa performance...</div>
+                    ) : villas.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">No villa data available</div>
+                    ) : (
+                        villas.map((villa: any) => (
+                            <OwnerVillaPerformanceCardComponent
+                                key={villa.villaId}
+                                villaName={villa.villaName}
+                                monthlyRevenue={formatCurrency(villa.monthlyRevenue)}
+                                totalBookings={villa.totalBookings}
+                                avgNightlyRate={formatCurrency(villa.avgNightlyRate)}
+                                occupancyRate={villa.occupancyRate}
+                            />
+                        ))
+                    )}
                 </CardContent>
             </Card>
 
@@ -156,16 +152,22 @@ export default function OwnerAnalyticsPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
-                    {mockFinanceData.slice().reverse().map((month, index) => (
-                        <OwnerMonthlyTrendCardComponent
-                            key={month.month}
-                            month={month.month}
-                            bookings={month.bookings}
-                            revenue={formatCurrency(month.revenue)}
-                            avgBookingValue={formatCurrency(month.avgBookingValue)}
-                            isCurrent={index === 0}
-                        />
-                    ))}
+                    {revenueLoading ? (
+                        <div className="text-center py-8">Loading revenue trends...</div>
+                    ) : months.length === 0 ? (
+                        <div className="text-center py-8 text-muted-foreground">No revenue data available</div>
+                    ) : (
+                        months.map((month: any, index: number) => (
+                            <OwnerMonthlyTrendCardComponent
+                                key={month.month}
+                                month={month.month}
+                                bookings={month.bookings}
+                                revenue={formatCurrency(month.revenue)}
+                                avgBookingValue={formatCurrency(month.avgBookingValue)}
+                                isCurrent={index === 0}
+                            />
+                        ))
+                    )}
                 </CardContent>
             </Card>
         </div>

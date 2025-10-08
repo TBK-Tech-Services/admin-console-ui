@@ -2,93 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Calendar, User, MapPin, Clock, CreditCard } from "lucide-react";
 
-interface Booking {
-  id: string;
-  guestName: string;
-  villa: string;
-  checkIn: string;
-  checkOut: string;
-  guests: number;
-  status: "confirmed" | "pending" | "checked-in" | "checked-out" | "cancelled";
-  amount: string;
-  bookedDate: string;
-  paymentStatus: "paid" | "pending";
-}
-
-const mockBookings: Booking[] = [
-  {
-    id: "1",
-    guestName: "Rahul Sharma",
-    villa: "Sunset Paradise Villa",
-    checkIn: "2024-01-15",
-    checkOut: "2024-01-18",
-    guests: 4,
-    status: "confirmed",
-    amount: "₹32,000",
-    bookedDate: "2024-01-10",
-    paymentStatus: "paid",
-  },
-  {
-    id: "2",
-    guestName: "Priya Patel",
-    villa: "Ocean Breeze Resort",
-    checkIn: "2024-01-20",
-    checkOut: "2024-01-25",
-    guests: 6,
-    status: "checked-in",
-    amount: "₹65,000",
-    bookedDate: "2024-01-05",
-    paymentStatus: "paid",
-  },
-  {
-    id: "3",
-    guestName: "Amit Kumar",
-    villa: "Coastal Dreams Villa",
-    checkIn: "2024-01-12",
-    checkOut: "2024-01-14",
-    guests: 2,
-    status: "checked-out",
-    amount: "₹18,000",
-    bookedDate: "2024-01-08",
-    paymentStatus: "paid",
-  },
-  {
-    id: "4",
-    guestName: "Sneha Reddy",
-    villa: "Sunset Paradise Villa",
-    checkIn: "2024-01-25",
-    checkOut: "2024-01-28",
-    guests: 3,
-    status: "pending",
-    amount: "₹28,500",
-    bookedDate: "2024-01-12",
-    paymentStatus: "pending",
-  },
-  {
-    id: "5",
-    guestName: "Karthik Nair",
-    villa: "Ocean Breeze Resort",
-    checkIn: "2024-01-30",
-    checkOut: "2024-02-02",
-    guests: 8,
-    status: "confirmed",
-    amount: "₹52,000",
-    bookedDate: "2024-01-11",
-    paymentStatus: "paid",
-  },
-];
-
 const getStatusColor = (status: string) => {
   switch (status) {
-    case "confirmed":
+    case "CONFIRMED":
       return "bg-success/10 text-success border-success/20";
-    case "pending":
+    case "PENDING":
       return "bg-warning/10 text-warning border-warning/20";
-    case "checked-in":
+    case "CHECKED_IN":
       return "bg-accent/10 text-accent border-accent/20";
-    case "checked-out":
+    case "CHECKED_OUT":
       return "bg-muted/50 text-muted-foreground border-muted";
-    case "cancelled":
+    case "CANCELLED":
       return "bg-destructive/10 text-destructive border-destructive/20";
     default:
       return "bg-muted text-muted-foreground";
@@ -97,9 +21,9 @@ const getStatusColor = (status: string) => {
 
 const getPaymentStatusColor = (status: string) => {
   switch (status) {
-    case "paid":
+    case "PAID":
       return "bg-success/10 text-success border-success/20";
-    case "pending":
+    case "PENDING":
       return "bg-warning/10 text-warning border-warning/20";
     default:
       return "bg-muted text-muted-foreground";
@@ -115,7 +39,24 @@ const formatDate = (dateString: string) => {
   });
 };
 
-export default function OwnerBookingsComponent() {
+interface OwnerBookingsComponentProps {
+  data: any;
+  isLoading: boolean;
+}
+
+export default function OwnerBookingsComponent({ data, isLoading }: OwnerBookingsComponentProps) {
+  if (isLoading) {
+    return (
+      <Card className="border-border shadow-soft">
+        <CardContent className="py-8 text-center">Loading bookings...</CardContent>
+      </Card>
+    );
+  }
+
+  const bookingsData = data || {};
+  const bookings = bookingsData.bookings || [];
+  const totalCount = bookingsData.totalCount || 0;
+
   return (
     <Card className="border-border shadow-soft">
       <CardHeader>
@@ -130,86 +71,90 @@ export default function OwnerBookingsComponent() {
             </CardDescription>
           </div>
           <Badge variant="secondary" className="bg-gradient-accent text-accent-foreground">
-            {mockBookings.length} Total
+            {totalCount} Total
           </Badge>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="max-h-[500px] overflow-y-auto pr-2">
-          {mockBookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="p-4 rounded-lg border border-border bg-card hover:bg-muted/30 transition-all duration-200 mb-3"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
+          {bookings.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">No bookings found</div>
+          ) : (
+            bookings.map((booking: any) => (
+              <div
+                key={booking.id}
+                className="p-4 rounded-lg border border-border bg-card hover:bg-muted/30 transition-all duration-200 mb-3"
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <h3 className="font-semibold text-foreground">{booking.guestName}</h3>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                      <MapPin className="h-3 w-3" />
+                      {booking.villaName}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <Badge className={getStatusColor(booking.bookingStatus)}>
+                      {booking.bookingStatus}
+                    </Badge>
+                    <div className="text-sm font-semibold text-foreground mt-1">
+                      ₹{booking.amount?.toLocaleString('en-IN')}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-foreground font-medium">
+                        {formatDate(booking.checkIn)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Check-in</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <div className="text-foreground font-medium">
+                        {formatDate(booking.checkOut)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">Check-out</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="font-semibold text-foreground">{booking.guestName}</h3>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <MapPin className="h-3 w-3" />
-                    {booking.villa}
-                  </div>
-                </div>
-                <div className="text-right">
-                  <Badge className={getStatusColor(booking.status)}>
-                    {booking.status}
-                  </Badge>
-                  <div className="text-sm font-semibold text-foreground mt-1">
-                    {booking.amount}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-foreground font-medium">
-                      {formatDate(booking.checkIn)}
+                    <div>
+                      <div className="text-foreground font-medium">
+                        {booking.totalGuests} guests
+                      </div>
+                      <div className="text-xs text-muted-foreground">Total</div>
                     </div>
-                    <div className="text-xs text-muted-foreground">Check-in</div>
                   </div>
                 </div>
                 
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-foreground font-medium">
-                      {formatDate(booking.checkOut)}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Check-out</div>
+                <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3 w-3 text-muted-foreground" />
+                    <span className="text-xs text-muted-foreground">
+                      Booked on {formatDate(booking.bookedOn)}
+                    </span>
                   </div>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  <div>
-                    <div className="text-foreground font-medium">
-                      {booking.guests} guests
-                    </div>
-                    <div className="text-xs text-muted-foreground">Total</div>
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-3 w-3 text-muted-foreground" />
+                    <Badge variant="outline" className={getPaymentStatusColor(booking.paymentStatus)}>
+                      {booking.paymentStatus}
+                    </Badge>
                   </div>
                 </div>
               </div>
-              
-              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
-                <div className="flex items-center gap-2">
-                  <Clock className="h-3 w-3 text-muted-foreground" />
-                  <span className="text-xs text-muted-foreground">
-                    Booked on {formatDate(booking.bookedDate)}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <CreditCard className="h-3 w-3 text-muted-foreground" />
-                  <Badge variant="outline" className={getPaymentStatusColor(booking.paymentStatus)}>
-                    {booking.paymentStatus}
-                  </Badge>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </CardContent>
     </Card>

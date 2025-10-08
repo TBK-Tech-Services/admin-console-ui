@@ -2,11 +2,34 @@ import OwnerBookingsComponent from "@/components/owner/OwnerBookingsComponent";
 import OwnerStatsComponent from "@/components/owner/OwnerStatsComponent";
 import OwnerVillasComponent from "@/components/owner/OwnerVillasComponent";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getOwnerDashboardStatsService, getOwnerVillasService, getRecentBookingsForOwnerService } from "@/services/ownerDashboard.service";
+import { RootState } from "@/store/store";
+import { useQuery } from "@tanstack/react-query";
 import { Building2, Calendar, TrendingUp, MapPin } from "lucide-react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 export default function OwnerDashboardPage() {
   const navigate = useNavigate();
+  const ownerId = useSelector((state: RootState) => state?.auth?.user?.id);
+
+  // Query for Dashboard Stats
+  const { data: statsData, isLoading: statsLoading } = useQuery({
+    queryKey: ["ownerDashboardStats", ownerId],
+    queryFn: () => getOwnerDashboardStatsService({ ownerId }),
+  });
+
+  // Query for Owner Villas
+  const { data: villasData, isLoading: villasLoading } = useQuery({
+    queryKey: ["ownerVillas", ownerId],
+    queryFn: () => getOwnerVillasService({ ownerId }),
+  });
+
+  // Query for Recent Bookings
+  const { data: bookingsData, isLoading: bookingsLoading } = useQuery({
+    queryKey: ["recentBookings", ownerId],
+    queryFn: () => getRecentBookingsForOwnerService({ ownerId }),
+  });
 
   return (
     <div className="flex-1 space-y-6 p-6">
@@ -27,18 +50,18 @@ export default function OwnerDashboardPage() {
       </div>
 
       {/* Stats Overview */}
-      <OwnerStatsComponent />
+      <OwnerStatsComponent data={statsData} isLoading={statsLoading} />
 
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Villas Section */}
         <div>
-          <OwnerVillasComponent />
+          <OwnerVillasComponent data={villasData} isLoading={villasLoading} />
         </div>
 
         {/* Bookings Section */}
         <div>
-          <OwnerBookingsComponent />
+          <OwnerBookingsComponent data={bookingsData} isLoading={bookingsLoading} />
         </div>
       </div>
 
