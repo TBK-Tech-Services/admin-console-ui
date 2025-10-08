@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import BookingDetailsModalComponent from "./BookingDetailsModalComponent";
 import UpdateBookingModalComponent from "./UpdateBookingModalComponent";
+import VoucherPreviewModalComponent from "./VoucherPreviewModalComponent";
 import { useMutation } from "@tanstack/react-query";
 import { deleteBookingService, getABookingService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
@@ -29,6 +30,17 @@ const WhatsAppIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
+// Gmail Icon Component
+const GmailIcon = ({ className }: { className?: string }) => (
+  <svg 
+    className={className} 
+    viewBox="0 0 24 24" 
+    fill="currentColor"
+  >
+    <path d="M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z"/>
+  </svg>
+);
+
 export default function BookingActionsMenuComponent({ booking }) {
 
   // useErrorHanlder
@@ -37,6 +49,8 @@ export default function BookingActionsMenuComponent({ booking }) {
   // State Variables
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showVoucherModal, setShowVoucherModal] = useState(false);
+  const [sendType, setSendType] = useState<"whatsapp" | "gmail">("whatsapp");
 
   // Get Booking Mutation
   const getBookingMutation = useMutation({
@@ -58,6 +72,18 @@ export default function BookingActionsMenuComponent({ booking }) {
   // Handler Function to Update Booking
   const handleEditBooking = () => {
     setShowUpdateModal(true);
+  };
+
+  // Handler Function to Send WhatsApp
+  const handleSendWhatsApp = () => {
+    setSendType("whatsapp");
+    setShowVoucherModal(true);
+  };
+
+  // Handler Function to Send Gmail
+  const handleSendGmail = () => {
+    setSendType("gmail");
+    setShowVoucherModal(true);
   };
   
   // Delete Mutation
@@ -85,8 +111,23 @@ export default function BookingActionsMenuComponent({ booking }) {
         <Button variant="ghost" size="sm" title="Edit Booking" onClick={handleEditBooking}>
           <Edit className="h-4 w-4" />
         </Button>
-        <Button variant="ghost" size="sm" title="Send WhatsApp" className="text-green-600 hover:text-green-700">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          title="Send WhatsApp" 
+          className="text-green-600 hover:text-green-700"
+          onClick={handleSendWhatsApp}
+        >
           <WhatsAppIcon className="h-4 w-4" />
+        </Button>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          title="Send Email" 
+          className="text-red-600 hover:text-red-700"
+          onClick={handleSendGmail}
+        >
+          <GmailIcon className="h-4 w-4" />
         </Button>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -112,6 +153,7 @@ export default function BookingActionsMenuComponent({ booking }) {
         </AlertDialog>
       </div>
 
+      {/* Existing Modals */}
       <BookingDetailsModalComponent 
         isOpen={showDetailsModal}
         onClose={() => setShowDetailsModal(false)}
@@ -122,6 +164,14 @@ export default function BookingActionsMenuComponent({ booking }) {
         isOpen={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         booking={booking}
+      />
+
+      {/* New Voucher Modal */}
+      <VoucherPreviewModalComponent
+        isOpen={showVoucherModal}
+        onClose={() => setShowVoucherModal(false)}
+        booking={booking}
+        sendType={sendType}
       />
     </>
   );
