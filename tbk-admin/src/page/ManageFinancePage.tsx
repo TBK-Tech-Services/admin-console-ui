@@ -23,6 +23,13 @@ export default function ManageFinancePage() {
   if (dateRange.start) queryParams.startDate = dateRange.start;
   if (dateRange.end) queryParams.endDate = dateRange.end;
 
+  // Prepare filters object for header component
+  const currentFilters = {
+    selectedVilla,
+    selectedMonth,
+    dateRange,
+  };
+
   // Fetch dashboard data using TanStack Query
   const { data: response, isLoading, isError, error } = useQuery({
     queryKey: ['financeDashboard', selectedVilla, selectedMonth, dateRange.start, dateRange.end],
@@ -43,7 +50,7 @@ export default function ManageFinancePage() {
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
-        <FinancePageHeaderComponent />
+        <FinancePageHeaderComponent filters={currentFilters} />
         <div className="flex items-center justify-center h-64">
           <p className="text-muted-foreground">Loading finance data...</p>
         </div>
@@ -55,7 +62,7 @@ export default function ManageFinancePage() {
   if (!response || !response.success || !response.data) {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
-        <FinancePageHeaderComponent />
+        <FinancePageHeaderComponent filters={currentFilters} />
         <FinanceFiltersComponent 
           selectedVilla={selectedVilla}
           selectedMonth={selectedMonth}
@@ -75,7 +82,7 @@ export default function ManageFinancePage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <FinancePageHeaderComponent />
+      <FinancePageHeaderComponent filters={currentFilters} />
       
       <FinanceFiltersComponent 
         selectedVilla={selectedVilla}
