@@ -34,6 +34,20 @@ export default function ManageExpensesPage() {
   const [selectedDeleteExpense, setSelectedDeleteExpense] = useState<Expense | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  // Filter states for download report
+  const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [typeFilter, setTypeFilter] = useState<string>("");
+  const [villaFilter, setVillaFilter] = useState<string>("");
+  const [dateRange, setDateRange] = useState({ start: "", end: "" });
+
+  // Prepare filters object for header component
+  const currentFilters = {
+    categoryFilter,
+    typeFilter,
+    villaFilter,
+    dateRange,
+  };
+
   // useQuery
   const { data: expensesData, isLoading: expensesLoading, refetch: refetchExpenses } = useQuery({
     queryKey: ['expenses'],
@@ -161,7 +175,10 @@ export default function ManageExpensesPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <ExpensesPageHeaderComponent onModalOpen={() => setIsAddModalOpen(true)} />
+      <ExpensesPageHeaderComponent 
+        onModalOpen={() => setIsAddModalOpen(true)}
+        filters={currentFilters}
+      />
       
       <ExpensesTableComponent 
         onViewExpense={handleViewExpense}
