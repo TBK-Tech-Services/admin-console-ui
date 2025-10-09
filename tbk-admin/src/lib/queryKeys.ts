@@ -8,4 +8,10 @@ export const queryKeys = {
         villasOccupancy: () => [...queryKeys.dashboard.all, 'villas-occupancy'] as const,
         revenueTrends: () => [...queryKeys.dashboard.all, 'revenue-trends'] as const,
     },
+    expenses: {
+        all: ['expenses'] as const,
+        lists: () => [...queryKeys.expenses.all, 'list'] as const,
+        list: (filters?: any) => [...queryKeys.expenses.lists(), filters] as const,
+        categories: () => [...queryKeys.expenses.all, 'categories'] as const,
+    },
 };

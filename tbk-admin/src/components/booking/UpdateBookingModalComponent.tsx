@@ -11,16 +11,18 @@ import { Users, Calendar, MapPin, CreditCard } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { formatDateForInput } from "@/utils/formatDateForInput";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateBookingService } from "@/services/booking.service";
-import { AxiosError } from "axios";
-import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
-import { useToast } from "@/hooks/use-toast";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { queryKeys } from "@/lib/queryKeys";
 
 export default function UpdateBookingModalComponent({ isOpen, onClose, booking }) {
-  
-  // useToast
-  const { toast } = useToast();
+
+  // useQueryClient
+  const queryClient = useQueryClient();
+
+  // useErrorHanlder
+  const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // useSelector
   const villas = useSelector((state: RootState) => state.villas);
@@ -52,19 +54,21 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
       return await updateBookingService(formData , booking.id);
     },
     onSuccess: () => {
-      toast({
-        title: "Updated Booking Successfully!"
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.recentBookings()
       });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.stats()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.upcomingCheckins()
+      });
+
+      handleSuccess("Updated Booking Successfully!");
+
       onClose();
     },
-    onError: (error: unknown) => {
-      const err = error as AxiosError<ApiErrorResponse>;
-      const backendMessage = err.response?.data?.message || "Something went wrong!";
-      toast({
-        title: "Something went wrong",
-        description: backendMessage
-      });
-    }
+    onError: handleMutationError
   })
 
   // Handler Function to Update Booking

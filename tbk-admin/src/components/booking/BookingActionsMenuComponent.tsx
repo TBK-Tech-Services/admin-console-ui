@@ -15,9 +15,10 @@ import {
 import BookingDetailsModalComponent from "./BookingDetailsModalComponent";
 import UpdateBookingModalComponent from "./UpdateBookingModalComponent";
 import VoucherPreviewModalComponent from "./VoucherPreviewModalComponent";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteBookingService, getABookingService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { queryKeys } from "@/lib/queryKeys";
 
 // WhatsApp Icon Component
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -42,6 +43,9 @@ const GmailIcon = ({ className }: { className?: string }) => (
 );
 
 export default function BookingActionsMenuComponent({ booking }) {
+
+  // useQueryClient
+  const queryClient = useQueryClient();
 
   // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
@@ -92,6 +96,19 @@ export default function BookingActionsMenuComponent({ booking }) {
       return deleteBookingService(booking.id);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.recentBookings()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.stats()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.upcomingCheckins()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.revenueTrends()
+      });
+      
       handleSuccess("Deleted Booking Successfully!");
     },
     onError: handleMutationError

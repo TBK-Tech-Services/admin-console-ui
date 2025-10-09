@@ -4,7 +4,7 @@ import { getPaymentStatusColor } from "@/utils/getPaymentStatusColor";
 import { getInitials } from "@/utils/getNameInitials";
 import BookingActionsMenuComponent from "../booking/BookingActionsMenuComponent";
 import { CheckCircle, Clock, XCircle, ChevronDown } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +13,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { updateBookingStatusService, updatePaymentStatusService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { queryKeys } from "@/lib/queryKeys";
 
 export default function BookingItemComponent({ booking }) {
+
+  // useQueryClient
+  const queryClient = useQueryClient();
 
   // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
@@ -25,6 +29,16 @@ export default function BookingItemComponent({ booking }) {
       return updateBookingStatusService(value , booking.id);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.recentBookings()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.stats()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.upcomingCheckins()
+      });
+
       handleSuccess("Booking Status Updated Successfully!");
     },
     onError: handleMutationError
@@ -41,6 +55,13 @@ export default function BookingItemComponent({ booking }) {
       return updatePaymentStatusService(value , booking.id);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.recentBookings()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.stats()
+      });
+      
       handleSuccess("Payment Status Updated Successfully!");
     },
     onError: handleMutationError
@@ -66,8 +87,8 @@ export default function BookingItemComponent({ booking }) {
   };
 
   // Getting Icons For Booking Status & Payment Status
-  const StatusIcon = bookingStatusIcons[booking.status] || Clock;
-  const PaymentIcon = paymentStatusIcons[booking.rawBookingData?.paymentStatus] || Clock;
+  const BookingStatusIcon = bookingStatusIcons[booking.status] || Clock;
+  const PaymentStatusIcon = paymentStatusIcons[booking.rawBookingData?.paymentStatus] || Clock;
 
   return (
     <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-all duration-200">
@@ -104,7 +125,7 @@ export default function BookingItemComponent({ booking }) {
                 <div className={`${getBookingStatusColor(booking.status)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${
                   updateBookingStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
                 }`}>
-                  <StatusIcon className="h-3 w-3" />
+                  <BookingStatusIcon className="h-3 w-3" />
                   <span className="font-medium">{booking.status}</span>
                   <ChevronDown className="h-2 w-2 opacity-60" />
                 </div>
@@ -151,7 +172,7 @@ export default function BookingItemComponent({ booking }) {
                 <div className={`${getPaymentStatusColor(booking.rawBookingData?.paymentStatus)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${
                   updatePaymentStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
                 }`}>
-                  <PaymentIcon className="h-3 w-3" />
+                  <PaymentStatusIcon className="h-3 w-3" />
                   <span className="font-medium">{booking.rawBookingData?.paymentStatus || 'PENDING'}</span>
                   <ChevronDown className="h-2 w-2 opacity-60" />
                 </div>

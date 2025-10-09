@@ -5,15 +5,20 @@ import DeleteExpenseModalComponent from "@/components/expense/DeleteExpenseModal
 import ExpensesPageHeaderComponent from "@/components/expense/ExpensesPageHeaderComponent";
 import ExpensesTableComponent from "@/components/expense/ExpensesTableComponent";
 import { useEffect, useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { addExpenseService, deleteAExpenseService, getAllExpensesService, getAllExpenseCategoriesService, updateExpenseService } from "@/services/expense.service";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addExpenseService, deleteAExpenseService, updateExpenseService } from "@/services/expense.service";
 import { useDispatch, useSelector } from "react-redux";
 import { setExpensesList } from "@/store/slices/expensesSlice";
 import { RootState } from "@/store/store";
 import { Expense } from "@/types/expense/expenseData";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { useExpenseCategories, useExpenses } from "@/hooks/useExpenses";
+import { queryKeys } from "@/lib/queryKeys";
 
 export default function ManageExpensesPage() {
+
+  // useQueryClient
+  const queryClient = useQueryClient();
 
   // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
@@ -48,18 +53,9 @@ export default function ManageExpensesPage() {
     dateRange,
   };
 
-  // useQuery
-  const { data: expensesData, isLoading: expensesLoading, refetch: refetchExpenses } = useQuery({
-    queryKey: ['expenses'],
-    queryFn: async () => getAllExpensesService()
-  });
-
-  // useQuery
-  const { data, isLoading: categoriesLoading } = useQuery({
-    queryKey: ['expense-categories'],
-    queryFn: async () => getAllExpenseCategoriesService(),
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-  });
+  // Custom Hook
+  const { data: expensesData, isLoading: expensesLoading } = useExpenses();
+  const { data: categoriesData, isLoading: categoriesLoading } = useExpenseCategories();
 
   // useEffect
   useEffect(() => {
@@ -74,8 +70,12 @@ export default function ManageExpensesPage() {
       return addExpenseService(formData)
     },
     onSuccess: () => {
-      refetchExpenses();
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.expenses.all 
+      });
+
       setIsAddModalOpen(false);
+
       handleSuccess("New Expense Created Successfully!");
     },
     onError: handleMutationError
@@ -87,9 +87,14 @@ export default function ManageExpensesPage() {
       return updateExpenseService({ formData, expenseId })
     },
     onSuccess: () => {
-      refetchExpenses();
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.expenses.all 
+      });
+
       setIsEditModalOpen(false);
+
       setSelectedEditExpense(null);
+
       handleSuccess("Expense Updated Successfully!");
     },
     onError: handleMutationError
@@ -101,10 +106,16 @@ export default function ManageExpensesPage() {
       return deleteAExpenseService(expenseId)
     },
     onSuccess: () => {
-      refetchExpenses();
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.expenses.all 
+      });
+
       setIsDeleting(false);
+
       setIsDeleteModalOpen(false);
+
       setSelectedDeleteExpense(null);
+
       handleSuccess("Expense Deleted Successfully!");
     },
     onError: handleMutationError

@@ -32,6 +32,6 @@ export const deleteAExpenseService = async(expenseId) : Promise<void> => {
 
 // Service to Get all Expense Categories
 export const getAllExpenseCategoriesService = async() : Promise<[]> => {
-    const response = await apiService.delete('/expenses/v1/categories');
+    const response = await apiService.get('/expenses/v1/categories');
     return response.data;
 }
