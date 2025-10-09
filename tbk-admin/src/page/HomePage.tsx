@@ -1,36 +1,15 @@
 import DashboardGridComponent from "@/components/home/DashboardGridComponent";
 import DashboardHeaderComponent from "@/components/home/DashboardHeaderComponent";
 import DashboardStatsComponent from "@/components/home/DashboardStatsComponent";
-import { getDashboardStatsService, getRecentBookingsService, getRevenueTrendsService, getUpcomingCheckinService, getVillasOccupancyService } from "@/services/dashboard.service";
-import { useQuery } from "@tanstack/react-query";
+import { useDashboardStats, useRecentBookings, useRevenueTrends, useUpcomingCheckins, useVillasOccupancy } from "@/hooks/useDashboard";
 
 export default function HomePage() {
-  
-  // useQuery
-  const { data : upcomingCheckins } = useQuery({
-    queryKey : ['upcoming-checkins'],
-    queryFn : async () => getUpcomingCheckinService()
-  });
-
-  const { data : recentBookings } = useQuery({
-    queryKey : ['recent-bookings'],
-    queryFn : async () => getRecentBookingsService()
-  });
-
-  const { data : dashboardStats } = useQuery({
-    queryKey : ['dashboard-stats'],
-    queryFn : async () => getDashboardStatsService()
-  });
-
-  const { data : villasOccupancy } = useQuery({
-    queryKey : ['villas-occupancy'],
-    queryFn : async () => getVillasOccupancyService()
-  });
-
-  const { data : revenueTrends } = useQuery({
-    queryKey : ['revenue-trends'],
-    queryFn : async () => getRevenueTrendsService()
-  });
+  // Custom Hooks
+  const { data: upcomingCheckins } = useUpcomingCheckins();
+  const { data: recentBookings } = useRecentBookings();
+  const { data: dashboardStats } = useDashboardStats();
+  const { data: villasOccupancy } = useVillasOccupancy();
+  const { data: revenueTrends } = useRevenueTrends();
 
   return (
     <div className="space-y-6">
