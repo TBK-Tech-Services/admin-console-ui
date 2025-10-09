@@ -2,14 +2,18 @@ import { useEffect, useState } from "react";
 import BookingFormHeaderComponent from '@/components/booking/BookingFormHeaderComponent';
 import BookingFormComponent from '@/components/booking/BookingFormComponent';
 import BookingSummaryModal from "@/components/booking/BookingSummaryModal";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllVillasService } from "@/services/villa.service";
 import { useDispatch } from "react-redux";
 import { setVillas } from "@/store/slices/villasSlice";
 import { addBookingService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
+import { queryKeys } from "@/lib/queryKeys";
 
 export default function NewBookingPage() {
+
+  // useQueryClient
+  const queryClient = useQueryClient();
 
   // useDispatch
   const dispatch = useDispatch();
@@ -61,6 +65,20 @@ export default function NewBookingPage() {
         specialRequest: "",
         isGSTIncluded: false
       });
+
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.recentBookings()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.stats()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.upcomingCheckins()
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: queryKeys.dashboard.revenueTrends()
+      });
+
       handleSuccess("Booking created successfully!");
     },
     onError: handleMutationError
