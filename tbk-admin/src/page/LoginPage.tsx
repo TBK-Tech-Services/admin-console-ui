@@ -52,6 +52,9 @@ export default function LoginPage() {
                 else if (roleValue === 'Owner') {
                     navigate("/owner-dashboard");
                 }
+                else if(roleValue === 'Agent'){ 
+                    navigate("/agent");
+                }
                 else {
                     console.log("Unknown role format:", user.role);
                     navigate("/unauthorized");

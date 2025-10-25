@@ -23,6 +23,7 @@ import UnauthorizedPage from "./page/UnauthorizedPage";
 import RoleBasedHomeRedirectComponent from "./components/common/RoleBasedHomeRedirectComponent";
 import OwnerCalenderPage from "./page/OwnerCalenderPage";
 import OwnerAnalyticsPage from "./page/OwnerAnalyticsPage";
+import AgentLandingPage from "./page/AgentLandingPage";
 
 const App = () => (
   <TooltipProvider>
@@ -61,6 +62,13 @@ const App = () => (
             <Route path="/owner-dashboard" element={<OwnerDashboardPage />} />
             <Route path="/owner/calendar" element={<OwnerCalenderPage />} />
             <Route path="/owner/analytics" element={<OwnerAnalyticsPage />} />
+          </Route>
+        </Route>
+
+        {/* Agent Only Routes */}
+        <Route element={<RoleBasedRouteComponent allowedRoles={['Agent']} />}>
+          <Route element={<Layout />}>
+            <Route path="/agent" element={<AgentLandingPage />} />
           </Route>
         </Route>
 

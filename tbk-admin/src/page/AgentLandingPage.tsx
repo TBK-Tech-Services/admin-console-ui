@@ -1,0 +1,78 @@
+import AgentCallToActionComponent from "@/components/agent/AgentCallToActionComponent";
+import AgentHeroSectionComponent from "@/components/agent/AgentHeroSectionComponent";
+import AgentVillaModalComponent from "@/components/agent/AgentVillaModalComponent";
+import AgentVillaShowcaseComponent from "@/components/agent/AgentVillaShowcaseComponent";
+import { filterVillasService, getAllAmenitiesService } from "@/services/agent.service";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+
+export default function AgentLandingPage() {
+
+    // State Variables
+    const [selectedVilla, setSelectedVilla] = useState(null);
+    const [checkInDate, setCheckInDate] = useState();
+    const [checkOutDate, setCheckOutDate] = useState();
+    const [guestCount, setGuestCount] = useState(0);
+    const [amenityFilters, setAmenityFilters] = useState([]);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // useQuery
+    const { data: ammenitiesData, isLoading } = useQuery({
+        queryKey: ['ammenities'],
+        queryFn: async () => getAllAmenitiesService()
+    });
+
+    const { data: filteredVillasData, isLoading: villasLoading } = useQuery({
+        queryKey: ['filteredVillas', checkInDate, checkOutDate, guestCount, amenityFilters],
+        queryFn: async () =>
+            filterVillasService({
+                checkIn: checkInDate?.toISOString().split('T')[0] || '',
+                checkOut: checkOutDate?.toISOString().split('T')[0] || '',
+                guests: guestCount,
+                amenities: amenityFilters.join(','),
+            }),
+    });
+
+    // Handler Function to Handle View Details
+    const handleViewDetails = (villa) => {
+        setSelectedVilla(villa);
+        setIsModalOpen(true);
+    };
+
+    // Handler Function to Handle Search
+    const handleSearch = () => {
+        console.log('Search triggered - useQuery will handle the API call automatically');
+    };
+
+    return (
+        <div className="min-h-screen bg-background">
+            <AgentHeroSectionComponent
+                checkInDate={checkInDate}
+                setCheckInDate={setCheckInDate}
+                checkOutDate={checkOutDate}
+                setCheckOutDate={setCheckOutDate}
+                guestCount={guestCount}
+                setGuestCount={setGuestCount}
+                amenityFilters={amenityFilters}
+                setAmenityFilters={setAmenityFilters}
+                onSearch={handleSearch}
+                ammenitiesData={ammenitiesData || []}
+                isLoading={isLoading}
+            />
+
+            <AgentVillaShowcaseComponent
+                villas={filteredVillasData || []}
+                onViewDetails={handleViewDetails}
+                isLoading={villasLoading}
+            />
+
+            <AgentCallToActionComponent />
+
+            <AgentVillaModalComponent
+                villa={selectedVilla}
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
+        </div>
+    );
+}
