@@ -15,11 +15,17 @@ export default function ManageBookingsPage() {
   // State Variables
   const [searchText, setSearchText] = useState("");
   const [status, setStatus] = useState("");
+  const [checkInDate, setCheckInDate] = useState(null);
+
+  // Handler to clear date
+  const handleClearDate = () => {
+    setCheckInDate(null);
+  };
 
   // useQuery
   const { data } = useQuery({
-    queryKey: ['bookings' , searchText , status],
-    queryFn: () => searchAndFilterBookingsService(searchText , status),
+    queryKey: ['bookings', searchText, status, checkInDate],
+    queryFn: () => searchAndFilterBookingsService(searchText, status, checkInDate),
   })
 
   // useEffect
@@ -27,7 +33,7 @@ export default function ManageBookingsPage() {
     if(data){
       dispatch(setBookings(data));
     }
-  }, [data , dispatch]);
+  }, [data, dispatch]);
 
   return (
     <div className="space-y-6">
@@ -36,8 +42,11 @@ export default function ManageBookingsPage() {
       <BookingsFiltersComponent 
         searchTerm={searchText}
         statusFilter={status}
+        checkInDate={checkInDate}
         onSearchChange={setSearchText}
         onStatusFilterChange={setStatus}
+        onCheckInDateChange={setCheckInDate}
+        onClearDate={handleClearDate}
       />
       
       <BookingsListComponent />
