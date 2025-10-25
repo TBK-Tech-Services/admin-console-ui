@@ -156,7 +156,7 @@ export function Navigation() {
           <div className="flex items-center gap-2">
             <MapPin className="h-6 w-6 text-primary" />
             <span className="font-bold text-lg bg-gradient-primary bg-clip-text text-transparent">
-              Villa Bookings
+              TBK Villas
             </span>
           </div>
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -188,7 +188,7 @@ export function Navigation() {
             <div className="flex items-center gap-2 mb-8">
               <MapPin className="h-8 w-8 text-primary" />
               <span className="font-bold text-xl bg-gradient-primary bg-clip-text text-transparent">
-                Villa Bookings
+                TBK Villas
               </span>
             </div>
             <nav className="space-y-2">
