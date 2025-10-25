@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, Calendar, CheckCircle, XCircle, Clock } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar, CheckCircle, XCircle, Wrench } from "lucide-react";
 
 // Static data for demonstration
 const SAMPLE_BOOKINGS = [
@@ -10,7 +10,7 @@ const SAMPLE_BOOKINGS = [
   { date: '2025-09-30', status: 'booked', guestName: 'John Doe' },
   { date: '2025-10-05', status: 'booked', guestName: 'Sarah Smith' },
   { date: '2025-10-06', status: 'booked', guestName: 'Sarah Smith' },
-  { date: '2025-10-12', status: 'blocked', reason: 'Maintenance' },
+  { date: '2025-10-12', status: 'maintenance', reason: 'Maintenance' },
   { date: '2025-10-15', status: 'booked', guestName: 'Mike Johnson' },
   { date: '2025-10-16', status: 'booked', guestName: 'Mike Johnson' },
   { date: '2025-10-17', status: 'booked', guestName: 'Mike Johnson' },
@@ -92,8 +92,8 @@ export default function VillaCalendarTabComponent({ villa }) {
             h-12 flex items-center justify-center text-sm font-medium cursor-pointer rounded-lg transition-all duration-200
             ${isSelected ? 'ring-2 ring-primary ring-offset-2' : ''}
             ${dateInfo.status === 'available' ? 'bg-green-50 text-green-700 hover:bg-green-100 border border-green-200' : ''}
-            ${dateInfo.status === 'booked' ? 'bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200' : ''}
-            ${dateInfo.status === 'blocked' ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' : ''}
+            ${dateInfo.status === 'booked' ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' : ''}
+            ${dateInfo.status === 'maintenance' ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200 border border-yellow-300' : ''}
             ${dateInfo.status === 'past' ? 'bg-gray-50 text-gray-400 cursor-not-allowed' : ''}
           `}
         >
@@ -156,12 +156,12 @@ export default function VillaCalendarTabComponent({ villa }) {
               <span className="text-sm text-muted-foreground">Available</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-orange-100 border border-orange-200 rounded"></div>
+              <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
               <span className="text-sm text-muted-foreground">Booked</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-100 border border-red-200 rounded"></div>
-              <span className="text-sm text-muted-foreground">Blocked</span>
+              <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
+              <span className="text-sm text-muted-foreground">Maintenance</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 bg-gray-100 border border-gray-200 rounded"></div>
@@ -212,19 +212,19 @@ export default function VillaCalendarTabComponent({ villa }) {
                 )}
                 {selectedInfo.status === 'booked' && (
                   <>
-                    <XCircle className="h-5 w-5 text-orange-600" />
-                    <span className="text-orange-700 font-medium">Booked</span>
+                    <XCircle className="h-5 w-5 text-red-600" />
+                    <span className="text-red-700 font-medium">Booked</span>
                   </>
                 )}
-                {selectedInfo.status === 'blocked' && (
+                {selectedInfo.status === 'maintenance' && (
                   <>
-                    <Clock className="h-5 w-5 text-red-600" />
-                    <span className="text-red-700 font-medium">Blocked</span>
+                    <Wrench className="h-5 w-5 text-yellow-600" />
+                    <span className="text-yellow-700 font-medium">Maintenance</span>
                   </>
                 )}
                 {selectedInfo.status === 'past' && (
                   <>
-                    <Clock className="h-5 w-5 text-gray-600" />
+                    <CheckCircle className="h-5 w-5 text-gray-600" />
                     <span className="text-gray-700 font-medium">Past Date</span>
                   </>
                 )}
@@ -232,18 +232,18 @@ export default function VillaCalendarTabComponent({ villa }) {
             </div>
             
             {selectedInfo.guestName && (
-              <div className="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                <h4 className="font-medium text-orange-900 mb-1">Booking Details</h4>
-                <p className="text-sm text-orange-700">
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <h4 className="font-medium text-red-900 mb-1">Booking Details</h4>
+                <p className="text-sm text-red-700">
                   <strong>Guest:</strong> {selectedInfo.guestName}
                 </p>
               </div>
             )}
             
             {selectedInfo.reason && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <h4 className="font-medium text-red-900 mb-1">Blocked</h4>
-                <p className="text-sm text-red-700">
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-300 rounded-lg">
+                <h4 className="font-medium text-yellow-900 mb-1">Maintenance</h4>
+                <p className="text-sm text-yellow-800">
                   <strong>Reason:</strong> {selectedInfo.reason}
                 </p>
               </div>
@@ -285,12 +285,12 @@ export default function VillaCalendarTabComponent({ villa }) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                <XCircle className="h-4 w-4 text-orange-600" />
+              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
+                <XCircle className="h-4 w-4 text-red-600" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Booked Days</p>
-                <p className="text-xl font-semibold text-orange-700">
+                <p className="text-xl font-semibold text-red-700">
                   {SAMPLE_BOOKINGS.filter(b => 
                     b.status === 'booked' &&
                     new Date(b.date).getMonth() === getCurrentMonth() && 
@@ -305,14 +305,14 @@ export default function VillaCalendarTabComponent({ villa }) {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                <Clock className="h-4 w-4 text-red-600" />
+              <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Wrench className="h-4 w-4 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Blocked Days</p>
-                <p className="text-xl font-semibold text-red-700">
+                <p className="text-sm text-muted-foreground">Maintenance Days</p>
+                <p className="text-xl font-semibold text-yellow-700">
                   {SAMPLE_BOOKINGS.filter(b => 
-                    b.status === 'blocked' &&
+                    b.status === 'maintenance' &&
                     new Date(b.date).getMonth() === getCurrentMonth() && 
                     new Date(b.date).getFullYear() === getCurrentYear()
                   ).length}
