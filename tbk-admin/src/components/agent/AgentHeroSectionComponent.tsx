@@ -4,25 +4,24 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Calendar as CalendarIcon, Search, X } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Calendar as CalendarIcon, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-export default function AgentHeroSectionComponent({ checkInDate, setCheckInDate, checkOutDate, setCheckOutDate, guestCount, setGuestCount, amenityFilters, setAmenityFilters, onSearch, ammenitiesData, isLoading }) {
-
-    // Handler Function to Handle Amenity Add
-    const handleAmenityAdd = (amenityId: string) => {
-        const id = parseInt(amenityId);
-        if (!amenityFilters.includes(id)) {
-            setAmenityFilters([...amenityFilters, id]);
-        }
-    };
-
-    // Handler Function to Handle Amenity Remove
-    const handleAmenityRemove = (amenityId: number) => {
-        setAmenityFilters(amenityFilters.filter(item => item !== amenityId));
-    };
+export default function AgentHeroSectionComponent({ 
+    checkInDate, 
+    setCheckInDate, 
+    checkOutDate, 
+    setCheckOutDate, 
+    guestCount, 
+    setGuestCount, 
+    location,
+    setLocation,
+    bedrooms,
+    setBedrooms,
+    onSearch, 
+}) {
 
     return (
         <section className="relative bg-gradient-to-br from-primary via-primary-glow to-accent py-16 overflow-hidden">
@@ -113,61 +112,21 @@ export default function AgentHeroSectionComponent({ checkInDate, setCheckInDate,
                             />
                         </div>
 
-                        {/* Amenities */}
+                        {/* Number of Bedrooms */}
                         <div className="space-y-2">
-                            <Label htmlFor="amenities" className="text-sm font-medium text-foreground">Amenities</Label>
-                            <div className="space-y-2">
-                                <Select onValueChange={(value) => handleAmenityAdd(value)}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Add amenity" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {
-                                            isLoading ?
-                                                (
-                                                    <SelectItem value="loading">Loading amenities...</SelectItem>
-                                                )
-                                                :
-                                                (
-                                                    ammenitiesData
-                                                        ?.filter(amenity => !amenityFilters.includes(amenity.id))
-                                                        ?.map((amenity) => (
-                                                            <SelectItem key={amenity.id} value={amenity.id.toString()}>
-                                                                {amenity.name}
-                                                            </SelectItem>
-                                                        ))
-                                                )
-                                        }
-                                    </SelectContent>
-                                </Select>
-
-                                {/* Selected Amenities */}
-                                {
-                                    (amenityFilters.length > 0)
-                                    &&
-                                    (
-                                        <div className="flex flex-wrap gap-1 mt-2">
-                                            {
-                                                amenityFilters.map((amenityId) => {
-                                                    const amenity = ammenitiesData?.find(a => a.id === amenityId);
-
-                                                    return (
-                                                        <Badge key={amenityId} variant="secondary" className="text-xs">
-                                                            {amenity?.name}
-                                                            <button
-                                                                className="ml-1 hover:bg-secondary-foreground/20 rounded-full"
-                                                                onClick={() => handleAmenityRemove(amenityId)}
-                                                            >
-                                                                <X className="h-3 w-3" />
-                                                            </button>
-                                                        </Badge>
-                                                    );
-                                                })
-                                            }
-                                        </div>
-                                    )
-                                }
-                            </div>
+                            <Label htmlFor="bedrooms" className="text-sm font-medium text-foreground">Bedrooms</Label>
+                            <Select value={bedrooms} onValueChange={setBedrooms}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select bedrooms" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="1">1 Bedroom</SelectItem>
+                                    <SelectItem value="2">2 Bedrooms</SelectItem>
+                                    <SelectItem value="3">3 Bedrooms</SelectItem>
+                                    <SelectItem value="4">4 Bedrooms</SelectItem>
+                                    <SelectItem value="5">5+ Bedrooms</SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         {/* Search Button */}
@@ -178,6 +137,33 @@ export default function AgentHeroSectionComponent({ checkInDate, setCheckInDate,
                                 Search
                             </Button>
                         </div>
+                    </div>
+
+                    {/* Location Radio Buttons - Below the main filters */}
+                    <div className="mt-6 pt-6 border-t">
+                        <Label className="text-sm font-medium text-foreground mb-3 block">Location</Label>
+                        <RadioGroup value={location} onValueChange={setLocation} className="flex flex-wrap gap-4">
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="all" id="all" />
+                                <Label htmlFor="all" className="text-sm font-normal cursor-pointer">All Locations</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="north-goa" id="north-goa" />
+                                <Label htmlFor="north-goa" className="text-sm font-normal cursor-pointer">North Goa</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="south-goa" id="south-goa" />
+                                <Label htmlFor="south-goa" className="text-sm font-normal cursor-pointer">South Goa</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="beach-front" id="beach-front" />
+                                <Label htmlFor="beach-front" className="text-sm font-normal cursor-pointer">Beach Front</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="city-center" id="city-center" />
+                                <Label htmlFor="city-center" className="text-sm font-normal cursor-pointer">City Center</Label>
+                            </div>
+                        </RadioGroup>
                     </div>
                 </div>
             </div>

@@ -137,7 +137,7 @@ export default function AgentVillaModalComponent({ villa, isOpen, onClose }) {
                                             ) : (
                                                 <>
                                                     <Download className="h-4 w-4" />
-                                                    Download Voucher
+                                                    Download Brochure
                                                 </>
                                             )}
                                         </Button>

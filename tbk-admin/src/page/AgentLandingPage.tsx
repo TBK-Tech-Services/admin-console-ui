@@ -2,7 +2,7 @@ import AgentCallToActionComponent from "@/components/agent/AgentCallToActionComp
 import AgentHeroSectionComponent from "@/components/agent/AgentHeroSectionComponent";
 import AgentVillaModalComponent from "@/components/agent/AgentVillaModalComponent";
 import AgentVillaShowcaseComponent from "@/components/agent/AgentVillaShowcaseComponent";
-import { filterVillasService, getAllAmenitiesService } from "@/services/agent.service";
+import { filterVillasService } from "@/services/agent.service";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -13,23 +13,20 @@ export default function AgentLandingPage() {
     const [checkInDate, setCheckInDate] = useState();
     const [checkOutDate, setCheckOutDate] = useState();
     const [guestCount, setGuestCount] = useState(0);
-    const [amenityFilters, setAmenityFilters] = useState([]);
+    const [location, setLocation] = useState("all");
+    const [bedrooms, setBedrooms] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // useQuery
-    const { data: ammenitiesData, isLoading } = useQuery({
-        queryKey: ['ammenities'],
-        queryFn: async () => getAllAmenitiesService()
-    });
-
     const { data: filteredVillasData, isLoading: villasLoading } = useQuery({
-        queryKey: ['filteredVillas', checkInDate, checkOutDate, guestCount, amenityFilters],
+        queryKey: ['filteredVillas', checkInDate, checkOutDate, guestCount, location, bedrooms],
         queryFn: async () =>
             filterVillasService({
                 checkIn: checkInDate?.toISOString().split('T')[0] || '',
                 checkOut: checkOutDate?.toISOString().split('T')[0] || '',
                 guests: guestCount,
-                amenities: amenityFilters.join(','),
+                location: location,
+                bedrooms: bedrooms,
             }),
     });
 
@@ -53,11 +50,11 @@ export default function AgentLandingPage() {
                 setCheckOutDate={setCheckOutDate}
                 guestCount={guestCount}
                 setGuestCount={setGuestCount}
-                amenityFilters={amenityFilters}
-                setAmenityFilters={setAmenityFilters}
+                location={location}
+                setLocation={setLocation}
+                bedrooms={bedrooms}
+                setBedrooms={setBedrooms}
                 onSearch={handleSearch}
-                ammenitiesData={ammenitiesData || []}
-                isLoading={isLoading}
             />
 
             <AgentVillaShowcaseComponent
