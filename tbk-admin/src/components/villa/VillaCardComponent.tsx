@@ -18,7 +18,7 @@ export default function VillaCardComponent({ villa, onClick }) {
     >
       <div className="relative">
         <img 
-          src={villa.images?.[1]?.link || "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop"} 
+          src={villa.imageUrl || "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop"} 
           alt={villa.name}
           className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
