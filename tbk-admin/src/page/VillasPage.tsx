@@ -5,16 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddVillaFormComponent from "@/components/villa/AddVillaFormComponent";
 import VillaCardComponent from "@/components/villa/VillaCardComponent";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
-import { getAllAmenityCategoriesService } from "@/services/villa.service";
+import { getAllAmenityCategoriesService, getAllVillasService } from "@/services/villa.service";
 import { setAmenities } from "@/store/slices/amenitiesSlice";
 
 export default function VillasPage() {
-  
-  // useSelector
-  const villas = useSelector((state: RootState) => state.villas.listOfVilla);
 
   // useDispatch 
   const dispatch = useDispatch();
@@ -25,11 +21,19 @@ export default function VillasPage() {
   // State Variables
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // useQuery
+  // useQuery for Fetching Amenitites Category
   const { data } = useQuery({
     queryKey: ['amenities'],
     queryFn: getAllAmenityCategoriesService,
   });
+
+  // useQuery for Fetching all Villas
+  const { data: villas } = useQuery({
+    queryKey: ['villas'],
+    queryFn: getAllVillasService,
+  });
+
+  console.log(villas)
 
   // useEffect
   useEffect(() => {
@@ -79,9 +83,9 @@ export default function VillasPage() {
             {
               villas?.map((villa) => (
                 <VillaCardComponent 
-                  key={villa.id} 
+                  key={villa?.id} 
                   villa={villa}
-                  onClick={() => navigate(`/villas/${villa.id}`)}
+                  onClick={() => navigate(`/villas/${villa?.id}`)}
                 />
               ))
             }

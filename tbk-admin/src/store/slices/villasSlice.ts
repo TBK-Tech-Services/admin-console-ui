@@ -16,5 +16,5 @@ const villasSlice = createSlice({
 
 export const { 
     setVillas
- } = villasSlice.actions;
+} = villasSlice.actions;
 export default villasSlice.reducer;
