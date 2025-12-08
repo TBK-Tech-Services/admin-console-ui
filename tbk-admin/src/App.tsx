@@ -33,7 +33,7 @@ const App = () => (
     <BrowserRouter>
       <Routes>
         {/* Un-Authenticated Routes */}
-        <Route element={<PublicRoute/>}>
+        <Route element={<PublicRoute />}>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />

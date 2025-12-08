@@ -9,8 +9,29 @@ import { setVillas } from "@/store/slices/villasSlice";
 import { addBookingService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { queryKeys } from "@/lib/queryKeys";
+import { getAVillaService } from "@/services/villa.service";
+import { getTotalDaysOfStay } from "@/utils/getTotalDaysOfStay";
 
 export default function NewBookingPage() {
+
+  // State Variables
+  const [formData, setFormData] = useState({
+    guestName: "",
+    guestEmail: "",
+    guestPhone: "",
+    alternatePhone: "",
+    villaId: null,
+    checkIn: "",
+    checkOut: "",
+    totalGuests: 0,
+    specialRequest: "",
+    isGSTIncluded: false,
+    customPrice: 0,
+    extraPersonCharge: 0,
+    discount: 0,
+    advancePaid: 0,
+  });
+  const [showModal, setShowModal] = useState(false);
 
   // useQueryClient
   const queryClient = useQueryClient();
@@ -27,26 +48,19 @@ export default function NewBookingPage() {
     queryFn: getAllVillasService
   });
 
+  // useQuery
+  const { data: villaData } = useQuery({
+    queryKey: ['villa', formData.villaId],
+    queryFn: () => getAVillaService(formData.villaId),
+    enabled: !!formData.villaId,
+  });
+
   // useEffect
   useEffect(() => {
-    if(data) {
+    if (data) {
       dispatch(setVillas(data));
     }
   }, [data, dispatch]);
-
-  // State Variables
-  const [formData, setFormData] = useState({
-    guestName: "",
-    guestEmail: "",
-    guestPhone: "",
-    villaId: 0,
-    checkIn: "",
-    checkOut: "",
-    totalGuests: 0,
-    specialRequest: "",
-    isGSTIncluded: false
-  });
-  const [showModal, setShowModal] = useState(false);
 
   // Add Booking Mutation
   const addBookingMutation = useMutation({
@@ -58,24 +72,29 @@ export default function NewBookingPage() {
         guestName: "",
         guestEmail: "",
         guestPhone: "",
+        alternatePhone: "",
         villaId: null,
         checkIn: "",
         checkOut: "",
         totalGuests: 0,
         specialRequest: "",
-        isGSTIncluded: false
+        isGSTIncluded: false,
+        customPrice: 0,
+        extraPersonCharge: 0,
+        discount: 0,
+        advancePaid: 0,
       });
 
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.recentBookings()
       });
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.stats()
       });
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.upcomingCheckins()
       });
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.revenueTrends()
       });
 
@@ -87,7 +106,8 @@ export default function NewBookingPage() {
   // Handler Function to Handle Form Submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    addBookingMutation.mutate();
+    console.log(formData);
+    // addBookingMutation.mutate();
   };
 
   // Handler Function to Handle Input Change
@@ -98,16 +118,21 @@ export default function NewBookingPage() {
     }));
   };
 
+  // Get Total Days of Stay
+  const totalDaysOfStay = getTotalDaysOfStay({ checkIn: formData.checkIn, checkOut: formData.checkOut });
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <BookingFormHeaderComponent />
-      <BookingFormComponent 
+      <BookingFormComponent
         formData={formData}
+        villaData={villaData}
+        totalDaysOfStay={totalDaysOfStay}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
       />
-      
-      <BookingSummaryModal 
+
+      <BookingSummaryModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
         formData={formData}

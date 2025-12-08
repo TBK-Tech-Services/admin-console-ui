@@ -22,7 +22,7 @@ export default function GuestInformationComponent({ formData, onInputChange }) {
             onChange={(e) => onInputChange("guestName", e.target.value)}
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="guestEmail">Email Address</Label>
           <Input
@@ -33,7 +33,7 @@ export default function GuestInformationComponent({ formData, onInputChange }) {
             onChange={(e) => onInputChange("guestEmail", e.target.value)}
           />
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="guestPhone">Phone Number *</Label>
           <Input

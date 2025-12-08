@@ -2,12 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { getAVillaService } from "@/services/villa.service";
 import { RootState } from "@/store/store";
+import { useQuery } from "@tanstack/react-query";
 import { Calendar } from "lucide-react";
 import { useSelector } from "react-redux";
 
-export default function BookingDetailsComponent({ formData , onInputChange }) {
-  
+export default function BookingDetailsComponent({ formData, onInputChange }) {
+
   // useSelector
   const villas = useSelector((state: RootState) => state.villas);
 
@@ -31,13 +33,13 @@ export default function BookingDetailsComponent({ formData , onInputChange }) {
                 villas?.listOfVilla?.map((villa) => (
                   <SelectItem key={villa.id} value={villa.id}>
                     {villa.name}
-                  </SelectItem>    
+                  </SelectItem>
                 ))
               }
             </SelectContent>
           </Select>
         </div>
-        
+
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="checkIn">Check-in Date *</Label>
@@ -58,7 +60,7 @@ export default function BookingDetailsComponent({ formData , onInputChange }) {
             />
           </div>
         </div>
-        
+
         <div className="space-y-2">
           <Label htmlFor="totalGuests">Number of Guests *</Label>
           <Input

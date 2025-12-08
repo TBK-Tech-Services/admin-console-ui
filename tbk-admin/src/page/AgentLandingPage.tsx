@@ -30,6 +30,8 @@ export default function AgentLandingPage() {
             }),
     });
 
+    console.log(filteredVillasData);
+
     // Handler Function to Handle View Details
     const handleViewDetails = (villa) => {
         setSelectedVilla(villa);

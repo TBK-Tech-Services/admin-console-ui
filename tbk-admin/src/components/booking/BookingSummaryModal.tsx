@@ -11,7 +11,7 @@ export default function BookingSummaryModal({ isOpen, onClose, formData }) {
             Booking Created Successfully
           </DialogTitle>
         </DialogHeader>
-        
+
         <div className="space-y-4">
           <div className="bg-muted/50 rounded-lg p-4 space-y-3">
             <div className="flex justify-between text-sm">
@@ -26,14 +26,14 @@ export default function BookingSummaryModal({ isOpen, onClose, formData }) {
               <span className="text-muted-foreground">Subtotal</span>
               <span className="font-medium">₹45,000</span>
             </div>
-            
+
             {formData.isGSTIncluded && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">GST (18%)</span>
                 <span className="font-medium">₹8,100</span>
               </div>
             )}
-            
+
             <div className="border-t pt-3">
               <div className="flex justify-between">
                 <span className="font-semibold">Total Amount</span>

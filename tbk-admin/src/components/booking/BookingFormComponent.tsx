@@ -4,15 +4,15 @@ import AdditionalInformationComponent from './AdditionalInformationComponent';
 import { Button } from "@/components/ui/button";
 import GSTPricingConfigurationComponent from './GSTPricingConfigurationComponent';
 
-export default function BookingFormComponent({ formData , onInputChange, onSubmit, isLoading = false }) {
+export default function BookingFormComponent({ formData, villaData, totalDaysOfStay, onInputChange, onSubmit, isLoading = false }) {
   return (
     <div className="space-y-6">
       <div className="grid gap-6 lg:grid-cols-2">
-        <GuestInformationComponent 
+        <GuestInformationComponent
           formData={formData}
           onInputChange={onInputChange}
         />
-        <BookingDetailsComponent 
+        <BookingDetailsComponent
           formData={formData}
           onInputChange={onInputChange}
         />
@@ -25,13 +25,15 @@ export default function BookingFormComponent({ formData , onInputChange, onSubmi
 
       <GSTPricingConfigurationComponent
         formData={formData}
+        villaData={villaData}
+        totalDaysOfStay={totalDaysOfStay}
         onInputChange={onInputChange}
       />
 
       <div className="flex justify-end">
-        <Button 
-          onClick={onSubmit} 
-          size="lg" 
+        <Button
+          onClick={onSubmit}
+          size="lg"
           className="min-w-[150px]"
           disabled={isLoading}
         >
