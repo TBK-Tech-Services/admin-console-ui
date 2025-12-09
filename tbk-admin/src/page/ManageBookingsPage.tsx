@@ -15,6 +15,7 @@ export default function ManageBookingsPage() {
   // State Variables
   const [searchText, setSearchText] = useState("");
   const [status, setStatus] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("");
   const [checkInDate, setCheckInDate] = useState(null);
 
   // Handler to clear date
@@ -22,15 +23,23 @@ export default function ManageBookingsPage() {
     setCheckInDate(null);
   };
 
+  // Handler to clear all filters
+  const handleClearAllFilters = () => {
+    setSearchText("");
+    setStatus("");
+    setPaymentStatus("");
+    setCheckInDate(null);
+  };
+
   // useQuery
   const { data } = useQuery({
-    queryKey: ['bookings', searchText, status, checkInDate],
+    queryKey: ['bookings', searchText, status, paymentStatus, checkInDate],
     queryFn: () => searchAndFilterBookingsService(searchText, status, checkInDate),
   })
 
   // useEffect
   useEffect(() => {
-    if(data){
+    if (data) {
       dispatch(setBookings(data));
     }
   }, [data, dispatch]);
@@ -38,17 +47,20 @@ export default function ManageBookingsPage() {
   return (
     <div className="space-y-6">
       <ManageBookingsHeaderComponent />
-      
-      <BookingsFiltersComponent 
+
+      <BookingsFiltersComponent
         searchTerm={searchText}
         statusFilter={status}
+        paymentStatusFilter={paymentStatus}
         checkInDate={checkInDate}
         onSearchChange={setSearchText}
         onStatusFilterChange={setStatus}
+        onPaymentStatusFilterChange={setPaymentStatus}
         onCheckInDateChange={setCheckInDate}
         onClearDate={handleClearDate}
+        onClearAllFilters={handleClearAllFilters}
       />
-      
+
       <BookingsListComponent />
     </div>
   );

@@ -20,7 +20,7 @@ export default function BookingsStatusFilterComponent({ statusFilter, onStatusFi
     <Select value={statusFilter} onValueChange={onStatusFilterChange}>
       <SelectTrigger className="w-full sm:w-[200px] h-12">
         <Filter className="h-4 w-4 mr-2" />
-        <SelectValue placeholder="Filter by status" />
+        <SelectValue placeholder="Filter Booking Status" />
       </SelectTrigger>
       <SelectContent>
         {statusOptions.map((option) => (
