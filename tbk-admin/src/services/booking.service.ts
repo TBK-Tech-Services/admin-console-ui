@@ -59,3 +59,9 @@ export const deleteBookingService = async (id: number): Promise<void> => {
     const response = await apiService.delete(`/bookings/v1/${id}`);
     return response.data;
 }
+
+// Service to Generate Voucher
+export const generateVoucherService = async (bookingId: number): Promise<any> => {
+    const response = await apiService.post(`/bookings/v1/${bookingId}/generate-voucher`);
+    return response.data;
+}

@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Loader2, X } from "lucide-react";
 import VoucherDetailsCardComponent from "./VoucherDetailsCardComponent";
 import SendOptionsComponent from "./SendOptionsComponent";
+import { useGenerateVoucher } from "@/hooks/useGenerateVoucher";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 interface VoucherPreviewModalProps {
     isOpen: boolean;
@@ -24,27 +26,27 @@ export default function VoucherPreviewModalComponent({
     booking,
     sendType,
 }: VoucherPreviewModalProps) {
-    const [isGenerating, setIsGenerating] = useState(false);
     const [isSending, setIsSending] = useState(false);
     const [voucherUrl, setVoucherUrl] = useState<string | null>(null);
 
+    // useErrorHandler
+    const { handleMutationError, handleSuccess } = useErrorHandler();
+
+    // Generate Voucher Mutation
+    const generateVoucherMutation = useGenerateVoucher();
+
     // Handler to generate PDF voucher
     const handleGenerateVoucher = async () => {
-        setIsGenerating(true);
-        try {
-            // TODO: Call your backend API to generate PDF
-            // const response = await generateVoucherService(booking.id);
-            // setVoucherUrl(response.pdfUrl);
-
-            // Temporary mock
-            setTimeout(() => {
-                setVoucherUrl("https://example.com/voucher.pdf");
-                setIsGenerating(false);
-            }, 2000);
-        } catch (error) {
-            console.error("Error generating voucher:", error);
-            setIsGenerating(false);
-        }
+        generateVoucherMutation.mutate(booking.id, {
+            onSuccess: (response) => {
+                // Convert Google Drive view URL to embed URL
+                const driveUrl = response.voucherUrl; // ✅ FIXED - Direct access
+                const embedUrl = driveUrl.replace('/view', '/preview');
+                setVoucherUrl(embedUrl);
+                handleSuccess("Voucher generated successfully!");
+            },
+            onError: handleMutationError
+        });
     };
 
     // Handler to send voucher
@@ -102,7 +104,7 @@ export default function VoucherPreviewModalComponent({
                     <div className="border border-border rounded-lg p-4 bg-muted/30">
                         <h3 className="text-sm font-medium mb-3">PDF Voucher Preview</h3>
 
-                        {!voucherUrl && !isGenerating && (
+                        {!voucherUrl && !generateVoucherMutation.isPending && (
                             <div className="flex flex-col items-center justify-center py-12 space-y-3">
                                 <div className="text-muted-foreground text-sm">
                                     Generate voucher to preview
@@ -117,7 +119,7 @@ export default function VoucherPreviewModalComponent({
                             </div>
                         )}
 
-                        {isGenerating && (
+                        {generateVoucherMutation.isPending && (
                             <div className="flex flex-col items-center justify-center py-12 space-y-3">
                                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
                                 <div className="text-sm text-muted-foreground">
@@ -126,7 +128,7 @@ export default function VoucherPreviewModalComponent({
                             </div>
                         )}
 
-                        {voucherUrl && !isGenerating && (
+                        {voucherUrl && !generateVoucherMutation.isPending && (
                             <div className="space-y-3">
                                 <div className="bg-background border border-border rounded-md p-4 h-64 flex items-center justify-center">
                                     <iframe

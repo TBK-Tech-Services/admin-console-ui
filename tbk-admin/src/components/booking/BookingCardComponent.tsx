@@ -22,12 +22,12 @@ export default function BookingCardComponent({ booking }) {
     },
     onError: handleMutationError
   });
-  
+
   // Handler Function to Update Booking Status
   const handleBookingStatusUpdate = (value) => {
     updateBookingStatusMutation.mutate(value);
   };
-  
+
   // Payment Status Update Mutation
   const updatePaymentStatusMutation = useMutation({
     mutationFn: (value) => {
@@ -38,7 +38,7 @@ export default function BookingCardComponent({ booking }) {
     },
     onError: handleMutationError
   });
-  
+
   // Handler Function to Update Payment Status
   const handlePaymentStatusUpdate = (value) => {
     updatePaymentStatusMutation.mutate(value);
@@ -51,18 +51,18 @@ export default function BookingCardComponent({ booking }) {
         {/* Left Section - Avatar + Info */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
           <BookingAvatarComponent guestName={booking.guestName} />
-          
+
           {/* Guest Info Section */}
           <div className="flex-1 min-w-0 space-y-3">
-            <BookingHeaderInfoComponent 
+            <BookingHeaderInfoComponent
               guestName={booking.guestName}
               status={booking.bookingStatus}
               booking={booking}
               onStatusUpdate={handleBookingStatusUpdate}
               isLoading={updateBookingStatusMutation.isPending}
             />
-            
-            <BookingInfoComponent 
+
+            <BookingInfoComponent
               villa={booking.villa?.name}
               guests={booking.totalGuests}
               id={booking.id}
@@ -72,17 +72,17 @@ export default function BookingCardComponent({ booking }) {
             />
           </div>
         </div>
-        
+
         {/* Right Section - Amount + Actions */}
         <div className="flex flex-col items-end gap-3 shrink-0">
-          <BookingAmountComponent 
+          <BookingAmountComponent
             amount={booking.totalPayableAmount}
             bookedOn={booking.updatedAt}
             paymentStatus={booking.paymentStatus}
             onStatusUpdate={handlePaymentStatusUpdate}
             isLoading={updatePaymentStatusMutation.isPending}
           />
-          
+
           {/* Actions - Only show on hover for cleaner look */}
           <div className="opacity-60 group-hover:opacity-100 transition-opacity duration-200">
             <BookingActionsMenuComponent booking={booking} />

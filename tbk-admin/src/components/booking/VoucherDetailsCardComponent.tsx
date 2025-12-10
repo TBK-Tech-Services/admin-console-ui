@@ -84,8 +84,8 @@ export default function VoucherDetailsCardComponent({
                         <div>
                             <div className="text-xs text-muted-foreground">Payment Status</div>
                             <div className={`text-sm font-medium ${booking.rawBookingData.paymentStatus === 'PAID'
-                                    ? 'text-green-600'
-                                    : 'text-yellow-600'
+                                ? 'text-green-600'
+                                : 'text-yellow-600'
                                 }`}>
                                 {booking.rawBookingData.paymentStatus}
                             </div>
