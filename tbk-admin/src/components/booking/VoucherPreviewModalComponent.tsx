@@ -11,6 +11,7 @@ import { Loader2, X } from "lucide-react";
 import VoucherDetailsCardComponent from "./VoucherDetailsCardComponent";
 import SendOptionsComponent from "./SendOptionsComponent";
 import { useGenerateVoucher } from "@/hooks/useGenerateVoucher";
+import { useSendVoucherEmail } from "@/hooks/useSendVoucherEmail";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 interface VoucherPreviewModalProps {
@@ -26,7 +27,6 @@ export default function VoucherPreviewModalComponent({
     booking,
     sendType,
 }: VoucherPreviewModalProps) {
-    const [isSending, setIsSending] = useState(false);
     const [voucherUrl, setVoucherUrl] = useState<string | null>(null);
 
     // useErrorHandler
@@ -35,12 +35,15 @@ export default function VoucherPreviewModalComponent({
     // Generate Voucher Mutation
     const generateVoucherMutation = useGenerateVoucher();
 
+    // Send Email Mutation
+    const sendEmailMutation = useSendVoucherEmail();
+
     // Handler to generate PDF voucher
     const handleGenerateVoucher = async () => {
         generateVoucherMutation.mutate(booking.id, {
             onSuccess: (response) => {
                 // Convert Google Drive view URL to embed URL
-                const driveUrl = response.voucherUrl; // ✅ FIXED - Direct access
+                const driveUrl = response.voucherUrl;
                 const embedUrl = driveUrl.replace('/view', '/preview');
                 setVoucherUrl(embedUrl);
                 handleSuccess("Voucher generated successfully!");
@@ -50,27 +53,28 @@ export default function VoucherPreviewModalComponent({
     };
 
     // Handler to send voucher
-    const handleSendVoucher = async (contactInfo: string) => {
-        setIsSending(true);
-        try {
-            // TODO: Call your backend API to send via WhatsApp/Gmail
-            // if (sendType === "whatsapp") {
-            //   await sendWhatsAppVoucherService(booking.id, contactInfo);
-            // } else {
-            //   await sendGmailVoucherService(booking.id, contactInfo);
-            // }
-
-            // Temporary mock
-            setTimeout(() => {
-                console.log(`Sending to ${contactInfo} via ${sendType}`);
-                setIsSending(false);
-                onClose();
-            }, 2000);
-        } catch (error) {
-            console.error("Error sending voucher:", error);
-            setIsSending(false);
+    const handleSendVoucher = async (contactInfo: string, message: string) => {
+        if (sendType === "gmail") {
+            sendEmailMutation.mutate({
+                bookingId: booking.id,
+                email: contactInfo,
+                message: message,
+                voucherUrl: voucherUrl!.replace('/preview', '/view')
+            }, {
+                onSuccess: () => {
+                    handleSuccess("Voucher sent via email successfully!");
+                    onClose();
+                },
+                onError: handleMutationError
+            });
+        } else {
+            // WhatsApp - TODO
+            console.log("WhatsApp not implemented yet");
         }
     };
+
+    // Use mutation pending state for isSending
+    const isSending = sendEmailMutation.isPending;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>

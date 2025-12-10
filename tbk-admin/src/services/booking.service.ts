@@ -65,3 +65,13 @@ export const generateVoucherService = async (bookingId: number): Promise<any> =>
     const response = await apiService.post(`/bookings/v1/${bookingId}/generate-voucher`);
     return response.data;
 }
+
+// Service to Send Voucher via Email
+export const sendVoucherEmailService = async (bookingId: number, email: string, message: string, voucherUrl: string): Promise<any> => {
+    const response = await apiService.post(`/bookings/v1/${bookingId}/send-voucher-email`, {
+        email,
+        message,
+        voucherUrl,
+    });
+    return response.data;
+};

@@ -22,7 +22,7 @@ const GmailIcon = ({ className }: { className?: string }) => (
 interface SendOptionsComponentProps {
     booking: any;
     sendType: "whatsapp" | "gmail";
-    onSend: (contactInfo: string) => void;
+    onSend: (contactInfo: string, message: string) => void;
     isSending: boolean;
 }
 
@@ -35,13 +35,13 @@ export default function SendOptionsComponent({
     const [contactInfo, setContactInfo] = useState("");
     const [message, setMessage] = useState(
         sendType === "whatsapp"
-            ? `Hi ${booking.guestName}, your booking voucher for ${booking.villa} is ready!`
-            : `Dear ${booking.guestName},\n\nThank you for your booking at ${booking.villa}. Please find your booking voucher attached.\n\nBest regards,\nTBK Villas Team`
+            ? `Hi ${booking.guestName}, your booking voucher for ${booking.villa.name} is ready!`
+            : `Dear ${booking.guestName},\n\nThank you for your booking at ${booking.villa.name}. Please find your booking voucher attached.\n\nBest regards,\nTBK Villas Team`
     );
 
     const handleSend = () => {
         if (contactInfo.trim()) {
-            onSend(contactInfo);
+            onSend(contactInfo, message);
         }
     };
 
