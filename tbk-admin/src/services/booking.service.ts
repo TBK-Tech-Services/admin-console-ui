@@ -75,3 +75,22 @@ export const sendVoucherEmailService = async (bookingId: number, email: string, 
     });
     return response.data;
 };
+
+// Service to Export Bookings with Filters
+export const exportBookingsService = async (
+    searchText?: string,
+    bookingStatus?: string,
+    paymentStatus?: string,
+    checkInDate?: string
+): Promise<Blob> => {
+    const response = await apiService['api'].get('/bookings/v1/export', {
+        responseType: 'blob',
+        params: {
+            searchText,
+            bookingStatus,
+            paymentStatus,
+            checkInDate
+        }
+    });
+    return response.data;
+}

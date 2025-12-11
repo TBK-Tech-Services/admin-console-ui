@@ -3,7 +3,19 @@ import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import BookingsExportModalComponent from "./BookingsExportModalComponent";
 
-export default function BookingsExportComponent() {
+interface BookingsExportComponentProps {
+  searchTerm: string;
+  statusFilter: string;
+  paymentStatusFilter: string;
+  checkInDate: any;
+}
+
+export default function BookingsExportComponent({
+  searchTerm,
+  statusFilter,
+  paymentStatusFilter,
+  checkInDate
+}: BookingsExportComponentProps) {
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   return (
@@ -20,6 +32,10 @@ export default function BookingsExportComponent() {
       <BookingsExportModalComponent
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}
+        searchTerm={searchTerm}
+        statusFilter={statusFilter}
+        paymentStatusFilter={paymentStatusFilter}
+        checkInDate={checkInDate}
       />
     </>
   );

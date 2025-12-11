@@ -50,7 +50,12 @@ export default function BookingsFiltersComponent({
               onClearDate={onClearDate}
             />
 
-            <BookingsExportComponent />
+            <BookingsExportComponent
+              searchTerm={searchTerm}
+              statusFilter={statusFilter}
+              paymentStatusFilter={paymentStatusFilter}
+              checkInDate={checkInDate}
+            />
           </div>
 
           {/* Clear All Filters Button */}
