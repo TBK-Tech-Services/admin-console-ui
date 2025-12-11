@@ -31,7 +31,10 @@ class ApiService {
 
         this.api.interceptors.response.use(
             (response: AxiosResponse) => {
-                if (response.data?.message && response.config.method !== 'get') {
+                // Skip success message for blob responses
+                if (response.config.responseType !== 'blob' &&
+                    response.data?.message &&
+                    response.config.method !== 'get') {
                     ErrorHandlingService.showSuccess(response.data.message);
                 }
                 return response;
@@ -40,17 +43,17 @@ class ApiService {
                 if (error.response?.status === 401) {
                     window.location.href = '/login';
                     ErrorHandlingService.showError(error, 'Session expired. Please login again.');
-                } 
+                }
                 else if (error.response?.status === 403) {
                     ErrorHandlingService.showError(error, 'Access denied');
-                } 
+                }
                 else if (error.response?.status >= 500) {
                     ErrorHandlingService.showError(error, 'Server error. Please try again later.');
-                } 
+                }
                 else {
                     ErrorHandlingService.showError(error);
                 }
-                
+
                 return Promise.reject(error);
             }
         );

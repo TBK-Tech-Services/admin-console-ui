@@ -4,17 +4,10 @@ import ExpenseReportDownloadComponent from "./ExpenseReportDownloadComponent";
 
 interface ExpensesPageHeaderComponentProps {
   onModalOpen: () => void;
-  filters?: {
-    categoryFilter?: string;
-    typeFilter?: string;
-    villaFilter?: string;
-    dateRange?: { start: string; end: string };
-  };
 }
 
 export default function ExpensesPageHeaderComponent({
   onModalOpen,
-  filters,
 }: ExpensesPageHeaderComponentProps) {
   return (
     <div className="space-y-4">
@@ -26,7 +19,7 @@ export default function ExpensesPageHeaderComponent({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <ExpenseReportDownloadComponent filters={filters} />
+          <ExpenseReportDownloadComponent />
           <Button onClick={onModalOpen} className="gap-2">
             <Plus className="h-4 w-4" />
             Add New Expense

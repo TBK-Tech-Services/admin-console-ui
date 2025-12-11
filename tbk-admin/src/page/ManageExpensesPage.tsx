@@ -22,7 +22,7 @@ export default function ManageExpensesPage() {
 
   // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
-  
+
   // useDispatch 
   const dispatch = useDispatch();
 
@@ -38,20 +38,6 @@ export default function ManageExpensesPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedDeleteExpense, setSelectedDeleteExpense] = useState<Expense | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
-
-  // Filter states for download report
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [typeFilter, setTypeFilter] = useState<string>("");
-  const [villaFilter, setVillaFilter] = useState<string>("");
-  const [dateRange, setDateRange] = useState({ start: "", end: "" });
-
-  // Prepare filters object for header component
-  const currentFilters = {
-    categoryFilter,
-    typeFilter,
-    villaFilter,
-    dateRange,
-  };
 
   // Custom Hook
   const { data: expensesData, isLoading: expensesLoading } = useExpenses();
@@ -70,8 +56,8 @@ export default function ManageExpensesPage() {
       return addExpenseService(formData)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.expenses.all 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.expenses.all
       });
 
       setIsAddModalOpen(false);
@@ -83,12 +69,12 @@ export default function ManageExpensesPage() {
 
   // Update Expense Mutation
   const updateExpenseMutation = useMutation({
-    mutationFn: ({ formData, expenseId }: {formData: any; expenseId: string}) => {
+    mutationFn: ({ formData, expenseId }: { formData: any; expenseId: string }) => {
       return updateExpenseService({ formData, expenseId })
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.expenses.all 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.expenses.all
       });
 
       setIsEditModalOpen(false);
@@ -106,8 +92,8 @@ export default function ManageExpensesPage() {
       return deleteAExpenseService(expenseId)
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.expenses.all 
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.expenses.all
       });
 
       setIsDeleting(false);
@@ -186,19 +172,18 @@ export default function ManageExpensesPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <ExpensesPageHeaderComponent 
+      <ExpensesPageHeaderComponent
         onModalOpen={() => setIsAddModalOpen(true)}
-        filters={currentFilters}
       />
-      
-      <ExpensesTableComponent 
+
+      <ExpensesTableComponent
         onViewExpense={handleViewExpense}
         onEditExpense={handleEditExpense}
         onDeleteExpense={handleDeleteExpense}
       />
 
       {/* Add Expense Modal */}
-      <AddExpenseModalComponent 
+      <AddExpenseModalComponent
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onAddExpense={handleAddExpense}
@@ -206,14 +191,14 @@ export default function ManageExpensesPage() {
       />
 
       {/* View Expense Modal */}
-      <ViewExpenseModalComponent 
+      <ViewExpenseModalComponent
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
         expense={selectedViewExpense}
       />
 
       {/* Edit Expense Modal */}
-      <EditExpenseModalComponent 
+      <EditExpenseModalComponent
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
         expense={selectedEditExpense}
@@ -222,7 +207,7 @@ export default function ManageExpensesPage() {
       />
 
       {/* Delete Expense Modal */}
-      <DeleteExpenseModalComponent 
+      <DeleteExpenseModalComponent
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}
         expense={selectedDeleteExpense}
