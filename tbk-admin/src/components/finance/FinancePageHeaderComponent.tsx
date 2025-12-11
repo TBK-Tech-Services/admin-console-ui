@@ -23,7 +23,7 @@ export default function FinancePageHeaderComponent({
           Track your financial performance and analyze villa profitability
         </p>
       </div>
-      
+
       {filters && (
         <FinanceReportDownloadComponent filters={filters} />
       )}

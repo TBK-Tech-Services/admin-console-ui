@@ -10,7 +10,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export default function ManageFinancePage() {
   const { toast } = useToast();
-  
+
   // Filter states
   const [selectedVilla, setSelectedVilla] = useState<string>("all");
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
@@ -63,7 +63,7 @@ export default function ManageFinancePage() {
     return (
       <div className="max-w-7xl mx-auto space-y-6">
         <FinancePageHeaderComponent filters={currentFilters} />
-        <FinanceFiltersComponent 
+        <FinanceFiltersComponent
           selectedVilla={selectedVilla}
           selectedMonth={selectedMonth}
           dateRange={dateRange}
@@ -83,8 +83,8 @@ export default function ManageFinancePage() {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <FinancePageHeaderComponent filters={currentFilters} />
-      
-      <FinanceFiltersComponent 
+
+      <FinanceFiltersComponent
         selectedVilla={selectedVilla}
         selectedMonth={selectedMonth}
         dateRange={dateRange}
@@ -93,14 +93,14 @@ export default function ManageFinancePage() {
         onDateRangeChange={setDateRange}
       />
 
-      <FinanceMetricsComponent 
+      <FinanceMetricsComponent
         totalIncomeData={summaryCards.totalIncome}
         totalExpensesData={summaryCards.totalExpenses}
         netProfitLossData={summaryCards.netProfitLoss}
         averageMonthlyData={summaryCards.averageMonthly}
       />
 
-      <FinanceChartsComponent 
+      <FinanceChartsComponent
         monthlyData={charts.monthlyIncomeExpense}
         profitTrendData={charts.profitTrend}
       />
