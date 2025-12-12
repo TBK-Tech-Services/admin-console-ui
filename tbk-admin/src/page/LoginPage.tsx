@@ -36,23 +36,23 @@ export default function LoginPage() {
             setEmail("");
             setPassword("");
             handleSuccess("Logged in successfully!");
-            
+
             setTimeout(() => {
                 let roleValue;
                 if (typeof user.role === 'string') {
                     roleValue = user.role;
-                } 
+                }
                 else if (user.role && user.role.name) {
                     roleValue = user.role.name;
                 }
-            
+
                 if (roleValue === 'Admin') {
                     navigate("/");
-                } 
+                }
                 else if (roleValue === 'Owner') {
                     navigate("/owner-dashboard");
                 }
-                else if(roleValue === 'Agent'){ 
+                else if (roleValue === 'Agent') {
                     navigate("/agent");
                 }
                 else {
