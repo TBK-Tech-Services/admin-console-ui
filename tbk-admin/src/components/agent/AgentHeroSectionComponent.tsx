@@ -9,22 +9,20 @@ import { Calendar as CalendarIcon, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
-export default function AgentHeroSectionComponent({ 
-    checkInDate, 
-    setCheckInDate, 
-    checkOutDate, 
-    setCheckOutDate, 
-    guestCount, 
-    setGuestCount, 
-    location,
-    setLocation,
+export default function AgentHeroSectionComponent({
+    checkInDate,
+    setCheckInDate,
+    checkOutDate,
+    setCheckOutDate,
+    guestCount,
+    setGuestCount,
     bedrooms,
     setBedrooms,
-    onSearch, 
+    onSearch,
 }) {
 
     return (
-        <section className="relative bg-gradient-to-br from-primary via-primary-glow to-accent py-16 overflow-hidden">
+        <section className="relative bg-gradient-to-br from-primary via-primary-glow to-accent rounded-2xl py-16 overflow-hidden">
             {/* Decorative elements */}
             <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-lg"></div>
             <div className="absolute bottom-10 right-10 w-24 h-24 bg-accent/20 rounded-full blur-xl"></div>
@@ -137,33 +135,6 @@ export default function AgentHeroSectionComponent({
                                 Search
                             </Button>
                         </div>
-                    </div>
-
-                    {/* Location Radio Buttons - Below the main filters */}
-                    <div className="mt-6 pt-6 border-t">
-                        <Label className="text-sm font-medium text-foreground mb-3 block">Location</Label>
-                        <RadioGroup value={location} onValueChange={setLocation} className="flex flex-wrap gap-4">
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="all" id="all" />
-                                <Label htmlFor="all" className="text-sm font-normal cursor-pointer">All Locations</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="north-goa" id="north-goa" />
-                                <Label htmlFor="north-goa" className="text-sm font-normal cursor-pointer">North Goa</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="south-goa" id="south-goa" />
-                                <Label htmlFor="south-goa" className="text-sm font-normal cursor-pointer">South Goa</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="beach-front" id="beach-front" />
-                                <Label htmlFor="beach-front" className="text-sm font-normal cursor-pointer">Beach Front</Label>
-                            </div>
-                            <div className="flex items-center space-x-2">
-                                <RadioGroupItem value="city-center" id="city-center" />
-                                <Label htmlFor="city-center" className="text-sm font-normal cursor-pointer">City Center</Label>
-                            </div>
-                        </RadioGroup>
                     </div>
                 </div>
             </div>

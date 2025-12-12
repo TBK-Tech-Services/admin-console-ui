@@ -24,22 +24,26 @@ export const filterVillasService = async (filters?: {
     checkIn?: string;
     checkOut?: string;
     guests?: number;
-    amenities?: string;
+    bedrooms?: number;
 }) => {
     try {
         const cleanFilters: any = {};
+
         if (filters?.checkIn) {
             cleanFilters.checkIn = filters.checkIn;
-        };
+        }
+
         if (filters?.checkOut) {
             cleanFilters.checkOut = filters.checkOut;
-        };
+        }
+
         if (filters?.guests && filters.guests > 0) {
             cleanFilters.guests = filters.guests;
-        };
-        if (filters?.amenities && filters.amenities.length > 0) {
-            cleanFilters.amenities = filters.amenities;
-        };
+        }
+
+        if (filters?.bedrooms && filters.bedrooms > 0) {
+            cleanFilters.bedrooms = filters.bedrooms;
+        }
 
         const response = await axios.get(`${API_URL}/agent/v1/villas`, {
             params: cleanFilters,

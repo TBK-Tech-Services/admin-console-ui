@@ -32,6 +32,7 @@ export default function NewBookingPage() {
     advancePaid: 0,
   });
   const [showModal, setShowModal] = useState(false);
+  const [lastBookingData, setLastBookingData] = useState(null);
 
   // useQueryClient
   const queryClient = useQueryClient();
@@ -62,12 +63,23 @@ export default function NewBookingPage() {
     }
   }, [data, dispatch]);
 
+  // Get Total Days of Stay
+  const totalDaysOfStay = getTotalDaysOfStay({ checkIn: formData.checkIn, checkOut: formData.checkOut });
+
   // Add Booking Mutation
   const addBookingMutation = useMutation({
     mutationFn: () => {
       return addBookingService(formData);
     },
     onSuccess: () => {
+      // Save booking data before clearing form
+      setLastBookingData({
+        formData: { ...formData },
+        villaData: villaData,
+        totalDaysOfStay: totalDaysOfStay
+      });
+
+      // Clear form
       setFormData({
         guestName: "",
         guestEmail: "",
@@ -99,6 +111,9 @@ export default function NewBookingPage() {
       });
 
       handleSuccess("Booking created successfully!");
+
+      // Open modal after success
+      setShowModal(true);
     },
     onError: handleMutationError
   });
@@ -118,9 +133,6 @@ export default function NewBookingPage() {
     }));
   };
 
-  // Get Total Days of Stay
-  const totalDaysOfStay = getTotalDaysOfStay({ checkIn: formData.checkIn, checkOut: formData.checkOut });
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <BookingFormHeaderComponent />
@@ -130,13 +142,16 @@ export default function NewBookingPage() {
         totalDaysOfStay={totalDaysOfStay}
         onInputChange={handleInputChange}
         onSubmit={handleSubmit}
+        isLoading={addBookingMutation.isPending}
       />
 
-      <BookingSummaryModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        formData={formData}
-      />
+      {lastBookingData && (
+        <BookingSummaryModal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          bookingData={lastBookingData}
+        />
+      )}
     </div>
   );
 }

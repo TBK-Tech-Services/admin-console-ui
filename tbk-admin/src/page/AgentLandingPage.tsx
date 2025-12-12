@@ -13,19 +13,17 @@ export default function AgentLandingPage() {
     const [checkInDate, setCheckInDate] = useState();
     const [checkOutDate, setCheckOutDate] = useState();
     const [guestCount, setGuestCount] = useState(0);
-    const [location, setLocation] = useState("all");
-    const [bedrooms, setBedrooms] = useState("");
+    const [bedrooms, setBedrooms] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // useQuery
     const { data: filteredVillasData, isLoading: villasLoading } = useQuery({
-        queryKey: ['filteredVillas', checkInDate, checkOutDate, guestCount, location, bedrooms],
+        queryKey: ['filteredVillas', checkInDate, checkOutDate, guestCount, bedrooms],
         queryFn: async () =>
             filterVillasService({
                 checkIn: checkInDate?.toISOString().split('T')[0] || '',
                 checkOut: checkOutDate?.toISOString().split('T')[0] || '',
                 guests: guestCount,
-                location: location,
                 bedrooms: bedrooms,
             }),
     });
@@ -52,8 +50,6 @@ export default function AgentLandingPage() {
                 setCheckOutDate={setCheckOutDate}
                 guestCount={guestCount}
                 setGuestCount={setGuestCount}
-                location={location}
-                setLocation={setLocation}
                 bedrooms={bedrooms}
                 setBedrooms={setBedrooms}
                 onSearch={handleSearch}

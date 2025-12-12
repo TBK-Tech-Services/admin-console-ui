@@ -3,6 +3,8 @@ import BookingDetailsComponent from './BookingDetailsComponent';
 import AdditionalInformationComponent from './AdditionalInformationComponent';
 import { Button } from "@/components/ui/button";
 import GSTPricingConfigurationComponent from './GSTPricingConfigurationComponent';
+import { CheckCircle, Loader2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function BookingFormComponent({ formData, villaData, totalDaysOfStay, onInputChange, onSubmit, isLoading = false }) {
   return (
@@ -30,16 +32,31 @@ export default function BookingFormComponent({ formData, villaData, totalDaysOfS
         onInputChange={onInputChange}
       />
 
-      <div className="flex justify-end">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+        className="flex justify-end"
+      >
         <Button
           onClick={onSubmit}
           size="lg"
-          className="min-w-[150px]"
+          className="min-w-[180px] h-12 bg-gradient-primary hover:shadow-medium transition-all duration-300 font-semibold text-base gap-2"
           disabled={isLoading}
         >
-          {isLoading ? "Creating..." : "Create Booking"}
+          {isLoading ? (
+            <>
+              <Loader2 className="h-5 w-5 animate-spin" />
+              Creating Booking...
+            </>
+          ) : (
+            <>
+              <CheckCircle className="h-5 w-5" />
+              Create Booking
+            </>
+          )}
         </Button>
-      </div>
+      </motion.div>
     </div>
   );
 }

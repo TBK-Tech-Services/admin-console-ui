@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+import { Home, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ export default function VillasPage() {
 
   // useDispatch 
   const dispatch = useDispatch();
-  
+
   // useNavigate
   const navigate = useNavigate();
 
@@ -37,10 +37,10 @@ export default function VillasPage() {
 
   // useEffect
   useEffect(() => {
-    if(data){
+    if (data) {
       dispatch(setAmenities(data));
     }
-  }, [data , dispatch]);
+  }, [data, dispatch]);
 
   return (
     <div className="space-y-6">
@@ -60,9 +60,14 @@ export default function VillasPage() {
               Add New Villa
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Add New Villa</DialogTitle>
+              <DialogTitle className="flex items-center gap-3 text-xl">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Home className="h-5 w-5 text-primary" />
+                </div>
+                Add New Villa
+              </DialogTitle>
             </DialogHeader>
             <AddVillaFormComponent onClose={() => setIsModalOpen(false)} />
           </DialogContent>
@@ -70,27 +75,27 @@ export default function VillasPage() {
       </div>
 
       {
-        (villas?.length === 0 )
-        ? 
-        (
-          <div className="text-center py-12 text-muted-foreground">
-            <p>No villas found. Add your first villa to get started!</p>
-          </div>
-        ) 
-        : 
-        (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {
-              villas?.map((villa) => (
-                <VillaCardComponent 
-                  key={villa?.id} 
-                  villa={villa}
-                  onClick={() => navigate(`/villas/${villa?.id}`)}
-                />
-              ))
-            }
-          </div>
-        )
+        (villas?.length === 0)
+          ?
+          (
+            <div className="text-center py-12 text-muted-foreground">
+              <p>No villas found. Add your first villa to get started!</p>
+            </div>
+          )
+          :
+          (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {
+                villas?.map((villa) => (
+                  <VillaCardComponent
+                    key={villa?.id}
+                    villa={villa}
+                    onClick={() => navigate(`/villas/${villa?.id}`)}
+                  />
+                ))
+              }
+            </div>
+          )
       }
     </div>
   );

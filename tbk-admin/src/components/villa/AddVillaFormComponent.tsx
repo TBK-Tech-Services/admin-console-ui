@@ -5,13 +5,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { ChevronDown, ChevronRight, Loader2, Upload } from "lucide-react";
+import { ChevronDown, Loader2, Upload, Home, MapPin, Bed, Bath, Users, IndianRupee, FileText, Image as ImageIcon, X, CheckCircle2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { addVillaService } from "@/services/villa.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner"; // or your toast library
+import { toast } from "sonner";
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary";
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AddVillaFormComponent({ onClose }) {
 
@@ -58,7 +59,6 @@ export default function AddVillaFormComponent({ onClose }) {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Validate image
     const validation = validateImageFile(file);
     if (!validation.valid) {
       toast.error(validation.error);
@@ -66,8 +66,7 @@ export default function AddVillaFormComponent({ onClose }) {
     }
 
     setSelectedImage(file);
-    
-    // Create preview
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result as string);
@@ -88,8 +87,8 @@ export default function AddVillaFormComponent({ onClose }) {
 
   // Handler Function to Handle Toggle Category
   const toggleCategory = (categoryId: number) => {
-    setExpandedCategories(prev => 
-      prev.includes(categoryId) 
+    setExpandedCategories(prev =>
+      prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
         : [...prev, categoryId]
     );
@@ -99,7 +98,7 @@ export default function AddVillaFormComponent({ onClose }) {
   const handleAmenityChange = (amenityId: number, checked: boolean) => {
     if (checked) {
       setSelectedAmenities([...selectedAmenities, amenityId]);
-    } 
+    }
     else {
       setSelectedAmenities(selectedAmenities.filter(id => id !== amenityId));
     }
@@ -109,8 +108,8 @@ export default function AddVillaFormComponent({ onClose }) {
   const getCategorySelectedCount = (categoryId: number) => {
     const category = amenities.find(cat => cat.id === categoryId);
     if (!category) return 0;
-    
-    return category.amenities.filter(amenity => 
+
+    return category.amenities.filter(amenity =>
       selectedAmenities.includes(amenity.id)
     ).length;
   };
@@ -137,7 +136,7 @@ export default function AddVillaFormComponent({ onClose }) {
     if (checked) {
       const newAmenities = category.amenities.map(amenity => amenity.id);
       setSelectedAmenities(prev => [...prev, ...newAmenities.filter(id => !prev.includes(id))]);
-    } 
+    }
     else {
       const amenityIds = category.amenities.map(amenity => amenity.id);
       setSelectedAmenities(prev => prev.filter(id => !amenityIds.includes(id)));
@@ -146,7 +145,6 @@ export default function AddVillaFormComponent({ onClose }) {
 
   // Main Form Submit Handler
   const handleSubmit = async () => {
-    // Validation
     if (!formData.villaName || !formData.location || !formData.description) {
       toast.error("Please fill all required fields");
       return;
@@ -165,10 +163,8 @@ export default function AddVillaFormComponent({ onClose }) {
     try {
       setIsUploading(true);
 
-      // Step 1: Upload image to Cloudinary
       const imageUrl = await uploadImageToCloudinary(selectedImage);
 
-      // Step 2: Prepare payload
       const payload = {
         villaName: formData.villaName,
         location: formData.location,
@@ -178,11 +174,10 @@ export default function AddVillaFormComponent({ onClose }) {
         pricePerNight: formData.pricePerNight,
         status: formData.status,
         description: formData.description,
-        imageUrl: imageUrl, // ✅ Cloudinary URL
+        imageUrl: imageUrl,
         amenities: selectedAmenities,
       };
 
-      // Step 3: Submit to backend
       await addVillaMutation.mutateAsync(payload);
 
     } catch (error: any) {
@@ -195,253 +190,383 @@ export default function AddVillaFormComponent({ onClose }) {
   const isLoading = isUploading || addVillaMutation.isPending;
 
   return (
-    <>
-      <div className="grid gap-4 py-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="name">Villa Name</Label>
-            <Input 
-              id="name" 
-              placeholder="Enter villa name" 
-              value={formData.villaName}
-              onChange={(e) => handleInputChange('villaName', e.target.value)}
-            />
-          </div>
-          <div>
-            <Label htmlFor="location">Location</Label>
-            <Input 
-              id="location" 
-              placeholder="Enter location" 
-              value={formData.location}
-              onChange={(e) => handleInputChange('location', e.target.value)}
-            />
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <Label htmlFor="bedrooms">Bedrooms</Label>
-            <Input 
-              id="bedrooms" 
-              type="number" 
-              placeholder="3" 
-              min="1" 
-              value={formData.bedrooms}
-              onChange={(e) => handleInputChange('bedrooms', parseInt(e.target.value))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="bathrooms">Bathrooms</Label>
-            <Input 
-              id="bathrooms" 
-              type="number" 
-              placeholder="2" 
-              min="1" 
-              value={formData.bathrooms}
-              onChange={(e) => handleInputChange('bathrooms', parseInt(e.target.value))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="maxGuests">Max Guests</Label>
-            <Input 
-              id="maxGuests" 
-              type="number" 
-              placeholder="8" 
-              min="1" 
-              value={formData.maxGuests}
-              onChange={(e) => handleInputChange('maxGuests', parseInt(e.target.value))}
-            />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="price">Price per Night</Label>
-            <Input 
-              id="price" 
-              type="number" 
-              placeholder="15000" 
-              min="0" 
-              value={formData.pricePerNight}
-              onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
-            />
-          </div>
-          <div>
-            <Label htmlFor="status">Status</Label>
-            <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="AVAILABLE">Available</SelectItem>
-                <SelectItem value="OCCUPIED">Occupied</SelectItem>
-                <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Amenities Section - Keep as is */}
-        <div className="space-y-4">
-          <Label htmlFor="amenities" className="text-base font-medium">Amenities</Label>
-          
-          <div className="border rounded-lg divide-y divide-gray-100 max-h-80 overflow-y-auto">
-            {amenities.map((category) => {
-              const isExpanded = expandedCategories.includes(category.id);
-              const selectedCount = getCategorySelectedCount(category.id);
-              const isPartiallySelected = isCategoryPartiallySelected(category.id);
-              const isFullySelected = isCategoryFullySelected(category.id);
-              
-              return (
-                <div key={category.id} className="bg-white">
-                  <div className="flex items-center justify-between p-3 hover:bg-gray-50 transition-colors">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <Checkbox 
-                        checked={isFullySelected}
-                        ref={(el) => {
-                          if (el) el.indeterminate = isPartiallySelected;
-                        }}
-                        onCheckedChange={(checked) => handleCategorySelectAll(category.id, checked as boolean)}
-                        className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-600 data-[state=checked]:to-purple-600"
-                      />
-                      <div className="flex items-center space-x-2">
-                        <div className="text-gray-600">{category.icon}</div>
-                        <span className="font-medium text-gray-900 text-sm">{category.name}</span>
-                        {selectedCount > 0 && (
-                          <span className="text-xs bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 px-2 py-1 rounded-full">
-                            {selectedCount}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    
-                    <button
-                      type="button"
-                      onClick={() => toggleCategory(category.id)}
-                      className="p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                    >
-                      {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                    </button>
-                  </div>
-
-                  {isExpanded && (
-                    <div className="px-3 pb-3 bg-gray-50">
-                      <div className="grid grid-cols-1 gap-2 pt-2">
-                        {category.amenities.map((amenity) => (
-                          <div key={amenity.id} className="flex items-center space-x-3">
-                            <Checkbox 
-                              checked={selectedAmenities.includes(amenity.id)} 
-                              onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)}
-                              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-blue-600 data-[state=checked]:to-purple-600"
-                            />
-                            <Label className="text-sm text-gray-700 cursor-pointer flex-1">
-                              {amenity.name}
-                            </Label>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {selectedAmenities.length > 0 && (
-            <div className="p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-              <div className="text-sm font-medium text-blue-800 mb-1">
-                Selected Amenities ({selectedAmenities.length})
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-6"
+    >
+      {/* Horizontal Layout: Two Columns for Desktop, Single Column for Mobile */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Left Column - Basic Info */}
+        <div className="space-y-6">
+          {/* Basic Information Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="p-1.5 rounded-lg bg-primary/10">
+                <Home className="h-4 w-4 text-primary" />
               </div>
-              <div className="text-xs text-blue-600">
-                {amenities.map(category => {
-                  const count = getCategorySelectedCount(category.id);
-                  return count > 0 ? `${category.name}: ${count}` : null;
-                }).filter(Boolean).join(' • ')}
+              <h3 className="font-semibold text-base">Basic Information</h3>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
+                  <Home className="h-4 w-4 text-muted-foreground" />
+                  Villa Name *
+                </Label>
+                <Input
+                  id="name"
+                  placeholder="Enter villa name"
+                  value={formData.villaName}
+                  onChange={(e) => handleInputChange('villaName', e.target.value)}
+                  className="h-11 border-border/60 focus:border-primary transition-colors"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  Location *
+                </Label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="location"
+                    placeholder="Enter location"
+                    value={formData.location}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    className="pl-10 h-11 border-border/60 focus:border-primary transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="bedrooms" className="text-sm font-medium">
+                    <Bed className="h-4 w-4 inline mr-1 text-muted-foreground" />
+                    Bedrooms
+                  </Label>
+                  <Input
+                    id="bedrooms"
+                    type="number"
+                    placeholder="3"
+                    min="1"
+                    value={formData.bedrooms}
+                    onChange={(e) => handleInputChange('bedrooms', parseInt(e.target.value))}
+                    className="h-11 border-border/60 focus:border-primary transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="bathrooms" className="text-sm font-medium">
+                    <Bath className="h-4 w-4 inline mr-1 text-muted-foreground" />
+                    Bathrooms
+                  </Label>
+                  <Input
+                    id="bathrooms"
+                    type="number"
+                    placeholder="2"
+                    min="1"
+                    value={formData.bathrooms}
+                    onChange={(e) => handleInputChange('bathrooms', parseInt(e.target.value))}
+                    className="h-11 border-border/60 focus:border-primary transition-colors"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="maxGuests" className="text-sm font-medium">
+                    <Users className="h-4 w-4 inline mr-1 text-muted-foreground" />
+                    Guests
+                  </Label>
+                  <Input
+                    id="maxGuests"
+                    type="number"
+                    placeholder="8"
+                    min="1"
+                    value={formData.maxGuests}
+                    onChange={(e) => handleInputChange('maxGuests', parseInt(e.target.value))}
+                    className="h-11 border-border/60 focus:border-primary transition-colors"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
+                    <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                    Price/Night *
+                  </Label>
+                  <div className="relative">
+                    <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="price"
+                      type="number"
+                      placeholder="15000"
+                      min="0"
+                      value={formData.pricePerNight}
+                      onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
+                      className="pl-10 h-11 border-border/60 focus:border-primary transition-colors"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
+                    Status
+                  </Label>
+                  <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
+                    <SelectTrigger className="h-11 border-border/60 focus:border-primary transition-colors">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="AVAILABLE">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-green-500" />
+                          Available
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="OCCUPIED">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-orange-500" />
+                          Occupied
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="MAINTENANCE">
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 w-2 rounded-full bg-red-500" />
+                          Maintenance
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
 
-        <div>
-          <Label htmlFor="description">Description</Label>
-          <Textarea 
-            id="description" 
-            placeholder="Describe the villa and its features..." 
-            className="min-h-[80px]"
-            value={formData.description}
-            onChange={(e) => handleInputChange('description', e.target.value)}
-          />
-        </div>
+          {/* Description Section */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
+              <FileText className="h-4 w-4 text-muted-foreground" />
+              Description *
+            </Label>
+            <Textarea
+              id="description"
+              placeholder="Describe the villa and its features..."
+              className="min-h-[120px] resize-none border-border/60 focus:border-primary transition-colors"
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+            />
+          </div>
 
-        {/* Updated Image Upload Section */}
-        <div>
-          <Label htmlFor="image">Villa Image</Label>
+          {/* Image Upload Section */}
           <div className="space-y-3">
+            <Label htmlFor="image" className="text-sm font-medium flex items-center gap-2">
+              <ImageIcon className="h-4 w-4 text-muted-foreground" />
+              Villa Image *
+            </Label>
             {!imagePreview ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                <Upload className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                <Input 
-                  id="image" 
-                  type="file" 
+              <motion.div
+                whileHover={{ scale: 1.01 }}
+                className="border-2 border-dashed border-primary/30 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer"
+              >
+                <Input
+                  id="image"
+                  type="file"
                   accept="image/*"
                   onChange={handleImageUpload}
                   className="hidden"
                 />
-                <Label 
-                  htmlFor="image" 
-                  className="cursor-pointer text-sm text-gray-600 hover:text-gray-800"
-                >
-                  Click to upload villa image
-                  <span className="block text-xs text-gray-400 mt-1">
-                    PNG, JPG, WebP up to 5MB
-                  </span>
+                <Label htmlFor="image" className="cursor-pointer">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="p-3 rounded-full bg-primary/10">
+                      <Upload className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Click to upload</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        PNG, JPG, WebP (max 5MB)
+                      </p>
+                    </div>
+                  </div>
                 </Label>
-              </div>
+              </motion.div>
             ) : (
-              <div className="relative border rounded-lg overflow-hidden">
-                <img 
-                  src={imagePreview} 
-                  alt="Villa preview" 
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative border-2 border-primary/30 rounded-xl overflow-hidden"
+              >
+                <img
+                  src={imagePreview}
+                  alt="Villa preview"
                   className="w-full h-48 object-cover"
                 />
                 <button
                   type="button"
                   onClick={removeImage}
-                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1.5 hover:bg-red-600 transition-colors"
+                  className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 hover:bg-destructive/90 transition-all shadow-lg"
                 >
-                  ✕
+                  <X className="h-4 w-4" />
                 </button>
-                <div className="p-2 bg-gray-50">
-                  <p className="text-sm text-gray-700 truncate">{selectedImage?.name}</p>
-                  <p className="text-xs text-gray-500">
+                <div className="p-2 bg-gradient-to-t from-black/60 to-transparent absolute bottom-0 left-0 right-0">
+                  <p className="text-xs text-white font-medium truncate">{selectedImage?.name}</p>
+                  <p className="text-xs text-white/80">
                     {selectedImage && (selectedImage.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 </div>
-              </div>
+              </motion.div>
             )}
           </div>
         </div>
+
+        {/* Right Column - Amenities */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="p-1.5 rounded-lg bg-accent/10">
+              <CheckCircle2 className="h-4 w-4 text-accent" />
+            </div>
+            <h3 className="font-semibold text-base">Amenities *</h3>
+          </div>
+
+          <div className="border-2 rounded-xl divide-y overflow-hidden bg-muted/20 max-h-[500px]">
+            <div className="overflow-y-auto max-h-full">
+              {amenities.map((category) => {
+                const isExpanded = expandedCategories.includes(category.id);
+                const selectedCount = getCategorySelectedCount(category.id);
+                const isPartiallySelected = isCategoryPartiallySelected(category.id);
+                const isFullySelected = isCategoryFullySelected(category.id);
+
+                return (
+                  <motion.div
+                    key={category.id}
+                    initial={false}
+                    className="bg-card"
+                  >
+                    <div className="flex items-center justify-between p-3 hover:bg-accent/5 transition-colors cursor-pointer">
+                      <div className="flex items-center space-x-3 flex-1">
+                        <Checkbox
+                          checked={isFullySelected}
+                          ref={(el) => {
+                            if (el) el.indeterminate = isPartiallySelected;
+                          }}
+                          onCheckedChange={(checked) => handleCategorySelectAll(category.id, checked as boolean)}
+                          className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                        />
+                        <div className="flex items-center space-x-2 flex-1">
+                          <div className="text-xl">{category.icon}</div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-sm">{category.name}</span>
+                            {selectedCount > 0 && (
+                              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">
+                                {selectedCount}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => toggleCategory(category.id)}
+                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all"
+                      >
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 180 : 0 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ChevronDown className="h-4 w-4" />
+                        </motion.div>
+                      </button>
+                    </div>
+
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.2 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="px-3 pb-3 bg-muted/30">
+                            <div className="grid grid-cols-1 gap-2 pt-2">
+                              {category.amenities.map((amenity) => (
+                                <motion.div
+                                  key={amenity.id}
+                                  whileHover={{ x: 2 }}
+                                  className={`flex items-center space-x-2 p-2 rounded-lg transition-all ${selectedAmenities.includes(amenity.id)
+                                      ? 'bg-primary/10 border border-primary/20'
+                                      : 'hover:bg-muted'
+                                    }`}
+                                >
+                                  <Checkbox
+                                    checked={selectedAmenities.includes(amenity.id)}
+                                    onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)}
+                                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                                  />
+                                  <Label className="text-sm cursor-pointer flex-1">
+                                    {amenity.name}
+                                  </Label>
+                                  {selectedAmenities.includes(amenity.id) && (
+                                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                                  )}
+                                </motion.div>
+                              ))}
+                            </div>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          {selectedAmenities.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="p-3 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border-2 border-primary/20"
+            >
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary mb-1">
+                <CheckCircle2 className="h-4 w-4" />
+                Selected: {selectedAmenities.length}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {amenities.map(category => {
+                  const count = getCategorySelectedCount(category.id);
+                  return count > 0 ? `${category.name}: ${count}` : null;
+                }).filter(Boolean).join(' • ')}
+              </div>
+            </motion.div>
+          )}
+        </div>
       </div>
-      
-      <div className="flex justify-end gap-3">
-        <Button variant="outline" onClick={onClose} disabled={isLoading}>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end gap-3 pt-4 border-t">
+        <Button variant="outline" onClick={onClose} disabled={isLoading} className="min-w-[100px]">
           Cancel
         </Button>
-        <Button 
-          className="bg-gradient-primary hover:opacity-90"
+        <Button
+          className="bg-gradient-primary hover:shadow-medium transition-all min-w-[150px] gap-2"
           onClick={handleSubmit}
           disabled={isLoading}
         >
           {isLoading ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              {isUploading ? 'Uploading Image...' : 'Adding Villa...'}
+              <Loader2 className="h-4 w-4 animate-spin" />
+              {isUploading ? 'Uploading...' : 'Adding...'}
             </>
           ) : (
-            'Add Villa'
+            <>
+              <CheckCircle2 className="h-4 w-4" />
+              Add Villa
+            </>
           )}
         </Button>
       </div>
-    </>
+    </motion.div>
   );
 }
