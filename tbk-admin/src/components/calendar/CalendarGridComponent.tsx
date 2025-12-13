@@ -1,4 +1,8 @@
 import { DayBlockComponent } from "./DayBlockComponent";
+import { useQuery } from "@tanstack/react-query";
+import { getCalendarBookingsService } from "@/services/booking.service";
+import { Loader2 } from "lucide-react";
+import { useEffect } from "react";
 
 interface CalendarGridComponentProps {
     selectedVilla: string;
@@ -14,82 +18,6 @@ interface BookingRange {
     checkIn: string; // YYYY-MM-DD
     checkOut: string; // YYYY-MM-DD
 }
-
-// Dummy booking ranges
-const DUMMY_BOOKING_RANGES: BookingRange[] = [
-    // December 2025 - Heavy booking period (Christmas/New Year season)
-
-    // Week 1 (Dec 1-7)
-    { id: "dec1", villaId: "1", villaName: "Green Valley Resort", checkIn: "2025-12-01", checkOut: "2025-12-04" },
-    { id: "dec2", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2025-12-01", checkOut: "2025-12-03" },
-    { id: "dec3", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2025-12-02", checkOut: "2025-12-05" },
-    { id: "dec4", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2025-12-05", checkOut: "2025-12-08" },
-    { id: "dec5", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2025-12-05", checkOut: "2025-12-07" },
-
-    // Week 2 (Dec 8-14)
-    { id: "dec6", villaId: "1", villaName: "Green Valley Resort", checkIn: "2025-12-08", checkOut: "2025-12-11" },
-    { id: "dec7", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2025-12-09", checkOut: "2025-12-12" },
-    { id: "dec8", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2025-12-10", checkOut: "2025-12-13" },
-    { id: "dec9", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2025-12-11", checkOut: "2025-12-14" },
-    { id: "dec10", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2025-12-12", checkOut: "2025-12-15" },
-    { id: "dec11", villaId: "1", villaName: "Green Valley Resort", checkIn: "2025-12-14", checkOut: "2025-12-17" },
-
-    // Week 3 (Dec 15-21)
-    { id: "dec12", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2025-12-15", checkOut: "2025-12-18" },
-    { id: "dec13", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2025-12-16", checkOut: "2025-12-19" },
-    { id: "dec14", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2025-12-18", checkOut: "2025-12-21" },
-    { id: "dec15", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2025-12-19", checkOut: "2025-12-22" },
-    { id: "dec16", villaId: "1", villaName: "Green Valley Resort", checkIn: "2025-12-20", checkOut: "2025-12-23" },
-
-    // Week 4 - Christmas Week (Dec 22-28) - Heavy overlapping bookings
-    { id: "dec17", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2025-12-22", checkOut: "2025-12-26" },
-    { id: "dec18", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2025-12-23", checkOut: "2025-12-27" },
-    { id: "dec19", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2025-12-24", checkOut: "2025-12-28" },
-    { id: "dec20", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2025-12-25", checkOut: "2025-12-29" },
-    { id: "dec21", villaId: "1", villaName: "Green Valley Resort", checkIn: "2025-12-26", checkOut: "2025-12-30" },
-
-    // New Year Week (Dec 29-31 extending to Jan)
-    { id: "dec22", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2025-12-29", checkOut: "2026-01-02" },
-    { id: "dec23", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2025-12-30", checkOut: "2026-01-03" },
-    { id: "dec24", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2025-12-31", checkOut: "2026-01-04" },
-
-    // January 2026 - Post New Year bookings
-
-    // Week 1 (Jan 1-7) - New Year continuation + new bookings
-    { id: "jan1", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2026-01-01", checkOut: "2026-01-04" },
-    { id: "jan2", villaId: "1", villaName: "Green Valley Resort", checkIn: "2026-01-02", checkOut: "2026-01-05" },
-    { id: "jan3", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2026-01-05", checkOut: "2026-01-08" },
-    { id: "jan4", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2026-01-06", checkOut: "2026-01-09" },
-    { id: "jan5", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2026-01-07", checkOut: "2026-01-10" },
-
-    // Week 2 (Jan 8-14)
-    { id: "jan6", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2026-01-08", checkOut: "2026-01-11" },
-    { id: "jan7", villaId: "1", villaName: "Green Valley Resort", checkIn: "2026-01-09", checkOut: "2026-01-12" },
-    { id: "jan8", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2026-01-10", checkOut: "2026-01-13" },
-    { id: "jan9", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2026-01-11", checkOut: "2026-01-14" },
-    { id: "jan10", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2026-01-12", checkOut: "2026-01-15" },
-    { id: "jan11", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2026-01-14", checkOut: "2026-01-17" },
-
-    // Week 3 (Jan 15-21) - Republic Day weekend
-    { id: "jan12", villaId: "1", villaName: "Green Valley Resort", checkIn: "2026-01-15", checkOut: "2026-01-18" },
-    { id: "jan13", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2026-01-16", checkOut: "2026-01-19" },
-    { id: "jan14", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2026-01-17", checkOut: "2026-01-20" },
-    { id: "jan15", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2026-01-18", checkOut: "2026-01-21" },
-    { id: "jan16", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2026-01-19", checkOut: "2026-01-22" },
-    { id: "jan17", villaId: "1", villaName: "Green Valley Resort", checkIn: "2026-01-20", checkOut: "2026-01-23" },
-
-    // Week 4 (Jan 22-28)
-    { id: "jan18", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2026-01-22", checkOut: "2026-01-25" },
-    { id: "jan19", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2026-01-23", checkOut: "2026-01-26" },
-    { id: "jan20", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2026-01-24", checkOut: "2026-01-27" },
-    { id: "jan21", villaId: "5", villaName: "Palm Grove Estate", checkIn: "2026-01-25", checkOut: "2026-01-28" },
-    { id: "jan22", villaId: "1", villaName: "Green Valley Resort", checkIn: "2026-01-26", checkOut: "2026-01-29" },
-
-    // Week 5 (Jan 29-31)
-    { id: "jan23", villaId: "4", villaName: "Sunset Terrace Villa", checkIn: "2026-01-29", checkOut: "2026-02-01" },
-    { id: "jan24", villaId: "2", villaName: "Desert Oasis Villa", checkIn: "2026-01-30", checkOut: "2026-02-02" },
-    { id: "jan25", villaId: "3", villaName: "Ocean Breeze Paradise", checkIn: "2026-01-31", checkOut: "2026-02-03" },
-];
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -128,22 +56,67 @@ export function CalendarGridComponent({
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     const emptyCells = Array.from({ length: firstDayOfMonth }, (_, i) => i);
 
+    // ✅ Fetch bookings from API
+    const { data: bookingsResponse, isLoading, isError, error } = useQuery({
+        queryKey: ['calendar-bookings', selectedVilla, currentMonth, currentYear],
+        queryFn: () => {
+            console.log('🔍 Fetching calendar bookings...', {
+                selectedVilla,
+                month: currentMonth + 1,
+                year: currentYear
+            });
+            return getCalendarBookingsService(
+                currentMonth + 1, // Backend expects 1-12, JS uses 0-11
+                currentYear,
+                selectedVilla
+            );
+        },
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    });
+
+    // Debug: Log the response
+    useEffect(() => {
+        if (bookingsResponse) {
+            console.log('📦 Raw API Response:', bookingsResponse);
+            console.log('📊 Bookings Data:', bookingsResponse?.data);
+            console.log('📈 Total Bookings:', bookingsResponse?.data?.length || 0);
+        }
+    }, [bookingsResponse]);
+
+    useEffect(() => {
+        if (isError) {
+            console.error('❌ Error fetching bookings:', error);
+        }
+    }, [isError, error]);
+
+    const BOOKING_RANGES: BookingRange[] = bookingsResponse || []
+
+    console.log('🎯 BOOKING_RANGES:', BOOKING_RANGES);
+
     // Get bookings for a specific day
     const getBookingsForDay = (day: number): DayBooking[] => {
         const currentDate = createDateOnly(currentYear, currentMonth, day);
 
-        let bookings = DUMMY_BOOKING_RANGES.filter(booking => {
+        let bookings = BOOKING_RANGES.filter(booking => {
             const checkIn = getDateOnly(booking.checkIn);
             const checkOut = getDateOnly(booking.checkOut);
 
             // Check if current date falls within booking range (date-only comparison)
-            return currentDate >= checkIn && currentDate <= checkOut;
-        });
+            const isWithinRange = currentDate >= checkIn && currentDate <= checkOut;
 
-        // Filter by villa if not "all"
-        if (selectedVilla !== "all") {
-            bookings = bookings.filter(b => b.villaId === selectedVilla);
-        }
+            // Debug for first day
+            if (day === 1) {
+                console.log(`📅 Day ${day} - Checking booking:`, {
+                    villaName: booking.villaName,
+                    checkIn: booking.checkIn,
+                    checkOut: booking.checkOut,
+                    currentDate: currentDate.toISOString().split('T')[0],
+                    isWithinRange
+                });
+            }
+
+            return isWithinRange;
+        });
 
         // Add metadata about booking position
         return bookings.map(booking => {
@@ -159,8 +132,38 @@ export function CalendarGridComponent({
         });
     };
 
+    // Loading State
+    if (isLoading) {
+        return (
+            <div className="bg-card border-2 border-border rounded-xl shadow-medium p-12 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+                    <p className="text-muted-foreground">Loading bookings...</p>
+                </div>
+            </div>
+        );
+    }
+
+    // Error State
+    if (isError) {
+        return (
+            <div className="bg-card border-2 border-border rounded-xl shadow-medium p-12 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                    <p className="text-destructive font-semibold">Failed to load bookings</p>
+                    <p className="text-muted-foreground text-sm">{error?.message || 'Please try again later'}</p>
+                    <p className="text-xs text-muted-foreground">Check console for details</p>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="bg-card border-2 border-border rounded-xl shadow-medium overflow-visible">
+            {/* Debug Info */}
+            <div className="bg-muted/50 p-2 text-xs text-center border-b">
+                Found {BOOKING_RANGES.length} booking(s) for {currentMonth + 1}/{currentYear}
+            </div>
+
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 bg-gradient-primary">
                 {WEEKDAYS.map((day) => (
