@@ -24,6 +24,7 @@ import RoleBasedHomeRedirectComponent from "./components/common/RoleBasedHomeRed
 import OwnerCalenderPage from "./page/OwnerCalenderPage";
 import OwnerAnalyticsPage from "./page/OwnerAnalyticsPage";
 import AgentLandingPage from "./page/AgentLandingPage";
+import { CalendarPage } from "./page/CalendarPage";
 
 const App = () => (
   <TooltipProvider>
@@ -46,6 +47,7 @@ const App = () => (
         <Route element={<RoleBasedRouteComponent allowedRoles={['Admin']} />}>
           <Route element={<Layout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/calendar" element={<CalendarPage />} />
             <Route path="/booking" element={<NewBookingPage />} />
             <Route path="/bookings" element={<ManageBookingsPage />} />
             <Route path="/villas" element={<VillasPage />} />

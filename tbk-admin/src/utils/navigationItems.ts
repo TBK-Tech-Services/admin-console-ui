@@ -1,6 +1,7 @@
-import { 
-  LayoutDashboard, 
+import {
+  LayoutDashboard,
   Calendar,
+  CalendarDays,
   ClipboardList,
   Settings,
   MapPin,
@@ -14,6 +15,11 @@ export const adminNavigationItems = [
     name: "Dashboard",
     href: "/",
     icon: LayoutDashboard,
+  },
+  {
+    name: "Calendar",
+    href: "/calendar",
+    icon: CalendarDays,
   },
   {
     name: "New Booking",
@@ -50,13 +56,13 @@ export const adminNavigationItems = [
 export const ownerNavigationItems = [
   {
     name: "Owner Dashboard",
-    href: "/owner-dashboard", 
+    href: "/owner-dashboard",
     icon: Building2,
   },
   {
     name: "Calendar",
     href: "/owner/calendar",
-    icon: Calendar,
+    icon: CalendarDays,
   },
   {
     name: "Analytics",
