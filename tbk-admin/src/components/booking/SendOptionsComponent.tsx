@@ -32,7 +32,12 @@ export default function SendOptionsComponent({
     onSend,
     isSending,
 }: SendOptionsComponentProps) {
-    const [contactInfo, setContactInfo] = useState("");
+    // Pre-fill phone number from booking if available
+    const defaultContact = sendType === "whatsapp"
+        ? (booking.guestPhone || "")
+        : (booking.guestEmail || "");
+
+    const [contactInfo, setContactInfo] = useState(defaultContact);
     const [message, setMessage] = useState(
         sendType === "whatsapp"
             ? `Hi ${booking.guestName}, your booking voucher for ${booking.villa.name} is ready!`
@@ -96,7 +101,9 @@ export default function SendOptionsComponent({
                         className="min-h-[100px] resize-none"
                     />
                     <p className="text-xs text-muted-foreground">
-                        Customize the message sent with the voucher
+                        {sendType === "whatsapp"
+                            ? "Note: Using 'Hello World' template for demo. Custom message will be used once template is approved."
+                            : "Customize the message sent with the voucher"}
                     </p>
                 </div>
 

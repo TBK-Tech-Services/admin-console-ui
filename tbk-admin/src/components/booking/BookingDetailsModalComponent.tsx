@@ -8,7 +8,7 @@ import { getPaymentStatusColor } from "@/utils/getPaymentStatusColor";
 export default function BookingDetailsModalComponent({ isOpen, onClose, booking }) {
 
   // Return null if no booking data
-  if (!booking){
+  if (!booking) {
     return null;
   };
 
@@ -19,14 +19,14 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
           <DialogTitle className="flex items-center justify-between">
             <span>Booking ID - {booking.id}</span>
             <Badge variant="outline" className={`ml-2 ${getBookingStatusColor(booking?.bookingStatus || '')}`}>
-            {booking?.bookingStatus?.replace('_', ' ').toUpperCase()}
+              {booking?.bookingStatus?.replace('_', ' ').toUpperCase()}
             </Badge>
           </DialogTitle>
         </DialogHeader>
-        
+
         {/* Compact 3-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
+
           {/* Guest Information */}
           <div className="bg-muted/50 rounded-lg p-4">
             <h3 className="font-semibold mb-3 flex items-center gap-2 text-sm">

@@ -12,6 +12,7 @@ import VoucherDetailsCardComponent from "./VoucherDetailsCardComponent";
 import SendOptionsComponent from "./SendOptionsComponent";
 import { useGenerateVoucher } from "@/hooks/useGenerateVoucher";
 import { useSendVoucherEmail } from "@/hooks/useSendVoucherEmail";
+import { useSendVoucherWhatsApp } from "@/hooks/useSendVoucherWhatsApp";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 interface VoucherPreviewModalProps {
@@ -37,6 +38,9 @@ export default function VoucherPreviewModalComponent({
 
     // Send Email Mutation
     const sendEmailMutation = useSendVoucherEmail();
+
+    // Send WhatsApp Mutation
+    const sendWhatsAppMutation = useSendVoucherWhatsApp();
 
     // Handler to generate PDF voucher
     const handleGenerateVoucher = async () => {
@@ -68,13 +72,25 @@ export default function VoucherPreviewModalComponent({
                 onError: handleMutationError
             });
         } else {
-            // WhatsApp - TODO
-            console.log("WhatsApp not implemented yet");
+            // WhatsApp
+            sendWhatsAppMutation.mutate({
+                bookingId: booking.id,
+                phoneNumber: contactInfo,
+                voucherUrl: voucherUrl!.replace('/preview', '/view')
+            }, {
+                onSuccess: () => {
+                    handleSuccess("Voucher sent via WhatsApp successfully!");
+                    onClose();
+                },
+                onError: handleMutationError
+            });
         }
     };
 
     // Use mutation pending state for isSending
-    const isSending = sendEmailMutation.isPending;
+    const isSending = sendType === "gmail"
+        ? sendEmailMutation.isPending
+        : sendWhatsAppMutation.isPending;
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
