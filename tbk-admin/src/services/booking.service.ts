@@ -113,3 +113,15 @@ export const getCalendarBookingsService = async (month: number, year: number, vi
     const response = await apiService.get('/bookings/v1/calendar', { params });
     return response.data;
 };
+
+// Service to Send Voucher to Admin
+export const sendVoucherToAdminsService = async (bookingId: number) => {
+    const response = await apiService.post(`/bookings/v1/${bookingId}/send-voucher-to-admins`);
+    return response.data;
+};
+
+// Service to Update Voucher Approval
+export const updateVoucherApprovalService = async (bookingId: number, approvedBy: "PUJA" | "JAIRAJ") => {
+    const response = await apiService.patch(`/bookings/v1/${bookingId}/voucher-approval`, { approvedBy });
+    return response.data;
+};

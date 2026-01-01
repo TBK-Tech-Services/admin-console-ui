@@ -1,99 +1,137 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useEffect, useState } from "react";
+import { User, Mail, Phone, Building2, Users } from "lucide-react";
+import { AdminBlockComponent } from "./AdminBlockComponent";
 
-export default function GeneralSettingsFormComponent({generalSettingsData , onFormChange}) {
+interface GeneralSettingsFormProps {
+  generalSettingsData: any;
+  onFormChange: (data: any, hasChanges: boolean) => void;
+}
 
-  // Get Data
-  const name = generalSettingsData?.[0]?.businessName;
-  const email = generalSettingsData?.[0]?.contactEmail;
-  const phone = generalSettingsData?.[0]?.phoneNumber;
+export default function GeneralSettingsFormComponent({
+  generalSettingsData,
+  onFormChange,
+}: GeneralSettingsFormProps) {
 
-  // State Variables 
-  const [formData , setFormData] = useState({
+  const [formData, setFormData] = useState<any>({
     businessName: "",
     contactEmail: "",
     phoneNumber: "",
-  });
-  const [originalData, setOriginalData] = useState({
-    businessName: "",
-    contactEmail: "",
-    phoneNumber: "",
+    admin1Name: "",
+    admin1Email: "",
+    admin1Phone: "",
+    admin2Name: "",
+    admin2Email: "",
+    admin2Phone: "",
   });
 
-  // useEffect
+  const [initialFormData, setInitialFormData] = useState<any>(null);
+
+  // 🔥 Initialize form + baseline snapshot
   useEffect(() => {
-    if (generalSettingsData && generalSettingsData.length > 0) {
-      const data = {
-        businessName: generalSettingsData[0]?.businessName || "",
-        contactEmail: generalSettingsData[0]?.contactEmail || "",
-        phoneNumber: generalSettingsData[0]?.phoneNumber || "",
-      };
-      setFormData(data);
-      setOriginalData(data);
-      onFormChange(data, false);
-    }
+    if (!generalSettingsData) return;
+
+    const normalizedData = {
+      businessName: generalSettingsData.businessName || "",
+      contactEmail: generalSettingsData.contactEmail || "",
+      phoneNumber: generalSettingsData.phoneNumber || "",
+      admin1Name: generalSettingsData.admin1Name || "",
+      admin1Email: generalSettingsData.admin1Email || "",
+      admin1Phone: generalSettingsData.admin1Phone || "",
+      admin2Name: generalSettingsData.admin2Name || "",
+      admin2Email: generalSettingsData.admin2Email || "",
+      admin2Phone: generalSettingsData.admin2Phone || "",
+    };
+
+    setFormData(normalizedData);
+    setInitialFormData(normalizedData);
   }, [generalSettingsData]);
 
-  // Handler Function to Handle Input Changes
-  const handleInputChange = (field: string, value: string) => {
-    const newFormData = { ...formData, [field]: value };
-    setFormData(newFormData);
+  // 🔥 Handle change + dirty check
+  const handleChange = (field: string, value: string) => {
+    const updatedFormData = {
+      ...formData,
+      [field]: value,
+    };
 
-    const hasChanges = 
-      newFormData.businessName !== originalData.businessName ||
-      newFormData.contactEmail !== originalData.contactEmail ||
-      newFormData.phoneNumber !== originalData.phoneNumber;
-    
-    onFormChange(newFormData, hasChanges);
+    setFormData(updatedFormData);
+
+    const hasChanges = Object.keys(updatedFormData).some(
+      (key) => updatedFormData[key] !== initialFormData?.[key]
+    );
+
+    onFormChange(updatedFormData, hasChanges);
   };
 
-  // useEffect
-  useEffect(() => {
-    if (generalSettingsData && generalSettingsData.length > 0) {
-      const newData = {
-        businessName: generalSettingsData[0]?.businessName || "",
-        contactEmail: generalSettingsData[0]?.contactEmail || "",
-        phoneNumber: generalSettingsData[0]?.phoneNumber || "",
-      };
-      setOriginalData(newData);
-    }
-  }, [generalSettingsData]);
+  if (!initialFormData) return null;
 
   return (
-    <>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="businessName">Business Name</Label>
-          <Input
-            id="businessName"
-            value={formData.businessName}
-            onChange={(e) => handleInputChange("businessName", e.target.value)}
-            className="h-12"
-          />
+    <div className="space-y-8">
+      {/* Business Information */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground border-b pb-2">
+          <Building2 className="h-4 w-4" />
+          Business Information
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="contactEmail">Contact Email</Label>
-          <Input
-            id="contactEmail"
-            type="email"
-            value={formData.contactEmail}
-            onChange={(e) => handleInputChange("contactEmail", e.target.value)}
-            className="h-12"
-          />
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Business Name</Label>
+            <Input
+              value={formData.businessName}
+              onChange={(e) => handleChange("businessName", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Contact Email</Label>
+            <Input
+              type="email"
+              value={formData.contactEmail}
+              onChange={(e) => handleChange("contactEmail", e.target.value)}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label>Phone Number</Label>
+            <Input
+              value={formData.phoneNumber}
+              onChange={(e) => handleChange("phoneNumber", e.target.value)}
+            />
+          </div>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="phone">Phone Number</Label>
-          <Input
-            id="phone"
-            value={formData.phoneNumber}
-            onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
-            className="h-12"
-          />
+
+      {/* Admin Contacts */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground border-b pb-2">
+          <Users className="h-4 w-4" />
+          Admin Contacts (For Voucher Approval)
         </div>
+
+        {/* Admin 1 */}
+        <AdminBlockComponent
+          title="Admin 1 (Puja)"
+          color="orange"
+          prefix="admin1"
+          formData={formData}
+          handleChange={handleChange}
+        />
+
+        {/* Admin 2 */}
+        <AdminBlockComponent
+          title="Admin 2 (Jairaj)"
+          color="blue"
+          prefix="admin2"
+          formData={formData}
+          handleChange={handleChange}
+        />
+
+        <p className="text-xs text-muted-foreground bg-muted p-3 rounded-lg">
+          💡 These admin contacts will receive booking vouchers for approval via WhatsApp and Email before staff can send them to guests.
+        </p>
       </div>
-    </>
+    </div>
   );
 }

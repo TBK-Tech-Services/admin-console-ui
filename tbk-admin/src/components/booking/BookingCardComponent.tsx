@@ -3,13 +3,14 @@ import BookingAmountComponent from './BookingAmountComponent';
 import BookingAvatarComponent from './BookingAvatarComponent';
 import BookingHeaderInfoComponent from './BookingHeaderInfoComponent';
 import BookingInfoComponent from './BookingInfoComponent';
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateBookingStatusService, updatePaymentStatusService } from '@/services/booking.service';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { queryKeys } from '@/lib/queryKeys';
+import VoucherApprovalBadgeComponent from './VoucherApprovalBadgeComponent';
 
 export default function BookingCardComponent({ booking }) {
-
-  // useErrorHanlder
+  const queryClient = useQueryClient();
   const { handleMutationError, handleSuccess } = useErrorHandler();
 
   // Booking Status Update Mutation
@@ -18,12 +19,14 @@ export default function BookingCardComponent({ booking }) {
       return updateBookingStatusService(value, booking.id);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.search() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.recentBookings() });
       handleSuccess("Booking Status updated successfully!");
     },
     onError: handleMutationError
   });
 
-  // Handler Function to Update Booking Status
   const handleBookingStatusUpdate = (value) => {
     updateBookingStatusMutation.mutate(value);
   };
@@ -34,12 +37,14 @@ export default function BookingCardComponent({ booking }) {
       return updatePaymentStatusService(value, booking.id);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.bookings.search() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.recentBookings() });
       handleSuccess("Payment Status updated successfully!");
     },
     onError: handleMutationError
   });
 
-  // Handler Function to Update Payment Status
   const handlePaymentStatusUpdate = (value) => {
     updatePaymentStatusMutation.mutate(value);
   };
@@ -73,8 +78,9 @@ export default function BookingCardComponent({ booking }) {
           </div>
         </div>
 
-        {/* Right Section - Amount + Actions */}
+        {/* Right Section - Amount + Status + Actions */}
         <div className="flex flex-col items-end gap-3 shrink-0">
+          {/* Amount & Payment Status */}
           <BookingAmountComponent
             amount={booking.totalPayableAmount}
             bookedOn={booking.updatedAt}
@@ -83,8 +89,23 @@ export default function BookingCardComponent({ booking }) {
             isLoading={updatePaymentStatusMutation.isPending}
           />
 
-          {/* Actions - Only show on hover for cleaner look */}
-          <div className="opacity-60 group-hover:opacity-100 transition-opacity duration-200">
+          {/* Voucher Approval Badge - Clickable when NOT_APPROVED */}
+          <div
+            onClick={() => {
+              if (booking.voucherApprovalStatus !== "APPROVED") {
+                // Will be handled by BookingActionsMenuComponent
+              }
+            }}
+            className={booking.voucherApprovalStatus !== "APPROVED" ? "cursor-pointer" : ""}
+          >
+            <VoucherApprovalBadgeComponent
+              status={booking.voucherApprovalStatus || "NOT_APPROVED"}
+              approvedBy={booking.voucherApprovedBy}
+            />
+          </div>
+
+          {/* Actions */}
+          <div className="opacity-70 group-hover:opacity-100 transition-opacity duration-200">
             <BookingActionsMenuComponent booking={booking} />
           </div>
         </div>

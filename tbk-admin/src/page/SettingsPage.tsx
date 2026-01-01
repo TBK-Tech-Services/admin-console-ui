@@ -27,12 +27,12 @@ export default function SettingsPage() {
   // useQuery
   const { data: villasData } = useQuery({
     queryKey: ['villas'],
-    queryFn: async() => getAllVillasService()
+    queryFn: async () => getAllVillasService()
   });
 
   const { data: generalSettingsData } = useQuery({
     queryKey: ['generalSettings'],
-    queryFn: async() => getGeneralSettingsService()
+    queryFn: async () => getGeneralSettingsService()
   });
 
   // Update General Settings Mutation
@@ -58,7 +58,7 @@ export default function SettingsPage() {
       <SettingsPageHeaderComponent />
 
       <div className="grid gap-6">
-        <GeneralSettingsComponent 
+        <GeneralSettingsComponent
           generalSettingsData={generalSettingsData}
           onUpdateSettings={handleUpdateGeneralSettings}
           isUpdating={updateGeneralSettingsMutation.isPending}
