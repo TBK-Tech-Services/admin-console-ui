@@ -2,14 +2,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Receipt } from "lucide-react";
 import ExpenseRowComponent from "./ExpenseRowComponent";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
+import { Expense } from "@/types/expense/expenseData";
 
-export default function ExpensesTableComponent({ onViewExpense, onEditExpense, onDeleteExpense }) {
-  
-  // useSelector
-  const expenses = useSelector((store: RootState) => store.expenses.listOfExpenses);
+interface ExpensesTableComponentProps {
+  expenses: Expense[];
+  onViewExpense: (expense: Expense) => void;
+  onEditExpense: (expense: Expense) => void;
+  onDeleteExpense: (expense: Expense) => void;
+}
 
+export default function ExpensesTableComponent({
+  expenses,
+  onViewExpense,
+  onEditExpense,
+  onDeleteExpense,
+}: ExpensesTableComponentProps) {
   return (
     <Card>
       <CardHeader>
@@ -34,8 +41,8 @@ export default function ExpensesTableComponent({ onViewExpense, onEditExpense, o
             </TableHeader>
             <TableBody>
               {expenses.map((expense) => (
-                <ExpenseRowComponent 
-                  key={expense.id} 
+                <ExpenseRowComponent
+                  key={expense.id}
                   expense={expense}
                   onView={onViewExpense}
                   onEdit={onEditExpense}
@@ -46,7 +53,7 @@ export default function ExpensesTableComponent({ onViewExpense, onEditExpense, o
           </Table>
         ) : (
           <div className="text-center py-8 text-gray-500">
-            No expenses found. Add your first expense to get started.
+            No expenses found matching the filters.
           </div>
         )}
       </CardContent>

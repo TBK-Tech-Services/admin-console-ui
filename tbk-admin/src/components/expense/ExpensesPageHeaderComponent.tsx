@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ExpenseReportDownloadComponent from "./ExpenseReportDownloadComponent";
+import { ExpenseFilters } from "@/types/expense/expenseFilters";
 
 interface ExpensesPageHeaderComponentProps {
   onModalOpen: () => void;
+  filters: ExpenseFilters;
 }
 
 export default function ExpensesPageHeaderComponent({
   onModalOpen,
+  filters,
 }: ExpensesPageHeaderComponentProps) {
   return (
     <div className="space-y-4">
@@ -19,7 +22,7 @@ export default function ExpensesPageHeaderComponent({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <ExpenseReportDownloadComponent />
+          <ExpenseReportDownloadComponent filters={filters} />
           <Button onClick={onModalOpen} className="gap-2">
             <Plus className="h-4 w-4" />
             Add New Expense

@@ -3,8 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { downloadExpenseReportService } from "@/services/expense.service";
+import { ExpenseFilters } from "@/types/expense/expenseFilters";
 
-export default function ExpenseReportDownloadComponent() {
+interface ExpenseReportDownloadComponentProps {
+    filters: ExpenseFilters;
+}
+
+export default function ExpenseReportDownloadComponent({
+    filters,
+}: ExpenseReportDownloadComponentProps) {
     const { toast } = useToast();
     const [isDownloading, setIsDownloading] = useState(false);
 
@@ -12,12 +19,12 @@ export default function ExpenseReportDownloadComponent() {
     const handleDownloadPDF = async () => {
         setIsDownloading(true);
         try {
-            // Call backend API
-            const blob = await downloadExpenseReportService();
+            // Call backend API with filters
+            const blob = await downloadExpenseReportService(filters);
 
             // Create download link
             const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
+            const link = document.createElement("a");
             link.href = url;
             link.download = `Expense_Report_${Date.now()}.pdf`;
             document.body.appendChild(link);
