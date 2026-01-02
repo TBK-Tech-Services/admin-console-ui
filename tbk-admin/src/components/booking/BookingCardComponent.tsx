@@ -74,6 +74,7 @@ export default function BookingCardComponent({ booking }) {
               checkIn={booking.checkIn}
               checkOut={booking.checkOut}
               phone={booking.guestPhone}
+              bookingSource={booking.bookingSource}
             />
           </div>
         </div>

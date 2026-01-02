@@ -11,11 +11,29 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
 
   const { formData, villaData, totalDaysOfStay } = bookingData;
 
+  // Convert string values to numbers
+  const customPrice = Number(formData.customPrice) || 0;
+  const extraPersonCharge = Number(formData.extraPersonCharge) || 0;
+  const discount = Number(formData.discount) || 0;
+  const advancePaid = Number(formData.advancePaid) || 0;
+  const basePrice = (villaData?.price * (totalDaysOfStay || 0)) || 0;
+  const effectivePrice = customPrice > 0 ? customPrice : basePrice;
+
   // Calculate amounts
   const subTotalAmount = getBookingSubtotal(formData, villaData, totalDaysOfStay);
-  const gstAmount = calculateGST(formData.isGSTIncluded, subTotalAmount);
+
+  const gstAmount = calculateGST({
+    gstMode: formData.gstMode,
+    gstOnBasePrice: formData.gstOnBasePrice,
+    gstOnExtraCharge: formData.gstOnExtraCharge,
+    effectivePrice,
+    extraPersonCharge,
+    discount,
+    subTotalAmount
+  });
+
   const totalPayableAmount = subTotalAmount + gstAmount;
-  const dueAmount = getDueAmount(totalPayableAmount, formData.advancePaid);
+  const dueAmount = getDueAmount(totalPayableAmount, advancePaid);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -113,36 +131,46 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                   <span className="font-medium">{totalDaysOfStay || 0}</span>
                 </div>
 
-                {formData.customPrice > 0 && (
+                {customPrice > 0 && (
                   <div className="flex justify-between text-sm bg-primary/10 px-2 py-1.5 rounded border border-primary/20">
                     <span className="text-primary font-medium">Custom Price Applied</span>
-                    <span className="font-semibold text-primary">₹{formData.customPrice}</span>
+                    <span className="font-semibold text-primary">₹{customPrice}</span>
                   </div>
                 )}
 
-                {formData.extraPersonCharge > 0 && (
+                {extraPersonCharge > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Extra Person Charge</span>
-                    <span className="font-medium text-primary">+ ₹{formData.extraPersonCharge}</span>
+                    <span className="font-medium text-primary">+ ₹{extraPersonCharge}</span>
                   </div>
                 )}
 
-                {formData.discount > 0 && (
+                {discount > 0 && (
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Discount</span>
-                    <span className="font-medium text-green-600">- ₹{formData.discount}</span>
+                    <span className="font-medium text-green-600">- ₹{discount}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-sm pt-2 border-t">
                   <span className="text-muted-foreground font-medium">Subtotal</span>
-                  <span className="font-semibold">₹{subTotalAmount || 0}</span>
+                  <span className="font-semibold">₹{subTotalAmount}</span>
                 </div>
 
-                {formData.isGSTIncluded && (
+                {gstAmount > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">GST (18%)</span>
-                    <span className="font-medium text-accent">+ ₹{gstAmount || 0}</span>
+                    <span className="text-muted-foreground">
+                      GST (18%)
+                      {formData.gstMode === "SELECTIVE" && (
+                        <span className="text-xs ml-1">
+                          ({[
+                            formData.gstOnBasePrice && "Base",
+                            formData.gstOnExtraCharge && "Extra"
+                          ].filter(Boolean).join(" + ")})
+                        </span>
+                      )}
+                    </span>
+                    <span className="font-medium text-accent">+ ₹{gstAmount.toFixed(2)}</span>
                   </div>
                 )}
 
@@ -150,7 +178,7 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-base">Total Amount</span>
                     <span className="font-bold text-primary text-2xl">
-                      ₹{totalPayableAmount || 0}
+                      ₹{totalPayableAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>
@@ -163,13 +191,13 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                       Advance Paid
                     </span>
                     <span className="font-medium text-green-600">
-                      ₹{formData.advancePaid || 0}
+                      ₹{advancePaid}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className="font-semibold">Due Amount</span>
                     <span className="font-bold text-orange-600 text-xl">
-                      ₹{dueAmount || 0}
+                      ₹{dueAmount.toFixed(2)}
                     </span>
                   </div>
                 </div>
