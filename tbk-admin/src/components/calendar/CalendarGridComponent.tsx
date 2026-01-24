@@ -19,7 +19,8 @@ interface BookingRange {
     checkOut: string; // YYYY-MM-DD
 }
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS_FULL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS_SHORT = ["S", "M", "T", "W", "T", "F", "S"];
 
 interface DayBooking extends BookingRange {
     isStart: boolean;
@@ -135,10 +136,10 @@ export function CalendarGridComponent({
     // Loading State
     if (isLoading) {
         return (
-            <div className="bg-card border-2 border-border rounded-xl shadow-medium p-12 flex items-center justify-center">
+            <div className="bg-card border-2 border-border rounded-xl shadow-medium p-8 sm:p-12 flex items-center justify-center">
                 <div className="text-center space-y-4">
-                    <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
-                    <p className="text-muted-foreground">Loading bookings...</p>
+                    <Loader2 className="h-8 w-8 sm:h-12 sm:w-12 animate-spin text-primary mx-auto" />
+                    <p className="text-muted-foreground text-sm">Loading bookings...</p>
                 </div>
             </div>
         );
@@ -147,7 +148,7 @@ export function CalendarGridComponent({
     // Error State
     if (isError) {
         return (
-            <div className="bg-card border-2 border-border rounded-xl shadow-medium p-12 flex items-center justify-center">
+            <div className="bg-card border-2 border-border rounded-xl shadow-medium p-8 sm:p-12 flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <p className="text-destructive font-semibold">Failed to load bookings</p>
                     <p className="text-muted-foreground text-sm">{error?.message || 'Please try again later'}</p>
@@ -160,18 +161,20 @@ export function CalendarGridComponent({
     return (
         <div className="bg-card border-2 border-border rounded-xl shadow-medium overflow-visible">
             {/* Debug Info */}
-            <div className="bg-muted/50 p-2 text-xs text-center border-b">
+            <div className="bg-muted/50 p-1.5 sm:p-2 text-[10px] sm:text-xs text-center border-b">
                 Found {BOOKING_RANGES.length} booking(s) for {currentMonth + 1}/{currentYear}
             </div>
 
             {/* Weekday Headers */}
             <div className="grid grid-cols-7 bg-gradient-primary">
-                {WEEKDAYS.map((day) => (
+                {WEEKDAYS_FULL.map((day, index) => (
                     <div
                         key={day}
-                        className="py-4 text-center text-sm font-semibold text-white border-r border-white/20 last:border-r-0"
+                        className="py-2 sm:py-3 lg:py-4 text-center text-[10px] sm:text-xs lg:text-sm font-semibold text-white border-r border-white/20 last:border-r-0"
                     >
-                        {day}
+                        {/* Show short version on mobile, full on larger screens */}
+                        <span className="sm:hidden">{WEEKDAYS_SHORT[index]}</span>
+                        <span className="hidden sm:inline">{day}</span>
                     </div>
                 ))}
             </div>
@@ -182,7 +185,7 @@ export function CalendarGridComponent({
                 {emptyCells.map((index) => (
                     <div
                         key={`empty-${index}`}
-                        className="min-h-[140px] bg-muted/30 border-b border-r border-border"
+                        className="min-h-[90px] sm:min-h-[110px] lg:min-h-[140px] bg-muted/30 border-b border-r border-border"
                     />
                 ))}
 

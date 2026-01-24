@@ -26,16 +26,16 @@ export default function BookingItemComponent({ booking }) {
   // Booking Status Update Mutation
   const updateBookingStatusMutation = useMutation({
     mutationFn: (value) => {
-      return updateBookingStatusService(value , booking.id);
+      return updateBookingStatusService(value, booking.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.recentBookings()
       });
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.stats()
       });
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.upcomingCheckins()
       });
 
@@ -52,16 +52,16 @@ export default function BookingItemComponent({ booking }) {
   // Payment Status Update Mutation
   const updatePaymentStatusMutation = useMutation({
     mutationFn: (value) => {
-      return updatePaymentStatusService(value , booking.id);
+      return updatePaymentStatusService(value, booking.id);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.recentBookings()
       });
-      queryClient.invalidateQueries({ 
+      queryClient.invalidateQueries({
         queryKey: queryKeys.dashboard.stats()
       });
-      
+
       handleSuccess("Payment Status Updated Successfully!");
     },
     onError: handleMutationError
@@ -75,7 +75,7 @@ export default function BookingItemComponent({ booking }) {
   // Mapping Booking Status Icons
   const bookingStatusIcons = {
     CONFIRMED: CheckCircle,
-    CHECKED_IN: CheckCircle, 
+    CHECKED_IN: CheckCircle,
     CHECKED_OUT: CheckCircle,
     CANCELLED: XCircle,
   };
@@ -91,47 +91,52 @@ export default function BookingItemComponent({ booking }) {
   const PaymentStatusIcon = paymentStatusIcons[booking.rawBookingData?.paymentStatus] || Clock;
 
   return (
-    <div className="flex items-center justify-between p-4 border border-border rounded-lg hover:shadow-soft transition-all duration-200">
-      <div className="flex items-center gap-4">
-        <Avatar>
-          <AvatarFallback className="bg-gradient-primary text-primary-foreground">
-            {getInitials(booking.guestName)}
-          </AvatarFallback>
-        </Avatar>
-        <div className="space-y-1">
-          <div className="font-medium text-foreground">
-            {booking.guestName}
+    <div className="p-3 sm:p-4 border border-border rounded-lg hover:shadow-soft transition-all duration-200">
+      {/* Mobile Layout: Stacked */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+
+        {/* Guest Info Section */}
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <Avatar className="h-10 w-10 shrink-0">
+            <AvatarFallback className="bg-gradient-primary text-primary-foreground text-sm">
+              {getInitials(booking.guestName)}
+            </AvatarFallback>
+          </Avatar>
+          <div className="space-y-0.5 min-w-0 flex-1">
+            <div className="font-medium text-foreground truncate">
+              {booking.guestName}
+            </div>
+            <div className="text-sm text-muted-foreground truncate">
+              {booking.villa} • {booking.guests} guests
+            </div>
+            <div className="text-xs text-muted-foreground">
+              {booking.checkIn} - {booking.checkOut}
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            {booking.villa} • {booking.guests} guests
-          </div>
-          <div className="text-xs text-muted-foreground">
-            {booking.checkIn} - {booking.checkOut}
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-3">
-        <div className="text-right space-y-2">
-          <div className="font-semibold text-foreground">
+
+          {/* Amount - visible on mobile next to name */}
+          <div className="font-semibold text-foreground sm:hidden shrink-0">
             {booking.amount}
           </div>
-          
-          {/* Status Updates Section */}
-          <div className="flex flex-col gap-1 items-end">
+        </div>
+
+        {/* Status & Actions Section */}
+        <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
+
+          {/* Status Dropdowns */}
+          <div className="flex flex-wrap gap-1.5 items-center">
             {/* Booking Status Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className={`${getBookingStatusColor(booking.status)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${
-                  updateBookingStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
-                }`}>
+                <div className={`${getBookingStatusColor(booking.status)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${updateBookingStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}>
                   <BookingStatusIcon className="h-3 w-3" />
-                  <span className="font-medium">{booking.status}</span>
+                  <span className="font-medium hidden xs:inline">{booking.status}</span>
                   <ChevronDown className="h-2 w-2 opacity-60" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[130px]">
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleBookingStatusUpdate('CONFIRMED')}
                   className="cursor-pointer text-xs"
                   disabled={updateBookingStatusMutation.isPending}
@@ -139,7 +144,7 @@ export default function BookingItemComponent({ booking }) {
                   <CheckCircle className="h-3 w-3 mr-2 text-green-600" />
                   Confirmed
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleBookingStatusUpdate('CHECKED_IN')}
                   className="cursor-pointer text-xs"
                   disabled={updateBookingStatusMutation.isPending}
@@ -147,7 +152,7 @@ export default function BookingItemComponent({ booking }) {
                   <CheckCircle className="h-3 w-3 mr-2 text-blue-600" />
                   Checked In
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleBookingStatusUpdate('CHECKED_OUT')}
                   className="cursor-pointer text-xs"
                   disabled={updateBookingStatusMutation.isPending}
@@ -155,7 +160,7 @@ export default function BookingItemComponent({ booking }) {
                   <CheckCircle className="h-3 w-3 mr-2 text-purple-600" />
                   Checked Out
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handleBookingStatusUpdate('CANCELLED')}
                   className="cursor-pointer text-xs"
                   disabled={updateBookingStatusMutation.isPending}
@@ -169,16 +174,15 @@ export default function BookingItemComponent({ booking }) {
             {/* Payment Status Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className={`${getPaymentStatusColor(booking.rawBookingData?.paymentStatus)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${
-                  updatePaymentStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
-                }`}>
+                <div className={`${getPaymentStatusColor(booking.rawBookingData?.paymentStatus)} px-2 py-1 rounded-full cursor-pointer hover:shadow-sm hover:scale-105 transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 text-xs ${updatePaymentStatusMutation.isPending ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}>
                   <PaymentStatusIcon className="h-3 w-3" />
-                  <span className="font-medium">{booking.rawBookingData?.paymentStatus || 'PENDING'}</span>
+                  <span className="font-medium hidden xs:inline">{booking.rawBookingData?.paymentStatus || 'PENDING'}</span>
                   <ChevronDown className="h-2 w-2 opacity-60" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="min-w-[120px]">
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handlePaymentStatusUpdate('PAID')}
                   className="cursor-pointer text-xs"
                   disabled={updatePaymentStatusMutation.isPending}
@@ -186,7 +190,7 @@ export default function BookingItemComponent({ booking }) {
                   <CheckCircle className="h-3 w-3 mr-2 text-green-600" />
                   Paid
                 </DropdownMenuItem>
-                <DropdownMenuItem 
+                <DropdownMenuItem
                   onClick={() => handlePaymentStatusUpdate('PENDING')}
                   className="cursor-pointer text-xs"
                   disabled={updatePaymentStatusMutation.isPending}
@@ -197,9 +201,15 @@ export default function BookingItemComponent({ booking }) {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
+
+          {/* Amount - hidden on mobile, shown on larger screens */}
+          <div className="font-semibold text-foreground hidden sm:block min-w-[80px] text-right">
+            {booking.amount}
+          </div>
+
+          {/* Actions Menu */}
+          <BookingActionsMenuComponent booking={booking.rawBookingData || booking} />
         </div>
-        
-        <BookingActionsMenuComponent booking={booking.rawBookingData || booking} />
       </div>
     </div>
   );

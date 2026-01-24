@@ -19,14 +19,14 @@ export function CalendarPage() {
     const handleNextMonth = () => {
         if (currentMonth === 11) {
             setCurrentMonth(0);
-            setCurrentYear(currentYear + 1);
+            setCurrentYear(currentMonth + 1);
         } else {
             setCurrentMonth(currentMonth + 1);
         }
     };
 
     return (
-        <div className="flex-1 space-y-6 p-6 lg:p-8">
+        <div className="flex-1 space-y-4 sm:space-y-6 p-4 sm:p-6 lg:p-8">
             {/* Header Section */}
             <CalendarHeaderComponent
                 selectedVilla={selectedVilla}

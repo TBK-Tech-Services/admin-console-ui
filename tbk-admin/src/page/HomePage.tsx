@@ -14,8 +14,8 @@ export default function HomePage() {
   return (
     <div className="space-y-6">
       <DashboardHeaderComponent />
-      <DashboardStatsComponent dashboardStatsData={dashboardStats}/>
-      <DashboardGridComponent upcomingCheckinsData={upcomingCheckins} recentBookingsData={recentBookings} villasOccupancyData={villasOccupancy} revenueTrendsData={revenueTrends}/>
+      <DashboardStatsComponent dashboardStatsData={dashboardStats} />
+      <DashboardGridComponent upcomingCheckinsData={upcomingCheckins} recentBookingsData={recentBookings} villasOccupancyData={villasOccupancy} revenueTrendsData={revenueTrends} />
     </div>
   );
 }

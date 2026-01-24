@@ -27,29 +27,40 @@ export function DayBlockComponent({
     bookings,
     isToday
 }: DayBlockComponentProps) {
+    // Show fewer bookings on mobile
+    const maxVisible = {
+        mobile: 2,
+        tablet: 3,
+        desktop: 4
+    };
+
     return (
         <div
             className={cn(
-                "min-h-[140px] p-2 border-b border-r border-border bg-background hover:bg-muted/30 transition-colors flex flex-col overflow-visible",
+                "min-h-[90px] sm:min-h-[110px] lg:min-h-[140px] p-1 sm:p-2 border-b border-r border-border bg-background hover:bg-muted/30 transition-colors flex flex-col overflow-visible",
                 isToday && "bg-primary/5 border-2 border-primary"
             )}
         >
             {/* Day Number */}
             <div className={cn(
-                "text-sm font-semibold mb-2",
+                "text-xs sm:text-sm font-semibold mb-1 sm:mb-2",
                 isToday ? "text-primary" : "text-foreground"
             )}>
                 {day}
             </div>
 
             {/* Bookings List - stays within the block */}
-            <div className="space-y-1 overflow-visible flex-1">
-                {bookings.slice(0, 4).map((booking) => (
+            <div className="space-y-0.5 sm:space-y-1 overflow-visible flex-1">
+                {/* Mobile: show 2, Tablet: show 3, Desktop: show 4 */}
+                {bookings.slice(0, maxVisible.desktop).map((booking, index) => (
                     <div
                         key={booking.id}
                         className={cn(
-                            "group relative px-2 py-1 text-white text-[10px] font-medium shadow-soft hover:shadow-medium transition-all cursor-pointer overflow-visible",
-                            "bg-gradient-to-r from-red-500 to-rose-600 hover:z-[100]", // ✅ RED GRADIENT
+                            "group relative px-1 sm:px-2 py-0.5 sm:py-1 text-white text-[8px] sm:text-[10px] font-medium shadow-soft hover:shadow-medium transition-all cursor-pointer overflow-visible",
+                            "bg-gradient-to-r from-red-500 to-rose-600 hover:z-[100]",
+                            // Hide extra bookings on smaller screens
+                            index >= maxVisible.mobile && "hidden xs:block",
+                            index >= maxVisible.tablet && "xs:hidden md:block",
                             // Visual indicators for continuous bookings
                             booking.isStart && !booking.isEnd && "rounded-l-md rounded-r-none",
                             booking.isEnd && !booking.isStart && "rounded-r-md rounded-l-none",
@@ -57,15 +68,15 @@ export function DayBlockComponent({
                             !booking.isStart && !booking.isEnd && !booking.isContinuation && "rounded-md"
                         )}
                     >
-                        <div className="flex items-center gap-1 min-w-0">
-                            {booking.isStart && <Home className="h-2.5 w-2.5 flex-shrink-0" />}
+                        <div className="flex items-center gap-0.5 sm:gap-1 min-w-0">
+                            {booking.isStart && <Home className="h-2 w-2 sm:h-2.5 sm:w-2.5 flex-shrink-0" />}
                             <span className="truncate leading-tight">
                                 {booking.villaName}
                             </span>
                         </div>
 
-                        {/* Tooltip on hover */}
-                        <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+10px)] px-4 py-3 bg-gray-900 text-white rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[9999] shadow-2xl border border-gray-700 min-w-max">
+                        {/* Tooltip on hover - hidden on touch devices */}
+                        <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(100%+10px)] px-4 py-3 bg-gray-900 text-white rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-[9999] shadow-2xl border border-gray-700 min-w-max hidden sm:block">
                             <div className="font-bold text-sm text-white">{booking.villaName}</div>
                             <div className="text-xs mt-1.5 text-gray-300 font-medium">
                                 {formatDate(booking.checkIn)} - {formatDate(booking.checkOut)}
@@ -78,10 +89,23 @@ export function DayBlockComponent({
                     </div>
                 ))}
 
-                {/* Show "+X more" if more than 4 bookings */}
-                {bookings.length > 4 && (
-                    <div className="text-[10px] text-muted-foreground font-medium px-2 py-0.5">
-                        +{bookings.length - 4} more
+                {/* Show "+X more" - responsive count */}
+                {/* Mobile: if more than 2 */}
+                {bookings.length > maxVisible.mobile && (
+                    <div className="text-[8px] sm:text-[10px] text-muted-foreground font-medium px-1 sm:px-2 py-0.5 xs:hidden">
+                        +{bookings.length - maxVisible.mobile} more
+                    </div>
+                )}
+                {/* Tablet: if more than 3 */}
+                {bookings.length > maxVisible.tablet && (
+                    <div className="text-[8px] sm:text-[10px] text-muted-foreground font-medium px-1 sm:px-2 py-0.5 hidden xs:block md:hidden">
+                        +{bookings.length - maxVisible.tablet} more
+                    </div>
+                )}
+                {/* Desktop: if more than 4 */}
+                {bookings.length > maxVisible.desktop && (
+                    <div className="text-[10px] text-muted-foreground font-medium px-2 py-0.5 hidden md:block">
+                        +{bookings.length - maxVisible.desktop} more
                     </div>
                 )}
             </div>
