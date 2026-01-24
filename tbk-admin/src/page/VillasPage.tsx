@@ -43,28 +43,29 @@ export default function VillasPage() {
   }, [data, dispatch]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Header - Stack on mobile, row on sm+ */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             Villa Management
           </h1>
-          <p className="text-muted-foreground mt-2">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1 sm:mt-2">
             Manage your villa properties and track their performance ({villas?.length || 0} villas)
           </p>
         </div>
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
           <DialogTrigger asChild>
-            <Button className="bg-gradient-primary hover:opacity-90">
+            <Button className="bg-gradient-primary hover:opacity-90 w-full sm:w-auto shrink-0">
               <Plus className="h-4 w-4 mr-2" />
               Add New Villa
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto mx-4 sm:mx-auto">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-3 text-xl">
-                <div className="p-2 rounded-lg bg-primary/10">
-                  <Home className="h-5 w-5 text-primary" />
+              <DialogTitle className="flex items-center gap-2 sm:gap-3 text-lg sm:text-xl">
+                <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+                  <Home className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 </div>
                 Add New Villa
               </DialogTitle>
@@ -78,13 +79,13 @@ export default function VillasPage() {
         (villas?.length === 0)
           ?
           (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>No villas found. Add your first villa to get started!</p>
+            <div className="text-center py-8 sm:py-12 text-muted-foreground">
+              <p className="text-sm sm:text-base">No villas found. Add your first villa to get started!</p>
             </div>
           )
           :
           (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {
                 villas?.map((villa) => (
                   <VillaCardComponent
