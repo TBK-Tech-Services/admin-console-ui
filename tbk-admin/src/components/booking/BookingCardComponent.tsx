@@ -50,9 +50,9 @@ export default function BookingCardComponent({ booking }) {
   };
 
   return (
-    <div className="group relative bg-card border border-border rounded-xl p-5 hover:shadow-lg hover:border-border/60 transition-all duration-200">
-      {/* Main Content Container */}
-      <div className="flex items-start gap-4">
+    <div className="group relative bg-card border border-border rounded-xl p-3 sm:p-5 hover:shadow-lg hover:border-border/60 transition-all duration-200">
+      {/* Desktop Layout */}
+      <div className="hidden sm:flex items-start gap-4">
         {/* Left Section - Avatar + Info */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
           <BookingAvatarComponent guestName={booking.guestName} />
@@ -81,7 +81,6 @@ export default function BookingCardComponent({ booking }) {
 
         {/* Right Section - Amount + Status + Actions */}
         <div className="flex flex-col items-end gap-3 shrink-0">
-          {/* Amount & Payment Status */}
           <BookingAmountComponent
             amount={booking.totalPayableAmount}
             bookedOn={booking.updatedAt}
@@ -90,25 +89,81 @@ export default function BookingCardComponent({ booking }) {
             isLoading={updatePaymentStatusMutation.isPending}
           />
 
-          {/* Voucher Approval Badge - Clickable when NOT_APPROVED */}
-          <div
-            onClick={() => {
-              if (booking.voucherApprovalStatus !== "APPROVED") {
-                // Will be handled by BookingActionsMenuComponent
-              }
-            }}
-            className={booking.voucherApprovalStatus !== "APPROVED" ? "cursor-pointer" : ""}
-          >
-            <VoucherApprovalBadgeComponent
-              status={booking.voucherApprovalStatus || "NOT_APPROVED"}
-              approvedBy={booking.voucherApprovedBy}
-            />
-          </div>
+          <VoucherApprovalBadgeComponent
+            status={booking.voucherApprovalStatus || "NOT_APPROVED"}
+            approvedBy={booking.voucherApprovedBy}
+          />
 
-          {/* Actions */}
           <div className="opacity-70 group-hover:opacity-100 transition-opacity duration-200">
             <BookingActionsMenuComponent booking={booking} />
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Layout */}
+      <div className="sm:hidden space-y-3">
+        {/* Top Row - Avatar, Name, Amount */}
+        <div className="flex items-start gap-3">
+          <BookingAvatarComponent guestName={booking.guestName} size="sm" />
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="font-semibold text-base text-foreground truncate">
+                {booking.guestName}
+              </h3>
+              <span className="font-bold text-lg text-primary shrink-0">
+                ₹{booking.totalPayableAmount?.toLocaleString()}
+              </span>
+            </div>
+
+            {/* Villa Name */}
+            <p className="text-sm text-muted-foreground truncate mt-0.5">
+              {booking.villa?.name}
+            </p>
+          </div>
+        </div>
+
+        {/* Status Row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <BookingHeaderInfoComponent
+            guestName={booking.guestName}
+            status={booking.bookingStatus}
+            booking={booking}
+            onStatusUpdate={handleBookingStatusUpdate}
+            isLoading={updateBookingStatusMutation.isPending}
+            mobileView
+          />
+
+          <BookingAmountComponent
+            amount={booking.totalPayableAmount}
+            bookedOn={booking.updatedAt}
+            paymentStatus={booking.paymentStatus}
+            onStatusUpdate={handlePaymentStatusUpdate}
+            isLoading={updatePaymentStatusMutation.isPending}
+            mobileView
+          />
+        </div>
+
+        {/* Info Row */}
+        <BookingInfoComponent
+          villa={booking.villa?.name}
+          guests={booking.totalGuests}
+          id={booking.id}
+          checkIn={booking.checkIn}
+          checkOut={booking.checkOut}
+          phone={booking.guestPhone}
+          bookingSource={booking.bookingSource}
+          mobileView
+        />
+
+        {/* Bottom Row - Approval Badge + Actions */}
+        <div className="flex items-center justify-between pt-2 border-t border-border/50">
+          <VoucherApprovalBadgeComponent
+            status={booking.voucherApprovalStatus || "NOT_APPROVED"}
+            approvedBy={booking.voucherApprovedBy}
+          />
+
+          <BookingActionsMenuComponent booking={booking} />
         </div>
       </div>
     </div>

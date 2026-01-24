@@ -20,20 +20,31 @@ export default function BookingsFiltersComponent({
   onClearAllFilters
 }) {
 
-  // Check if any filter is active
   const hasActiveFilters = searchTerm || statusFilter || paymentStatusFilter || checkInDate;
 
   return (
     <Card>
-      <CardContent className="pt-6">
-        <div className="flex flex-col gap-4">
-          {/* Main Filters Row */}
-          <div className="flex flex-col sm:flex-row gap-4">
+      <CardContent className="pt-4 sm:pt-6">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          {/* Search - Full width on top for mobile/tablet */}
+          <div className="w-full lg:hidden">
             <BookingsSearchComponent
               searchTerm={searchTerm}
               onSearchChange={onSearchChange}
             />
+          </div>
 
+          {/* Main Filters Row */}
+          <div className="flex flex-wrap lg:flex-nowrap gap-2 lg:gap-4">
+            {/* Search - Hidden on mobile/tablet, shown on lg+ */}
+            <div className="hidden lg:block lg:flex-1 lg:max-w-xs">
+              <BookingsSearchComponent
+                searchTerm={searchTerm}
+                onSearchChange={onSearchChange}
+              />
+            </div>
+
+            {/* Filters - flex-wrap on tablet, single row on desktop */}
             <BookingsStatusFilterComponent
               statusFilter={statusFilter}
               onStatusFilterChange={onStatusFilterChange}
@@ -65,9 +76,9 @@ export default function BookingsFiltersComponent({
                 variant="ghost"
                 size="sm"
                 onClick={onClearAllFilters}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground text-xs sm:text-sm"
               >
-                <X className="h-4 w-4 mr-2" />
+                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Clear all filters
               </Button>
             </div>

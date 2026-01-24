@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export default function BookingHeaderInfoComponent({ guestName, status, booking, onStatusUpdate, isLoading }) {
+export default function BookingHeaderInfoComponent({ guestName, status, booking, onStatusUpdate, isLoading, mobileView = false }) {
 
   // Status Icons Mapping
   const statusIcons = {
@@ -20,26 +20,75 @@ export default function BookingHeaderInfoComponent({ guestName, status, booking,
   // Determine the appropriate icon based on status, default to Clock if status is unrecognized
   const StatusIcon = statusIcons[status] || Clock;
 
+  // Mobile view - only show status badge
+  if (mobileView) {
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <div className={`${getBookingStatusColor(status)} px-2 py-1 rounded-full cursor-pointer hover:shadow-md transition-all duration-200 border border-transparent hover:border-gray-300 flex items-center gap-1 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}>
+            <StatusIcon className="h-3 w-3" />
+            <span className="text-xs font-medium">{status}</span>
+            <ChevronDown className="h-2.5 w-2.5 opacity-60" />
+          </div>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="min-w-[140px]">
+          <DropdownMenuItem
+            onClick={() => onStatusUpdate('CONFIRMED')}
+            className="cursor-pointer text-sm"
+            disabled={isLoading}
+          >
+            <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+            Confirmed
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onStatusUpdate('CHECKED_IN')}
+            className="cursor-pointer text-sm"
+            disabled={isLoading}
+          >
+            <CheckCircle className="h-4 w-4 mr-2 text-blue-600" />
+            Checked In
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onStatusUpdate('CHECKED_OUT')}
+            className="cursor-pointer text-sm"
+            disabled={isLoading}
+          >
+            <CheckCircle className="h-4 w-4 mr-2 text-purple-600" />
+            Checked Out
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => onStatusUpdate('CANCELLED')}
+            className="cursor-pointer text-sm"
+            disabled={isLoading}
+          >
+            <XCircle className="h-4 w-4 mr-2 text-red-600" />
+            Cancelled
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  // Desktop view - show name + status
   return (
     <div className="flex items-center justify-between">
       <h3 className="font-semibold text-lg text-foreground truncate">
         {guestName}
       </h3>
-      
+
       <div className="flex items-center gap-2">
-        {/* Booking Status Dropdown with clear clickable styling */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <div className={`${getBookingStatusColor(status)} px-3 py-1 rounded-full cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-gray-300 flex items-center gap-1 ${
-              isLoading ? 'opacity-50 cursor-not-allowed' : ''
-            }`}>
+            <div className={`${getBookingStatusColor(status)} px-3 py-1 rounded-full cursor-pointer hover:shadow-md hover:scale-105 transition-all duration-200 border-2 border-transparent hover:border-gray-300 flex items-center gap-1 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}>
               <StatusIcon className="h-3 w-3" />
               <span className="text-xs font-medium">{status}</span>
               <ChevronDown className="h-3 w-3 opacity-60" />
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="min-w-[150px]">
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onStatusUpdate('CONFIRMED')}
               className="cursor-pointer"
               disabled={isLoading}
@@ -47,7 +96,7 @@ export default function BookingHeaderInfoComponent({ guestName, status, booking,
               <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
               Confirmed
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onStatusUpdate('CHECKED_IN')}
               className="cursor-pointer"
               disabled={isLoading}
@@ -55,7 +104,7 @@ export default function BookingHeaderInfoComponent({ guestName, status, booking,
               <CheckCircle className="h-4 w-4 mr-2 text-blue-600" />
               Checked In
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onStatusUpdate('CHECKED_OUT')}
               className="cursor-pointer"
               disabled={isLoading}
@@ -63,7 +112,7 @@ export default function BookingHeaderInfoComponent({ guestName, status, booking,
               <CheckCircle className="h-4 w-4 mr-2 text-purple-600" />
               Checked Out
             </DropdownMenuItem>
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onStatusUpdate('CANCELLED')}
               className="cursor-pointer"
               disabled={isLoading}
