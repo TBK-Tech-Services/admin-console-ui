@@ -17,22 +17,22 @@ export default function BookingDetailsComponent({ formData, onInputChange }) {
       transition={{ duration: 0.5, delay: 0.1 }}
     >
       <Card className="border-border/50 shadow-soft hover:shadow-medium transition-all duration-300">
-        <CardHeader className="bg-gradient-to-br from-accent/5 to-transparent pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
+        <CardHeader className="bg-gradient-to-br from-accent/5 to-transparent pb-3 sm:pb-4">
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
             <div className="p-1.5 rounded-md bg-accent/10">
-              <Calendar className="h-5 w-5 text-accent" />
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-accent" />
             </div>
             Booking Details
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 pt-6">
-          <div className="space-y-2">
+        <CardContent className="space-y-3 sm:space-y-4 pt-4 sm:pt-6">
+          <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="villa" className="text-sm font-medium flex items-center gap-2">
-              <Home className="h-4 w-4 text-muted-foreground" />
+              <Home className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               Select Villa *
             </Label>
             <Select value={formData.villaId} onValueChange={(value) => onInputChange("villaId", value)}>
-              <SelectTrigger className="h-11 border-border/60 focus:border-accent transition-colors">
+              <SelectTrigger className="h-10 sm:h-11 border-border/60 focus:border-accent transition-colors">
                 <SelectValue placeholder="Choose a villa" />
               </SelectTrigger>
               <SelectContent>
@@ -48,42 +48,44 @@ export default function BookingDetailsComponent({ formData, onInputChange }) {
             </Select>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="checkIn" className="text-sm font-medium flex items-center gap-2">
-                <CalendarCheck className="h-4 w-4 text-green-600" />
-                Check-in Date *
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="checkIn" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                <CalendarCheck className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
+                <span className="hidden xs:inline">Check-in Date</span>
+                <span className="xs:hidden">Check-in</span> *
               </Label>
               <Input
                 id="checkIn"
                 type="date"
                 value={formData.checkIn}
                 onChange={(e) => onInputChange("checkIn", e.target.value)}
-                className="h-11 border-border/60 focus:border-green-500 transition-colors"
+                className="h-10 sm:h-11 border-border/60 focus:border-green-500 transition-colors text-sm"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="checkOut" className="text-sm font-medium flex items-center gap-2">
-                <CalendarX className="h-4 w-4 text-orange-600" />
-                Check-out Date *
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="checkOut" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                <CalendarX className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-600" />
+                <span className="hidden xs:inline">Check-out Date</span>
+                <span className="xs:hidden">Check-out</span> *
               </Label>
               <Input
                 id="checkOut"
                 type="date"
                 value={formData.checkOut}
                 onChange={(e) => onInputChange("checkOut", e.target.value)}
-                className="h-11 border-border/60 focus:border-orange-500 transition-colors"
+                className="h-10 sm:h-11 border-border/60 focus:border-orange-500 transition-colors text-sm"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <Label htmlFor="totalGuests" className="text-sm font-medium flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               Number of Guests *
             </Label>
             <div className="relative">
-              <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 id="totalGuests"
                 type="number"
@@ -91,7 +93,7 @@ export default function BookingDetailsComponent({ formData, onInputChange }) {
                 min="1"
                 value={formData.totalGuests}
                 onChange={(e) => onInputChange("totalGuests", e.target.value)}
-                className="pl-10 h-11 border-border/60 focus:border-accent transition-colors"
+                className="pl-9 sm:pl-10 h-10 sm:h-11 border-border/60 focus:border-accent transition-colors"
               />
             </div>
           </div>

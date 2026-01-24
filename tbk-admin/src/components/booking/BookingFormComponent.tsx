@@ -8,8 +8,8 @@ import { motion } from 'framer-motion';
 
 export default function BookingFormComponent({ formData, villaData, totalDaysOfStay, onInputChange, onSubmit, isLoading = false }) {
   return (
-    <div className="space-y-6">
-      <div className="grid gap-6 lg:grid-cols-2">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
         <GuestInformationComponent
           formData={formData}
           onInputChange={onInputChange}
@@ -41,17 +41,17 @@ export default function BookingFormComponent({ formData, villaData, totalDaysOfS
         <Button
           onClick={onSubmit}
           size="lg"
-          className="min-w-[180px] h-12 bg-gradient-primary hover:shadow-medium transition-all duration-300 font-semibold text-base gap-2"
+          className="w-full sm:w-auto min-w-[180px] h-11 sm:h-12 bg-gradient-primary hover:shadow-medium transition-all duration-300 font-semibold text-sm sm:text-base gap-2"
           disabled={isLoading}
         >
           {isLoading ? (
             <>
-              <Loader2 className="h-5 w-5 animate-spin" />
-              Creating Booking...
+              <Loader2 className="h-4 w-4 sm:h-5 sm:w-5 animate-spin" />
+              Creating...
             </>
           ) : (
             <>
-              <CheckCircle className="h-5 w-5" />
+              <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5" />
               Create Booking
             </>
           )}

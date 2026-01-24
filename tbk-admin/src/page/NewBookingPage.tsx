@@ -140,7 +140,7 @@ export default function NewBookingPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 px-4 sm:px-0">
       <BookingFormHeaderComponent />
       <BookingFormComponent
         formData={formData}
