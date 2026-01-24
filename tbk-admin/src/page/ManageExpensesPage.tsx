@@ -62,12 +62,11 @@ export default function ManageExpensesPage() {
     }
   }, [expensesData, dispatch]);
 
-  // Filter expenses based on current filters (client-side filtering for table view)
+  // Filter expenses based on current filters
   const filteredExpenses = useMemo(() => {
     if (!expenses) return [];
 
     return expenses.filter((expense: Expense) => {
-      // Month filter
       if (filters.month) {
         const [year, month] = filters.month.split('-').map(Number);
         const expenseDate = new Date(expense.date);
@@ -76,7 +75,6 @@ export default function ManageExpensesPage() {
         }
       }
 
-      // Date range filter
       if (filters.startDate) {
         const startDate = new Date(filters.startDate);
         startDate.setHours(0, 0, 0, 0);
@@ -91,21 +89,18 @@ export default function ManageExpensesPage() {
         if (expenseDate > endDate) return false;
       }
 
-      // Category filter
       if (filters.categoryId) {
         if (expense.categoryId !== parseInt(filters.categoryId)) {
           return false;
         }
       }
 
-      // Type filter
       if (filters.type) {
         if (expense.type !== filters.type) {
           return false;
         }
       }
 
-      // Villa filter
       if (filters.villaId) {
         const villaId = parseInt(filters.villaId);
         const isIndividualMatch = expense.type === 'INDIVIDUAL' && expense.villaId === villaId;
@@ -120,138 +115,99 @@ export default function ManageExpensesPage() {
     });
   }, [expenses, filters]);
 
-  // Handler to update filters
   const handleFiltersChange = (newFilters: ExpenseFilters) => {
     setFilters(newFilters);
   };
 
-  // Handler to clear all filters
   const handleClearFilters = () => {
     setFilters(initialExpenseFilters);
   };
 
-  // Add Expense Mutation
+  // Mutations (keep same as before)
   const addExpenseMutation = useMutation({
-    mutationFn: (formData: any) => {
-      return addExpenseService(formData)
-    },
+    mutationFn: (formData: any) => addExpenseService(formData),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.expenses.all
-      });
-
+      queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all });
       setIsAddModalOpen(false);
-
       handleSuccess("New Expense Created Successfully!");
     },
     onError: handleMutationError
   });
 
-  // Update Expense Mutation
   const updateExpenseMutation = useMutation({
-    mutationFn: ({ formData, expenseId }: { formData: any; expenseId: string }) => {
-      return updateExpenseService({ formData, expenseId })
-    },
+    mutationFn: ({ formData, expenseId }: { formData: any; expenseId: string }) =>
+      updateExpenseService({ formData, expenseId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.expenses.all
-      });
-
+      queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all });
       setIsEditModalOpen(false);
-
       setSelectedEditExpense(null);
-
       handleSuccess("Expense Updated Successfully!");
     },
     onError: handleMutationError
   });
 
-  // Delete Expense Mutation
   const deleteExpenseMutation = useMutation({
-    mutationFn: (expenseId: string) => {
-      return deleteAExpenseService(expenseId)
-    },
+    mutationFn: (expenseId: string) => deleteAExpenseService(expenseId),
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.expenses.all
-      });
-
+      queryClient.invalidateQueries({ queryKey: queryKeys.expenses.all });
       setIsDeleting(false);
-
       setIsDeleteModalOpen(false);
-
       setSelectedDeleteExpense(null);
-
       handleSuccess("Expense Deleted Successfully!");
     },
     onError: handleMutationError
   });
 
-  // Handler Function to Add Expense
-  const handleAddExpense = (formData: any) => {
-    addExpenseMutation.mutate(formData);
-  };
-
-  // Handler Function to Update Expense
-  const handleUpdateExpense = (formData: any, expenseId: string) => {
+  const handleAddExpense = (formData: any) => addExpenseMutation.mutate(formData);
+  const handleUpdateExpense = (formData: any, expenseId: string) =>
     updateExpenseMutation.mutate({ formData, expenseId });
-  };
-
-  // Handler Function to Delete Expense
   const handleDeleteConfirm = async (expense: Expense) => {
     setIsDeleting(true);
     deleteExpenseMutation.mutate(expense.id);
   };
 
-  // Handler Function to View Expense
   const handleViewExpense = (expense: Expense) => {
     setSelectedViewExpense(expense);
     setIsViewModalOpen(true);
   };
 
-  // Handler Function to Edit Expense
   const handleEditExpense = (expense: Expense) => {
     setSelectedEditExpense(expense);
     setIsEditModalOpen(true);
   };
 
-  // Handler Function to Delete Expense
   const handleDeleteExpense = (expense: Expense) => {
     setSelectedDeleteExpense(expense);
     setIsDeleteModalOpen(true);
   };
 
-  // Handler Functions to Close View Modal
   const handleCloseViewModal = () => {
     setIsViewModalOpen(false);
     setSelectedViewExpense(null);
   };
 
-  // Handler Functions to Close Edit Modal
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
     setSelectedEditExpense(null);
   };
 
-  // Handler Functions to Close Delete Modal
   const handleCloseDeleteModal = () => {
     setIsDeleteModalOpen(false);
     setSelectedDeleteExpense(null);
   };
 
-  // Loading state
   if (expensesLoading || categoriesLoading || villasLoading) {
     return (
-      <div className="max-w-7xl mx-auto space-y-6">
+      <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
         <div className="flex justify-center items-center h-64">
-          <div className="text-lg">Loading expenses...</div>
+          <div className="text-base sm:text-lg">Loading expenses...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
       <ExpensesPageHeaderComponent
         onModalOpen={() => setIsAddModalOpen(true)}
         filters={filters}
@@ -272,7 +228,6 @@ export default function ManageExpensesPage() {
         onDeleteExpense={handleDeleteExpense}
       />
 
-      {/* Add Expense Modal */}
       <AddExpenseModalComponent
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
@@ -280,14 +235,12 @@ export default function ManageExpensesPage() {
         isLoading={addExpenseMutation.isPending}
       />
 
-      {/* View Expense Modal */}
       <ViewExpenseModalComponent
         isOpen={isViewModalOpen}
         onClose={handleCloseViewModal}
         expense={selectedViewExpense}
       />
 
-      {/* Edit Expense Modal */}
       <EditExpenseModalComponent
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}
@@ -296,7 +249,6 @@ export default function ManageExpensesPage() {
         isLoading={updateExpenseMutation.isPending}
       />
 
-      {/* Delete Expense Modal */}
       <DeleteExpenseModalComponent
         isOpen={isDeleteModalOpen}
         onClose={handleCloseDeleteModal}

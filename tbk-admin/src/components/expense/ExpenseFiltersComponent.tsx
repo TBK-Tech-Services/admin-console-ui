@@ -112,8 +112,8 @@ export default function ExpenseFiltersComponent({
 
     return (
         <Card>
-            <CardContent className="pt-6">
-                <div className="space-y-4">
+            <CardContent className="pt-4 sm:pt-6">
+                <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <Filter className="h-4 w-4 text-muted-foreground" />
@@ -124,23 +124,23 @@ export default function ExpenseFiltersComponent({
                                 variant="ghost"
                                 size="sm"
                                 onClick={onClearFilters}
-                                className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                                className="h-8 px-2 text-muted-foreground hover:text-foreground text-xs sm:text-sm"
                             >
-                                <X className="h-4 w-4 mr-1" />
-                                Clear Filters
+                                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                Clear
                             </Button>
                         )}
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                    <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
                         {/* Month Selection */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                             <Label className="text-xs text-muted-foreground">Month</Label>
                             <Select
                                 value={filters.month || (filters.startDate || filters.endDate ? "custom" : "all")}
                                 onValueChange={handleMonthChange}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full h-9 sm:h-10 text-sm">
                                     <SelectValue placeholder="Select Month" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -156,37 +156,37 @@ export default function ExpenseFiltersComponent({
                         </div>
 
                         {/* Start Date */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                             <Label className="text-xs text-muted-foreground">Start Date</Label>
                             <Input
                                 type="date"
                                 value={filters.startDate || ""}
                                 onChange={(e) => handleDateChange("startDate", e.target.value)}
                                 disabled={!!filters.month}
-                                className="w-full"
+                                className="w-full h-9 sm:h-10 text-sm"
                             />
                         </div>
 
                         {/* End Date */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                             <Label className="text-xs text-muted-foreground">End Date</Label>
                             <Input
                                 type="date"
                                 value={filters.endDate || ""}
                                 onChange={(e) => handleDateChange("endDate", e.target.value)}
                                 disabled={!!filters.month}
-                                className="w-full"
+                                className="w-full h-9 sm:h-10 text-sm"
                             />
                         </div>
 
                         {/* Category Selection */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                             <Label className="text-xs text-muted-foreground">Category</Label>
                             <Select
                                 value={filters.categoryId || "all"}
                                 onValueChange={handleCategoryChange}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full h-9 sm:h-10 text-sm">
                                     <SelectValue placeholder="Select Category" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -201,13 +201,13 @@ export default function ExpenseFiltersComponent({
                         </div>
 
                         {/* Type Selection */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                             <Label className="text-xs text-muted-foreground">Type</Label>
                             <Select
                                 value={filters.type || "all"}
                                 onValueChange={handleTypeChange}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full h-9 sm:h-10 text-sm">
                                     <SelectValue placeholder="Select Type" />
                                 </SelectTrigger>
                                 <SelectContent>
@@ -219,13 +219,13 @@ export default function ExpenseFiltersComponent({
                         </div>
 
                         {/* Villa Selection */}
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                             <Label className="text-xs text-muted-foreground">Villa</Label>
                             <Select
                                 value={filters.villaId || "all"}
                                 onValueChange={handleVillaChange}
                             >
-                                <SelectTrigger className="w-full">
+                                <SelectTrigger className="w-full h-9 sm:h-10 text-sm">
                                     <SelectValue placeholder="Select Villa" />
                                 </SelectTrigger>
                                 <SelectContent>
