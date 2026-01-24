@@ -13,12 +13,12 @@ interface FinanceChartsComponentProps {
   }>;
 }
 
-export default function FinanceChartsComponent({ 
-  monthlyData, 
-  profitTrendData 
+export default function FinanceChartsComponent({
+  monthlyData,
+  profitTrendData
 }: FinanceChartsComponentProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
       <MonthlyIncomeExpensesChartComponent monthlyData={monthlyData} />
       <ProfitTrendChartComponent profitTrendData={profitTrendData} />
     </div>

@@ -25,7 +25,6 @@ export default function FinanceFiltersComponent({
 }: FinanceFiltersComponentProps) {
   const [villas, setVillas] = useState<any[]>([]);
 
-  // Fetch villas for dropdown
   useEffect(() => {
     const fetchVillas = async () => {
       try {
@@ -42,18 +41,18 @@ export default function FinanceFiltersComponent({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
           Filters & Analysis
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="villa-filter">Villa</Label>
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="villa-filter" className="text-xs sm:text-sm">Villa</Label>
             <Select value={selectedVilla} onValueChange={onVillaChange}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9 sm:h-10 text-sm">
                 <SelectValue placeholder="All Villas" />
               </SelectTrigger>
               <SelectContent>
@@ -67,10 +66,10 @@ export default function FinanceFiltersComponent({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="month-filter">Month</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="month-filter" className="text-xs sm:text-sm">Month</Label>
             <Select value={selectedMonth} onValueChange={onMonthChange}>
-              <SelectTrigger>
+              <SelectTrigger className="h-9 sm:h-10 text-sm">
                 <SelectValue placeholder="All Months" />
               </SelectTrigger>
               <SelectContent>
@@ -91,25 +90,27 @@ export default function FinanceFiltersComponent({
             </Select>
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="start-date">Start Date</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="start-date" className="text-xs sm:text-sm">Start Date</Label>
             <Input
               id="start-date"
               type="date"
               value={dateRange.start}
               onChange={(e) => onDateRangeChange({ ...dateRange, start: e.target.value })}
-              disabled={!!selectedMonth}
+              disabled={!!selectedMonth && selectedMonth !== "all"}
+              className="h-9 sm:h-10 text-sm"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="end-date">End Date</Label>
+          <div className="space-y-1.5 sm:space-y-2">
+            <Label htmlFor="end-date" className="text-xs sm:text-sm">End Date</Label>
             <Input
               id="end-date"
               type="date"
               value={dateRange.end}
               onChange={(e) => onDateRangeChange({ ...dateRange, end: e.target.value })}
-              disabled={!!selectedMonth}
+              disabled={!!selectedMonth && selectedMonth !== "all"}
+              className="h-9 sm:h-10 text-sm"
             />
           </div>
         </div>

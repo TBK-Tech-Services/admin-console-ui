@@ -16,12 +16,12 @@ interface FinanceVillaPerformanceComponentProps {
   }>;
 }
 
-export default function FinanceVillaPerformanceComponent({ 
-  villaData, 
-  expenseCategories 
+export default function FinanceVillaPerformanceComponent({
+  villaData,
+  expenseCategories
 }: FinanceVillaPerformanceComponentProps) {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
       <VillaPerformanceListComponent villaData={villaData} />
       <ExpenseDistributionChartComponent expenseCategories={expenseCategories} />
     </div>
