@@ -17,10 +17,10 @@ export function OwnersTableComponent({
 }) {
     if (owners.length === 0) {
         return (
-            <div className="text-center py-8 text-muted-foreground">
-                <UserCog className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg font-medium">No owners found</p>
-                <p className="text-sm">Create some owners first in User Management.</p>
+            <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                <UserCog className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                <p className="text-base sm:text-lg font-medium">No owners found</p>
+                <p className="text-xs sm:text-sm">Create some owners first in User Management.</p>
             </div>
         );
     }
@@ -30,9 +30,9 @@ export function OwnersTableComponent({
             <Table>
                 <TableHeader className="bg-muted/30">
                     <TableRow className="border-border/40">
-                        <TableHead className="font-semibold">Owner Details</TableHead>
-                        <TableHead className="font-semibold">Assigned Villas</TableHead>
-                        <TableHead className="font-semibold text-right">Actions</TableHead>
+                        <TableHead className="font-semibold text-xs sm:text-sm w-[120px] sm:w-[150px]">Owner Details</TableHead>
+                        <TableHead className="font-semibold text-xs sm:text-sm">Assigned Villas</TableHead>
+                        <TableHead className="font-semibold text-right text-xs sm:text-sm w-[60px] sm:w-[80px] hidden sm:table-cell">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

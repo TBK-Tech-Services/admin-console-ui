@@ -7,10 +7,10 @@ interface UserListComponentProps {
 
 export default function UserListComponent({ usersList, onEditUser }: UserListComponentProps) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {usersList?.map((user) => (
-        <UserItemComponent 
-          key={user.id} 
+        <UserItemComponent
+          key={user.id}
           user={user}
           onEdit={() => onEditUser(user)}
         />

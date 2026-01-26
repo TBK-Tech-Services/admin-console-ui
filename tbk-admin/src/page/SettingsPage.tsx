@@ -11,20 +11,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSelector } from "react-redux";
 
 export default function SettingsPage() {
-
-  // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
-
-  // useQueryClient
   const queryClient = useQueryClient();
-
-  // useSelector
   const user = useSelector((state: RootState) => state.auth.user);
-
-  // Get User Role
   const userRole = user?.role;
 
-  // useQuery
   const { data: villasData } = useQuery({
     queryKey: ['villas'],
     queryFn: async () => getAllVillasService()
@@ -35,7 +26,6 @@ export default function SettingsPage() {
     queryFn: async () => getGeneralSettingsService()
   });
 
-  // Update General Settings Mutation
   const updateGeneralSettingsMutation = useMutation({
     mutationFn: (formData: any) => {
       const settingId = generalSettingsData?.[0]?.id;
@@ -48,16 +38,15 @@ export default function SettingsPage() {
     onError: handleMutationError
   });
 
-  // Handle Update General Settings
   const handleUpdateGeneralSettings = (formData: any) => {
     updateGeneralSettingsMutation.mutate(formData);
   };
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-4 sm:space-y-6 max-w-4xl w-full overflow-hidden">
       <SettingsPageHeaderComponent />
 
-      <div className="grid gap-6">
+      <div className="grid gap-4 sm:gap-6">
         <GeneralSettingsComponent
           generalSettingsData={generalSettingsData}
           onUpdateSettings={handleUpdateGeneralSettings}

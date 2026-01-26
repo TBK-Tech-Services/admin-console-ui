@@ -7,46 +7,41 @@ import { OwnersTableComponent } from "./OwnersTableComponent";
 import { AssignVillasDialogComponent } from "./AssignVillasDialogComponent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
-import { 
-  assignVillasToOwnerService, 
-  getAllOwnersWithVillasService, 
-  getAllUnAssignedVillasService, 
-  getOwnerVillaManagementStatsService, 
-  unassignAllVillasToOwnerService, 
-  unassignSpecificVillaToOwnerService, 
-  updateVillaAssignmentToOwnerService 
+import {
+  assignVillasToOwnerService,
+  getAllOwnersWithVillasService,
+  getAllUnAssignedVillasService,
+  getOwnerVillaManagementStatsService,
+  unassignAllVillasToOwnerService,
+  unassignSpecificVillaToOwnerService,
+  updateVillaAssignmentToOwnerService
 } from "@/services/villaOwnerManagementSettings.service";
 
 export default function VillaOwnerManagementSettingsComponent() {
   const queryClient = useQueryClient();
   const { handleMutationError, handleSuccess } = useErrorHandler();
 
-  // State Variables
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedVillas, setSelectedVillas] = useState([]);
   const [ownerToUpdate, setOwnerToUpdate] = useState(null);
 
-  // useQuery - Fetch All Un-Assigned Villas
   const { data: unAssignedVillasList, isLoading: isLoadingUnassignedVillas } = useQuery({
     queryKey: ['villa-owner-management', 'unassignedVillas'],
     queryFn: getAllUnAssignedVillasService
   });
 
-  // useQuery - Fetch All Owners with Villas
   const { data: ownersResponse, isLoading: isLoadingOwners } = useQuery({
     queryKey: ['villa-owner-management', 'owners'],
     queryFn: getAllOwnersWithVillasService
   });
 
-  // useQuery - Fetch Stats
   const { data: statsResponse, isLoading: isLoadingStats } = useQuery({
     queryKey: ['villa-owner-management', 'stats'],
     queryFn: getOwnerVillaManagementStatsService
   });
 
-  // Extract data from responses
   const owners = ownersResponse || [];
   const stats = statsResponse || {
     totalOwners: 0,
@@ -55,7 +50,6 @@ export default function VillaOwnerManagementSettingsComponent() {
   };
   const unassignedVillas = unAssignedVillasList || [];
 
-  // Assign Villas Mutation
   const assignVillasMutation = useMutation({
     mutationFn: (assignData) => assignVillasToOwnerService(assignData),
     onSuccess: () => {
@@ -67,7 +61,6 @@ export default function VillaOwnerManagementSettingsComponent() {
     onError: handleMutationError
   });
 
-  // Update Assignments Mutation
   const updateAssignmentsMutation = useMutation({
     mutationFn: (updateData) => updateVillaAssignmentToOwnerService(updateData),
     onSuccess: () => {
@@ -79,7 +72,6 @@ export default function VillaOwnerManagementSettingsComponent() {
     onError: handleMutationError
   });
 
-  // Unassign Specific Villa Mutation
   const unassignSpecificVillaMutation = useMutation({
     mutationFn: (unassignData) => unassignSpecificVillaToOwnerService(unassignData),
     onSuccess: () => {
@@ -89,7 +81,6 @@ export default function VillaOwnerManagementSettingsComponent() {
     onError: handleMutationError
   });
 
-  // Unassign All Villas Mutation
   const unassignAllVillasMutation = useMutation({
     mutationFn: (deleteData) => unassignAllVillasToOwnerService(deleteData),
     onSuccess: () => {
@@ -99,13 +90,11 @@ export default function VillaOwnerManagementSettingsComponent() {
     onError: handleMutationError
   });
 
-  // Derived Data
   const allVillas = [
-    ...owners.flatMap((owner) => owner.ownedVillas), 
-    ...unassignedVillas                              
+    ...owners.flatMap((owner) => owner.ownedVillas),
+    ...unassignedVillas
   ];
 
-  // Handler Function to Handle Villa Selection Toggle
   const handleVillaSelection = (villaId, checked) => {
     setSelectedVillas(prev =>
       checked
@@ -114,17 +103,14 @@ export default function VillaOwnerManagementSettingsComponent() {
     );
   };
 
-  // Handler Function to Assign Villas
   const handleAssignVillas = () => {
     const assignData = {
       ownerId: parseInt(selectedOwner),
       villaIds: selectedVillas.map(id => parseInt(id))
     };
-
     assignVillasMutation.mutate(assignData);
   };
 
-  // Handler Function to Open Update Dialog
   const handleUpdateOwner = (owner) => {
     setOwnerToUpdate(owner);
     setSelectedOwner(owner.id.toString());
@@ -132,36 +118,24 @@ export default function VillaOwnerManagementSettingsComponent() {
     setIsUpdateDialogOpen(true);
   };
 
-  // Handler Function to Update Villa Assignments
   const handleUpdateVillas = () => {
     const updateData = {
       ownerId: parseInt(selectedOwner),
       villaIds: selectedVillas.map(id => parseInt(id))
     };
-
     updateAssignmentsMutation.mutate(updateData);
   };
 
-  // Handler Function to Delete Owner (Unassign All Villas)
   const handleDeleteOwner = (owner) => {
-    const deleteData = {
-      ownerId: owner.id
-    };
-
+    const deleteData = { ownerId: owner.id };
     unassignAllVillasMutation.mutate(deleteData);
   };
 
-  // Handler Function to Unassign Specific Villa
   const handleUnassignVilla = (villaId, ownerId) => {
-    const unassignData = {
-      villaId,
-      ownerId
-    };
-
+    const unassignData = { villaId, ownerId };
     unassignSpecificVillaMutation.mutate(unassignData);
   };
 
-  // Reset Functions
   const resetAssignDialog = () => {
     setSelectedOwner("");
     setSelectedVillas([]);
@@ -173,22 +147,21 @@ export default function VillaOwnerManagementSettingsComponent() {
     setSelectedVillas([]);
   };
 
-  // Loading State
   if (isLoadingOwners || isLoadingStats || isLoadingUnassignedVillas) {
     return (
-      <Card className="shadow-soft border-border/40">
+      <Card className="shadow-soft border-border/40 overflow-hidden">
         <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-muted/10">
-          <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <UserCog className="h-5 w-5 text-primary" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+              <UserCog className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <CardTitle className="text-foreground">Villa Owner Management</CardTitle>
+            <CardTitle className="text-foreground text-base sm:text-lg">Villa Owner Management</CardTitle>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-3 text-muted-foreground">Loading...</span>
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex items-center justify-center py-8 sm:py-12">
+            <Loader2 className="h-6 w-6 sm:h-8 sm:w-8 animate-spin text-primary" />
+            <span className="ml-2 sm:ml-3 text-sm sm:text-base text-muted-foreground">Loading...</span>
           </div>
         </CardContent>
       </Card>
@@ -196,17 +169,17 @@ export default function VillaOwnerManagementSettingsComponent() {
   }
 
   return (
-    <Card className="shadow-soft border-border/40">
-      <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-muted/10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <UserCog className="h-5 w-5 text-primary" />
+    <Card className="shadow-soft border-border/40 overflow-hidden">
+      <CardHeader className="border-b border-border/40 bg-gradient-to-r from-muted/30 to-muted/10 pb-3 sm:pb-6">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10">
+            <UserCog className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
           </div>
-          <CardTitle className="text-foreground">Villa Owner Management</CardTitle>
+          <CardTitle className="text-foreground text-base sm:text-lg">Villa Owner Management</CardTitle>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-hidden">
         {/* Actions Header */}
         <div className="flex justify-end">
           <AssignVillasDialogComponent
@@ -225,13 +198,17 @@ export default function VillaOwnerManagementSettingsComponent() {
         </div>
 
         {/* Owners Table */}
-        <OwnersTableComponent
-          owners={owners}
-          onUpdateOwner={handleUpdateOwner}
-          onDeleteOwner={handleDeleteOwner}
-          onUnassignVilla={handleUnassignVilla}
-          isUnassigningVilla={unassignSpecificVillaMutation.isPending}
-        />
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="min-w-full px-4 sm:px-0">
+            <OwnersTableComponent
+              owners={owners}
+              onUpdateOwner={handleUpdateOwner}
+              onDeleteOwner={handleDeleteOwner}
+              onUnassignVilla={handleUnassignVilla}
+              isUnassigningVilla={unassignSpecificVillaMutation.isPending}
+            />
+          </div>
+        </div>
 
         {/* Update Dialog */}
         <UpdateVillaAssignmentsDialogComponent

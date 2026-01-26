@@ -14,40 +14,26 @@ import { deleteAVillaService, getAllBookingsForVillaService, getRecentBookingsFo
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function SpecificVillaPage() {
-
-  // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
-
-  // useParams
   const { id } = useParams();
-  
-  // useSelector
   const villas = useSelector((state: RootState) => state.villas);
-
-  // Find specific villa by ID
   const villa = villas.listOfVilla?.find((v) => v.id === parseInt(id || "0"));
-
-  // useNavigate
   const navigate = useNavigate();
 
-  // State Variables
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // useQuery
   const { data: recentBookingsData } = useQuery({
     queryKey: ['recent-bookings'],
-    queryFn: async() => getRecentBookingsForVillaService(id)
+    queryFn: async () => getRecentBookingsForVillaService(id)
   })
 
   const { data: allBookingsData } = useQuery({
     queryKey: ['all-bookings'],
-    queryFn: async() => getAllBookingsForVillaService(id)
+    queryFn: async () => getAllBookingsForVillaService(id)
   })
-  
 
-  // Delete Villa Mutation
   const deleteVillaMutation = useMutation({
     mutationFn: () => {
       return deleteAVillaService(id);
@@ -58,32 +44,27 @@ export default function SpecificVillaPage() {
     onError: handleMutationError
   })
 
-  // Handler Function to Delete Villa
   const handleDeleteVilla = async () => {
     setIsDeleting(true);
-
     deleteVillaMutation.mutate();
-    
     setTimeout(() => {
       navigate("/villas");
     }, 2000);
   };
 
-  // Create mock stats since they're not in your API response
   const mockStats = {
-    totalBookings: 0, 
+    totalBookings: 0,
     totalRevenue: "₹0",
     occupancyRate: "0%",
     averageStay: "0 days"
   };
 
-  // If villa not found, show error message
   if (!villa) {
     return (
-      <div className="text-center py-12">
-        <h2 className="text-xl font-semibold mb-2">Villa not found</h2>
-        <p className="text-muted-foreground mb-4">The requested villa does not exist or may have been deleted.</p>
-        <Button onClick={() => navigate("/villas")} variant="outline">
+      <div className="text-center py-8 sm:py-12">
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">Villa not found</h2>
+        <p className="text-sm sm:text-base text-muted-foreground mb-4">The requested villa does not exist or may have been deleted.</p>
+        <Button onClick={() => navigate("/villas")} variant="outline" className="h-9 sm:h-10">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Villas
         </Button>
@@ -92,28 +73,28 @@ export default function SpecificVillaPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => navigate("/villas")}
-          className="hover:bg-secondary"
+          className="hover:bg-secondary h-8 sm:h-9 text-xs sm:text-sm"
           disabled={isDeleting}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
           Back to Villas
         </Button>
       </div>
 
       {/* Loading overlay during deletion */}
       {isDeleting && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 text-center max-w-md">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <h3 className="text-lg font-semibold mb-2">Deleting Villa</h3>
-            <p className="text-muted-foreground">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 text-center max-w-md">
+            <div className="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary mx-auto mb-3 sm:mb-4"></div>
+            <h3 className="text-base sm:text-lg font-semibold mb-2">Deleting Villa</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Please wait while we delete "{villa.name}" and all associated data...
             </p>
           </div>
@@ -121,7 +102,7 @@ export default function SpecificVillaPage() {
       )}
 
       {/* Villa Header */}
-      <VillaHeaderComponent 
+      <VillaHeaderComponent
         villa={villa}
         onEditClick={() => setIsEditModalOpen(true)}
         showAllBookings={showAllBookings}
@@ -129,19 +110,19 @@ export default function SpecificVillaPage() {
         onDeleteVilla={handleDeleteVilla}
       />
 
-      {/* Stats Cards - You'll need to fetch this data separately or disable this section */}
+      {/* Stats Cards */}
       <VillaStatsComponent stats={mockStats} />
 
-      {/* All Bookings View - You'll need to fetch bookings for this villa */}
+      {/* All Bookings View */}
       {showAllBookings && (
-        <VillaBookingsTableComponent 
+        <VillaBookingsTableComponent
           villa={villa}
           allBookings={allBookingsData}
         />
       )}
 
       {/* Detailed Information */}
-      <VillaTabsComponent villa={villa} bookingsData={recentBookingsData}/>
+      <VillaTabsComponent villa={villa} bookingsData={recentBookingsData} />
 
       {/* Edit Modal */}
       <EditVillaModalComponent

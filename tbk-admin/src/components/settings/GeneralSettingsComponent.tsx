@@ -5,47 +5,42 @@ import GeneralSettingsFormComponent from "./GeneralSettingsFormComponent";
 import { useState } from "react";
 
 export default function GeneralSettingsComponent({ generalSettingsData, onUpdateSettings, isUpdating }) {
-
-  // State Variables
   const [currentFormData, setCurrentFormData] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
 
-  // 🔥 FIX: Extract first item from array
   const settingsData = generalSettingsData?.[0] || null;
 
-  // Handler Function to Handle Form Changes
   const handleFormChange = (data: any, changesDetected: boolean) => {
     setCurrentFormData(data);
     setHasChanges(changesDetected);
   };
 
-  // Handler Function to Save Changes
   const handleSave = () => {
     onUpdateSettings(currentFormData);
   };
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <SettingsIcon className="h-5 w-5" />
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <SettingsIcon className="h-4 w-4 sm:h-5 sm:w-5" />
           General Settings
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-xs sm:text-sm">
           Manage your business information and admin contacts for voucher approvals.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         <GeneralSettingsFormComponent
-          generalSettingsData={settingsData}  // 🔥 Pass object, not array
+          generalSettingsData={settingsData}
           onFormChange={handleFormChange}
         />
 
-        <div className="flex items-center gap-4 pt-4 border-t">
+        <div className="flex flex-col xs:flex-row items-start xs:items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
           <Button
             onClick={handleSave}
             disabled={!hasChanges || isUpdating}
-            className="bg-gradient-primary hover:opacity-90"
+            className="bg-gradient-primary hover:opacity-90 w-full xs:w-auto"
           >
             {isUpdating ? (
               <>
@@ -61,7 +56,7 @@ export default function GeneralSettingsComponent({ generalSettingsData, onUpdate
           </Button>
 
           {hasChanges && (
-            <span className="text-sm text-muted-foreground">
+            <span className="text-xs sm:text-sm text-muted-foreground">
               You have unsaved changes
             </span>
           )}

@@ -10,21 +10,17 @@ import EditUserModalComponent from "./EditUserModalComponent";
 const availableRoles = ["Admin", "Manager", "Viewer", "Agent"];
 
 export default function UserManagementSettingsComponent() {
-
-  // State Variables
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [newUserCredentials, setNewUserCredentials] = useState<{email: string, password: string} | null>(null);
+  const [newUserCredentials, setNewUserCredentials] = useState<{ email: string, password: string } | null>(null);
   const [roles, setRoles] = useState(availableRoles);
 
-  // useQuery
   const { data: usersList } = useQuery({
     queryKey: ['users'],
     queryFn: getAllUsersService,
   });
 
-  // Handler Function to Edit User
   const handleEditUser = (user: any) => {
     setSelectedUser(user);
     setEditModalOpen(true);
@@ -32,18 +28,18 @@ export default function UserManagementSettingsComponent() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Users className="h-4 w-4 sm:h-5 sm:w-5" />
           User Management
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <UserListComponent 
+      <CardContent className="space-y-3 sm:space-y-4">
+        <UserListComponent
           usersList={usersList}
           onEditUser={handleEditUser}
         />
-        
+
         <InviteUserModalComponent
           inviteModalOpen={inviteModalOpen}
           setInviteModalOpen={setInviteModalOpen}
