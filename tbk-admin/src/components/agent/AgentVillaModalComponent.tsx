@@ -25,26 +25,18 @@ export default function AgentVillaModalComponent({ villa, isOpen, onClose }) {
         return null;
     };
 
-    // Handler to download villa voucher
-    const handleDownloadVoucher = async () => {
-        setIsDownloading(true);
-        try {
-            setTimeout(() => {
-                toast({
-                    title: "Voucher Downloaded",
-                    description: `Villa voucher for ${villa.name} has been downloaded`,
-                });
-                setIsDownloading(false);
-            }, 2000);
-        } catch (error) {
-            console.error("Error downloading voucher:", error);
+    // Handler to download villa brochure
+    const handleDownloadBrochure = () => {
+        if (!villa.brochureUrl) {
             toast({
-                title: "Download Failed",
-                description: "Failed to download villa voucher",
+                title: "Brochure Not Available",
+                description: "Brochure for this villa is not available yet.",
                 variant: "destructive",
             });
-            setIsDownloading(false);
+            return;
         }
+        console.log(villa.brochureUrl);
+        window.open(villa.brochureUrl, '_blank');
     };
 
     // Group amenities by category - backend data structure
@@ -121,21 +113,12 @@ export default function AgentVillaModalComponent({ villa, isOpen, onClose }) {
                                         </CardTitle>
                                         <Button
                                             variant="default"
-                                            onClick={handleDownloadVoucher}
-                                            disabled={isDownloading}
+                                            onClick={handleDownloadBrochure}
+                                            disabled={!villa.brochureUrl}
                                             className="gap-2 w-full sm:w-auto text-sm"
                                         >
-                                            {isDownloading ? (
-                                                <>
-                                                    <Download className="h-4 w-4 animate-bounce" />
-                                                    Downloading...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Download className="h-4 w-4" />
-                                                    Download Brochure
-                                                </>
-                                            )}
+                                            <Download className="h-4 w-4" />
+                                            Download Brochure
                                         </Button>
                                     </div>
                                 </CardHeader>
