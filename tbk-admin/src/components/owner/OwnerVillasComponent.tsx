@@ -24,7 +24,7 @@ export default function OwnerVillasComponent({ data, isLoading }: OwnerVillasCom
   if (isLoading) {
     return (
       <Card className="border-border shadow-soft">
-        <CardContent className="py-8 text-center">Loading villas...</CardContent>
+        <CardContent className="py-6 sm:py-8 text-center text-sm">Loading villas...</CardContent>
       </Card>
     );
   }
@@ -35,58 +35,58 @@ export default function OwnerVillasComponent({ data, isLoading }: OwnerVillasCom
 
   return (
     <Card className="border-border shadow-soft">
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5 text-primary" />
+      <CardHeader className="pb-3 sm:pb-6">
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
               My Villas
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               Overview of your villa properties
             </CardDescription>
           </div>
-          <Badge variant="secondary" className="bg-gradient-primary text-primary-foreground">
+          <Badge variant="secondary" className="bg-gradient-primary text-primary-foreground text-xs shrink-0">
             {totalCount} Properties
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-3 sm:space-y-4">
         {villas.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">No villas found</div>
+          <div className="text-center py-6 sm:py-8 text-sm text-muted-foreground">No villas found</div>
         ) : (
           villas.map((villa: any) => (
             <div
               key={villa.id}
-              className="p-4 rounded-lg border border-border bg-card hover:bg-muted/30 transition-all duration-200"
+              className="p-3 sm:p-4 rounded-lg border border-border bg-card hover:bg-muted/30 transition-all duration-200"
             >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground mb-1">{villa.name}</h3>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <MapPin className="h-3 w-3" />
-                    {villa.location}
+              <div className="flex items-start justify-between gap-2 mb-2 sm:mb-3">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-sm sm:text-base text-foreground mb-1 truncate">{villa.name}</h3>
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                    <MapPin className="h-3 w-3 shrink-0" />
+                    <span className="truncate">{villa.location}</span>
                   </div>
                 </div>
-                <Badge className={getStatusColor(villa.status)}>
+                <Badge className={`${getStatusColor(villa.status)} text-[10px] sm:text-xs shrink-0`}>
                   {villa.status}
                 </Badge>
               </div>
-              
-              <div className="grid grid-cols-3 gap-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-foreground">{villa.maxGuests} guests</span>
+
+              <div className="grid grid-cols-3 gap-2 sm:gap-3 text-xs sm:text-sm">
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                  <span className="text-foreground truncate">{villa.maxGuests} guests</span>
                 </div>
-                
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-foreground">{villa.currentBookings} bookings</span>
+
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                  <span className="text-foreground truncate">{villa.currentBookings} bookings</span>
                 </div>
-                
-                <div className="flex items-center gap-2">
-                  <IndianRupee className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-foreground">₹{villa.pricePerNight?.toLocaleString('en-IN')}</span>
+
+                <div className="flex items-center gap-1 sm:gap-2">
+                  <IndianRupee className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
+                  <span className="text-foreground truncate">₹{villa.pricePerNight?.toLocaleString('en-IN')}</span>
                 </div>
               </div>
             </div>
