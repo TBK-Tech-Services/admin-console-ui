@@ -30,13 +30,13 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ErrorBoundary>
       <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
+        {/* <PersistGate loading={null} persistor={persistor}> */}
           <QueryClientProvider client={queryClient}>
             <Toaster /> 
             <App />
             <ReactQueryDevtools initialIsOpen={false}/>
           </QueryClientProvider>
-        </PersistGate>
+        {/* </PersistGate> */}
       </Provider>
     </ErrorBoundary>
   </StrictMode>,
