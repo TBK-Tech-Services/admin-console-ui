@@ -3,20 +3,21 @@ import AgentHeroSectionComponent from "@/components/agent/AgentHeroSectionCompon
 import AgentVillaModalComponent from "@/components/agent/AgentVillaModalComponent";
 import AgentVillaShowcaseComponent from "@/components/agent/AgentVillaShowcaseComponent";
 import { filterVillasService } from "@/services/agent.service";
+import { getAVillaService } from "@/services/villa.service";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 export default function AgentLandingPage() {
 
     // State Variables
-    const [selectedVilla, setSelectedVilla] = useState(null);
+    const [selectedVillaId, setSelectedVillaId] = useState<number | null>(null);
     const [checkInDate, setCheckInDate] = useState();
     const [checkOutDate, setCheckOutDate] = useState();
     const [guestCount, setGuestCount] = useState(0);
     const [bedrooms, setBedrooms] = useState(0);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // useQuery
+    // useQuery for filtered villas
     const { data: filteredVillasData, isLoading: villasLoading } = useQuery({
         queryKey: ['filteredVillas', checkInDate, checkOutDate, guestCount, bedrooms],
         queryFn: async () =>
@@ -28,17 +29,31 @@ export default function AgentLandingPage() {
             }),
     });
 
-    console.log(filteredVillasData);
+    // useQuery for single villa details (with managers/caretakers)
+    const { data: selectedVillaResponse } = useQuery({
+        queryKey: ['villa', selectedVillaId],
+        queryFn: () => getAVillaService(selectedVillaId!),
+        enabled: !!selectedVillaId && isModalOpen,
+    });
+
+    // Extract villa from response
+    const selectedVilla = selectedVillaResponse?.data || selectedVillaResponse;
 
     // Handler Function to Handle View Details
     const handleViewDetails = (villa) => {
-        setSelectedVilla(villa);
+        setSelectedVillaId(villa.id);
         setIsModalOpen(true);
     };
 
     // Handler Function to Handle Search
     const handleSearch = () => {
         console.log('Search triggered - useQuery will handle the API call automatically');
+    };
+
+    // Handler to close modal
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedVillaId(null);
     };
 
     return (
@@ -66,7 +81,7 @@ export default function AgentLandingPage() {
             <AgentVillaModalComponent
                 villa={selectedVilla}
                 isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                onClose={handleCloseModal}
             />
         </div>
     );

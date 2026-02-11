@@ -1,50 +1,60 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import VillaHeaderComponent from "@/components/villa/VillaHeaderComponent";
 import VillaStatsComponent from "@/components/villa/VillaStatsComponent";
 import VillaBookingsTableComponent from "@/components/villa/VillaBookingsTableComponent";
 import VillaTabsComponent from "@/components/villa/VillaTabsComponent";
 import EditVillaModalComponent from "@/components/villa/EditVillaModalComponent";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteAVillaService, getAllBookingsForVillaService, getRecentBookingsForVillaService } from "@/services/villa.service";
+import { deleteAVillaService, getAllBookingsForVillaService, getAVillaService, getRecentBookingsForVillaService } from "@/services/villa.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function SpecificVillaPage() {
   const { handleMutationError, handleSuccess } = useErrorHandler();
   const { id } = useParams();
-  const villas = useSelector((state: RootState) => state.villas);
-  const villa = villas.listOfVilla?.find((v) => v.id === parseInt(id || "0"));
   const navigate = useNavigate();
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const { data: recentBookingsData } = useQuery({
-    queryKey: ['recent-bookings'],
-    queryFn: async () => getRecentBookingsForVillaService(id)
-  })
+  // Fetch villa from API
+  const { data: villaResponse, isLoading: villaLoading, isError: villaError } = useQuery({
+    queryKey: ['villa', id],
+    queryFn: () => getAVillaService(Number(id)),
+    enabled: !!id,
+  });
 
-  const { data: allBookingsData } = useQuery({
-    queryKey: ['all-bookings'],
-    queryFn: async () => getAllBookingsForVillaService(id)
-  })
+  // Extract villa from response
+  const villa = villaResponse?.data || villaResponse;
+
+  const { data: recentBookingsResponse } = useQuery({
+    queryKey: ['recent-bookings', id],
+    queryFn: () => getRecentBookingsForVillaService(id!),
+    enabled: !!id && !!villa,
+  });
+
+  const recentBookingsData = recentBookingsResponse?.data || recentBookingsResponse || [];
+
+  const { data: allBookingsResponse } = useQuery({
+    queryKey: ['all-bookings', id],
+    queryFn: () => getAllBookingsForVillaService(id!),
+    enabled: !!id && !!villa && showAllBookings,
+  });
+
+  const allBookingsData = allBookingsResponse?.data || allBookingsResponse || [];
 
   const deleteVillaMutation = useMutation({
-    mutationFn: () => {
-      return deleteAVillaService(id);
-    },
+    mutationFn: () => deleteAVillaService(id!),
     onSuccess: () => {
       handleSuccess("Villa Deleted Successfully!");
     },
     onError: handleMutationError
-  })
+  });
 
-  const handleDeleteVilla = async () => {
+  const handleDeleteVilla = () => {
     setIsDeleting(true);
     deleteVillaMutation.mutate();
     setTimeout(() => {
@@ -59,7 +69,18 @@ export default function SpecificVillaPage() {
     averageStay: "0 days"
   };
 
-  if (!villa) {
+  // Loading state
+  if (villaLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <span className="ml-2 text-muted-foreground">Loading villa details...</span>
+      </div>
+    );
+  }
+
+  // Error or not found
+  if (villaError || !villa) {
     return (
       <div className="text-center py-8 sm:py-12">
         <h2 className="text-lg sm:text-xl font-semibold mb-2">Villa not found</h2>
@@ -113,8 +134,8 @@ export default function SpecificVillaPage() {
       {/* Stats Cards */}
       <VillaStatsComponent stats={mockStats} />
 
-      {/* All Bookings View */}
-      {showAllBookings && (
+      {/* All Bookings View - only show if toggled AND data exists */}
+      {showAllBookings && Array.isArray(allBookingsData) && allBookingsData.length > 0 && (
         <VillaBookingsTableComponent
           villa={villa}
           allBookings={allBookingsData}

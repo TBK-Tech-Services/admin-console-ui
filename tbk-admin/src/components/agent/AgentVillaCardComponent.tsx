@@ -5,13 +5,14 @@ import {
     MapPin,
     Users,
     Eye,
+    ExternalLink,
 } from "lucide-react";
 import AgentVillaAvailabilityComponent from "./AgentVillaAvailabilityComponent";
 
 export default function AgentVillaCardComponent({ villa, onViewDetails }) {
 
     // Handle backend data format
-    const villaImage = villa.image || villa.images?.[0] || 'https://via.placeholder.com/400x300';
+    const villaImage = villa.imageUrl || villa.image || villa.images?.[0]?.url || villa.images?.[0] || 'https://via.placeholder.com/400x300';
 
     // Backend sends amenities as objects with name property
     const amenitiesList = villa.amenities?.slice(0, 4) || [];
@@ -32,6 +33,18 @@ export default function AgentVillaCardComponent({ villa, onViewDetails }) {
         id: villa.id.toString(),
         name: villa.name,
         bookedDates: bookedDatesArray
+    };
+
+    // Handle location click
+    const handleLocationClick = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (villa.location) {
+            if (villa.location.startsWith('http')) {
+                window.open(villa.location, '_blank');
+            } else {
+                window.open(`https://www.google.com/maps/search/${encodeURIComponent(villa.location)}`, '_blank');
+            }
+        }
     };
 
     return (
@@ -63,16 +76,20 @@ export default function AgentVillaCardComponent({ villa, onViewDetails }) {
                         <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
                         <span className="text-xs sm:text-sm">{villa.maxGuests} Guests</span>
                     </div>
-                    <div className="flex items-center gap-1 min-w-0">
-                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
-                        <span className="text-xs sm:text-sm truncate">{villa.location || "Goa, India"}</span>
-                    </div>
+                    <button
+                        onClick={handleLocationClick}
+                        className="flex items-center gap-1 text-primary hover:text-primary/80 transition-colors"
+                    >
+                        <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 shrink-0" />
+                        <span className="text-xs sm:text-sm">View Location</span>
+                        <ExternalLink className="h-3 w-3 shrink-0" />
+                    </button>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-4 sm:mb-6">
-                    {amenitiesList.map((amenity) => (
-                        <div key={amenity.id} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-muted rounded-full">
-                            <span className="text-[10px] sm:text-xs">{amenity.name}</span>
+                    {amenitiesList.map((amenityObj) => (
+                        <div key={amenityObj.amenity?.id || amenityObj.id} className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-muted rounded-full">
+                            <span className="text-[10px] sm:text-xs">{amenityObj.amenity?.name || amenityObj.name}</span>
                         </div>
                     ))}
                     {villa.amenities?.length > 4 && (

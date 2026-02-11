@@ -3,36 +3,21 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Download, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
 
 export default function VillaOverviewTabComponent({ villa }) {
   const { toast } = useToast();
-  const [isDownloading, setIsDownloading] = useState(false);
 
   // Handler to download villa voucher
-  const handleDownloadVoucher = async () => {
-    setIsDownloading(true);
-    try {
-      // TODO: Call your backend API to generate villa voucher PDF
-      // const response = await downloadVillaVoucherService(villa.id);
-      
-      // Temporary mock
-      setTimeout(() => {
-        toast({
-          title: "Voucher Downloaded",
-          description: `Villa voucher for ${villa.name} has been downloaded`,
-        });
-        setIsDownloading(false);
-      }, 2000);
-    } catch (error) {
-      console.error("Error downloading voucher:", error);
+  const handleDownloadVoucher = () => {
+    if (!villa.brochureUrl) {
       toast({
-        title: "Download Failed",
-        description: "Failed to download villa voucher",
+        title: "Voucher Not Available",
+        description: "Voucher for this villa is not available yet.",
         variant: "destructive",
       });
-      setIsDownloading(false);
+      return;
     }
+    window.open(villa.brochureUrl, '_blank');
   };
 
   return (
@@ -54,9 +39,9 @@ export default function VillaOverviewTabComponent({ villa }) {
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {villa.amenities.map((amenityObj) => (
-              <Badge key={amenityObj.amenityId} variant="secondary">
-                {amenityObj.amenity.name}
+            {villa.amenities?.map((amenityObj) => (
+              <Badge key={amenityObj.amenityId || amenityObj.amenity?.id} variant="secondary">
+                {amenityObj.amenity?.name || amenityObj.name}
               </Badge>
             ))}
           </div>
@@ -71,20 +56,11 @@ export default function VillaOverviewTabComponent({ villa }) {
               variant="outline"
               size="sm"
               onClick={handleDownloadVoucher}
-              disabled={isDownloading}
+              disabled={!villa.brochureUrl}
               className="gap-2"
             >
-              {isDownloading ? (
-                <>
-                  <Download className="h-4 w-4 animate-bounce" />
-                  Downloading...
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4" />
-                  Download Voucher
-                </>
-              )}
+              <FileText className="h-4 w-4" />
+              Download Voucher
             </Button>
           </div>
         </CardHeader>
@@ -97,7 +73,10 @@ export default function VillaOverviewTabComponent({ villa }) {
               <div className="flex-1">
                 <h4 className="font-medium text-foreground">Villa Information Document</h4>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Download a comprehensive PDF containing villa details, amenities, pricing, and contact information
+                  {villa.brochureUrl
+                    ? "Download a comprehensive PDF containing villa details, amenities, pricing, and contact information"
+                    : "Voucher not available for this villa yet"
+                  }
                 </p>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Users, Bed, Bath } from "lucide-react";
+import { MapPin, Users, Bed, Bath, ExternalLink } from "lucide-react";
 import { getVillaStatusColor } from "@/utils/getVillaStatusColor";
 
 export default function VillaCardComponent({ villa, onClick }) {
@@ -10,6 +10,14 @@ export default function VillaCardComponent({ villa, onClick }) {
 
   // Format price
   const formattedPrice = `₹${villa.price?.toLocaleString()}/night`;
+
+  // Handle location click
+  const handleLocationClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    if (villa.location) {
+      window.open(villa.location, '_blank');
+    }
+  };
 
   return (
     <Card
@@ -33,10 +41,14 @@ export default function VillaCardComponent({ villa, onClick }) {
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1">
             <CardTitle className="text-base sm:text-lg mb-0.5 sm:mb-1 truncate">{villa.name}</CardTitle>
-            <div className="flex items-start text-muted-foreground text-xs sm:text-sm">
-              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 shrink-0 mt-0.5" />
-              <span className="line-clamp-2">{villa.location}</span>
-            </div>
+            <button
+              onClick={handleLocationClick}
+              className="flex items-center text-primary hover:text-primary/80 text-xs sm:text-sm transition-colors"
+            >
+              <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 shrink-0" />
+              <span className="truncate max-w-[120px] sm:max-w-[150px]">View Location</span>
+              <ExternalLink className="h-3 w-3 ml-1 shrink-0" />
+            </button>
           </div>
           <div className="text-right shrink-0">
             <div className="font-bold text-primary text-sm sm:text-base">{formattedPrice}</div>
