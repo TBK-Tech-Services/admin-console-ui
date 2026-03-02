@@ -2,7 +2,7 @@ import { CalendarGridComponent } from "@/components/calendar/CalendarGridCompone
 import { CalendarHeaderComponent } from "@/components/calendar/CalendarHeaderComponent";
 import { useState } from "react";
 
-export function CalendarPage() {
+export default function CalendarPage() {
     const [selectedVilla, setSelectedVilla] = useState<string>("all");
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
