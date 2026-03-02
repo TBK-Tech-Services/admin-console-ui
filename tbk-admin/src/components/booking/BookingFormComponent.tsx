@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import GSTPricingConfigurationComponent from './GSTPricingConfigurationComponent';
 import { CheckCircle, Loader2 } from 'lucide-react';
 
-export default function BookingFormComponent({ formData, villaData, totalDaysOfStay, onInputChange, onSubmit, isLoading = false }) {
+// ✅ villas prop add kiya — BookingDetailsComponent ko pass karo
+export default function BookingFormComponent({ formData, villaData, villas = [], totalDaysOfStay, onInputChange, onSubmit, isLoading = false }) {
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
@@ -15,6 +16,7 @@ export default function BookingFormComponent({ formData, villaData, totalDaysOfS
         />
         <BookingDetailsComponent
           formData={formData}
+          villas={villas}
           onInputChange={onInputChange}
         />
       </div>

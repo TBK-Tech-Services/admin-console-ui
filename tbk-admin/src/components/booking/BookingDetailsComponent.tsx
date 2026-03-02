@@ -2,20 +2,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { RootState } from "@/store/store";
 import { Calendar, Home, CalendarCheck, CalendarX, Users } from "lucide-react";
-import { useSelector } from "react-redux";
-import { motion } from 'framer-motion';
 
-export default function BookingDetailsComponent({ formData, onInputChange }) {
-  const villas = useSelector((state: RootState) => state.villas);
-
+// ✅ useSelector, RootState, framer-motion — sab hataye
+export default function BookingDetailsComponent({ formData, onInputChange, villas = [] }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5, delay: 0.1 }}
-    >
+    <div className="animate-in fade-in slide-in-from-right-4 duration-500">
       <Card className="border-border/50 shadow-soft hover:shadow-medium transition-all duration-300">
         <CardHeader className="bg-gradient-to-br from-accent/5 to-transparent pb-3 sm:pb-4">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -36,7 +28,8 @@ export default function BookingDetailsComponent({ formData, onInputChange }) {
                 <SelectValue placeholder="Choose a villa" />
               </SelectTrigger>
               <SelectContent>
-                {villas?.listOfVilla?.map((villa) => (
+                {/* ✅ villas prop directly — Redux nahi */}
+                {villas?.map((villa) => (
                   <SelectItem key={villa.id} value={villa.id}>
                     <div className="flex items-center gap-2">
                       <Home className="h-4 w-4 text-primary" />
@@ -99,6 +92,6 @@ export default function BookingDetailsComponent({ formData, onInputChange }) {
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

@@ -1,42 +1,35 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-    MapPin,
-    Users,
-    Eye,
-    ExternalLink,
-} from "lucide-react";
+import { MapPin, Users, Eye, ExternalLink } from "lucide-react";
 import AgentVillaAvailabilityComponent from "./AgentVillaAvailabilityComponent";
 import villaPlaceholder from '@/assets/villa-placeholder.svg';
+import { useMemo } from "react";
 
 export default function AgentVillaCardComponent({ villa, onViewDetails }) {
+    const villaImage = villa.imageUrl || villa.image || villa.images?.[0]?.url || villa.images?.[0] || villaPlaceholder;
 
-    // Handle backend data format
-    const villaImage = villa.imageUrl || villa.image || villa.images?.[0]?.url || villa.images?.[0] || 'https://via.placeholder.com/400x300';
-
-    // Backend sends amenities as objects with name property
     const amenitiesList = villa.amenities?.slice(0, 4) || [];
 
-    // Booked dates conversion
-    const bookedDatesArray = villa.bookedDates?.map(range => {
-        const dates = [];
-        const start = new Date(range.checkIn);
-        const end = new Date(range.checkOut);
+    const bookedDatesArray = useMemo(() => {
+        return villa.bookedDates?.map(range => {
+            const dates = [];
+            const start = new Date(range.checkIn);
+            const end = new Date(range.checkOut);
 
-        for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-            dates.push(new Date(d));
-        }
-        return dates;
-    }).flat() || [];
+            for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                dates.push(new Date(d));
+            }
+            return dates;
+        }).flat() || [];
+    }, [villa.bookedDates]);
 
-    const villaForAvailability = {
+    const villaForAvailability = useMemo(() => ({
         id: villa.id.toString(),
         name: villa.name,
         bookedDates: bookedDatesArray
-    };
+    }), [villa.id, villa.name, bookedDatesArray]);
 
-    // Handle location click
     const handleLocationClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         if (villa.location) {
@@ -52,7 +45,7 @@ export default function AgentVillaCardComponent({ villa, onViewDetails }) {
         <Card className="overflow-hidden hover:shadow-large transition-all duration-300 group">
             <div className="relative">
                 <img
-                    src={villaImage || villaPlaceholder}
+                    src={villaImage}
                     alt={villa.name}
                     loading="lazy"
                     decoding="async"
@@ -113,4 +106,4 @@ export default function AgentVillaCardComponent({ villa, onViewDetails }) {
             </CardContent>
         </Card>
     );
-}
+};

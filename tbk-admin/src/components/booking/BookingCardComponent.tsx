@@ -8,16 +8,14 @@ import { updateBookingStatusService, updatePaymentStatusService } from '@/servic
 import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { queryKeys } from '@/lib/queryKeys';
 import VoucherApprovalBadgeComponent from './VoucherApprovalBadgeComponent';
+import { memo, useCallback } from "react";
 
-export default function BookingCardComponent({ booking }) {
+const BookingCardComponent = memo(function BookingCardComponent({ booking }) {
   const queryClient = useQueryClient();
   const { handleMutationError, handleSuccess } = useErrorHandler();
 
-  // Booking Status Update Mutation
   const updateBookingStatusMutation = useMutation({
-    mutationFn: (value) => {
-      return updateBookingStatusService(value, booking.id);
-    },
+    mutationFn: (value) => updateBookingStatusService(value, booking.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.search() });
@@ -27,15 +25,8 @@ export default function BookingCardComponent({ booking }) {
     onError: handleMutationError
   });
 
-  const handleBookingStatusUpdate = (value) => {
-    updateBookingStatusMutation.mutate(value);
-  };
-
-  // Payment Status Update Mutation
   const updatePaymentStatusMutation = useMutation({
-    mutationFn: (value) => {
-      return updatePaymentStatusService(value, booking.id);
-    },
+    mutationFn: (value) => updatePaymentStatusService(value, booking.id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.all });
       queryClient.invalidateQueries({ queryKey: queryKeys.bookings.search() });
@@ -45,19 +36,21 @@ export default function BookingCardComponent({ booking }) {
     onError: handleMutationError
   });
 
-  const handlePaymentStatusUpdate = (value) => {
+  const handleBookingStatusUpdate = useCallback((value) => {
+    updateBookingStatusMutation.mutate(value);
+  }, [updateBookingStatusMutation]);
+
+
+  const handlePaymentStatusUpdate = useCallback((value) => {
     updatePaymentStatusMutation.mutate(value);
-  };
+  }, [updatePaymentStatusMutation]);
 
   return (
     <div className="group relative bg-card border border-border rounded-xl p-3 sm:p-5 hover:shadow-lg hover:border-border/60 transition-all duration-200">
       {/* Desktop Layout */}
       <div className="hidden sm:flex items-start gap-4">
-        {/* Left Section - Avatar + Info */}
         <div className="flex items-start gap-4 flex-1 min-w-0">
           <BookingAvatarComponent guestName={booking.guestName} />
-
-          {/* Guest Info Section */}
           <div className="flex-1 min-w-0 space-y-3">
             <BookingHeaderInfoComponent
               guestName={booking.guestName}
@@ -66,7 +59,6 @@ export default function BookingCardComponent({ booking }) {
               onStatusUpdate={handleBookingStatusUpdate}
               isLoading={updateBookingStatusMutation.isPending}
             />
-
             <BookingInfoComponent
               villa={booking.villa?.name}
               guests={booking.totalGuests}
@@ -79,7 +71,6 @@ export default function BookingCardComponent({ booking }) {
           </div>
         </div>
 
-        {/* Right Section - Amount + Status + Actions */}
         <div className="flex flex-col items-end gap-3 shrink-0">
           <BookingAmountComponent
             amount={booking.totalPayableAmount}
@@ -88,12 +79,10 @@ export default function BookingCardComponent({ booking }) {
             onStatusUpdate={handlePaymentStatusUpdate}
             isLoading={updatePaymentStatusMutation.isPending}
           />
-
           <VoucherApprovalBadgeComponent
             status={booking.voucherApprovalStatus || "NOT_APPROVED"}
             approvedBy={booking.voucherApprovedBy}
           />
-
           <div className="opacity-70 group-hover:opacity-100 transition-opacity duration-200">
             <BookingActionsMenuComponent booking={booking} />
           </div>
@@ -102,10 +91,8 @@ export default function BookingCardComponent({ booking }) {
 
       {/* Mobile Layout */}
       <div className="sm:hidden space-y-3">
-        {/* Top Row - Avatar, Name, Amount */}
         <div className="flex items-start gap-3">
           <BookingAvatarComponent guestName={booking.guestName} size="sm" />
-
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-semibold text-base text-foreground truncate">
@@ -115,15 +102,12 @@ export default function BookingCardComponent({ booking }) {
                 ₹{booking.totalPayableAmount?.toLocaleString()}
               </span>
             </div>
-
-            {/* Villa Name */}
             <p className="text-sm text-muted-foreground truncate mt-0.5">
               {booking.villa?.name}
             </p>
           </div>
         </div>
 
-        {/* Status Row */}
         <div className="flex items-center gap-2 flex-wrap">
           <BookingHeaderInfoComponent
             guestName={booking.guestName}
@@ -133,7 +117,6 @@ export default function BookingCardComponent({ booking }) {
             isLoading={updateBookingStatusMutation.isPending}
             mobileView
           />
-
           <BookingAmountComponent
             amount={booking.totalPayableAmount}
             bookedOn={booking.updatedAt}
@@ -144,7 +127,6 @@ export default function BookingCardComponent({ booking }) {
           />
         </div>
 
-        {/* Info Row */}
         <BookingInfoComponent
           villa={booking.villa?.name}
           guests={booking.totalGuests}
@@ -156,16 +138,16 @@ export default function BookingCardComponent({ booking }) {
           mobileView
         />
 
-        {/* Bottom Row - Approval Badge + Actions */}
         <div className="flex items-center justify-between pt-2 border-t border-border/50">
           <VoucherApprovalBadgeComponent
             status={booking.voucherApprovalStatus || "NOT_APPROVED"}
             approvedBy={booking.voucherApprovedBy}
           />
-
           <BookingActionsMenuComponent booking={booking} />
         </div>
       </div>
     </div>
   );
-}
+});
+
+export default BookingCardComponent;

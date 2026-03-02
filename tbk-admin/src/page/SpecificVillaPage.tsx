@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import VillaHeaderComponent from "@/components/villa/VillaHeaderComponent";
 import VillaStatsComponent from "@/components/villa/VillaStatsComponent";
@@ -20,14 +20,20 @@ export default function SpecificVillaPage() {
   const [showAllBookings, setShowAllBookings] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Fetch villa from API
+  const deleteTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (deleteTimerRef.current) clearTimeout(deleteTimerRef.current);
+    };
+  }, []);
+
   const { data: villaResponse, isLoading: villaLoading, isError: villaError } = useQuery({
     queryKey: ['villa', id],
     queryFn: () => getAVillaService(Number(id)),
     enabled: !!id,
   });
 
-  // Extract villa from response
   const villa = villaResponse?.data || villaResponse;
 
   const { data: recentBookingsResponse } = useQuery({
@@ -57,7 +63,8 @@ export default function SpecificVillaPage() {
   const handleDeleteVilla = () => {
     setIsDeleting(true);
     deleteVillaMutation.mutate();
-    setTimeout(() => {
+    // ✅ Ref mein store karo — cleanup ho sake
+    deleteTimerRef.current = setTimeout(() => {
       navigate("/villas");
     }, 2000);
   };
@@ -69,7 +76,6 @@ export default function SpecificVillaPage() {
     averageStay: "0 days"
   };
 
-  // Loading state
   if (villaLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -79,7 +85,6 @@ export default function SpecificVillaPage() {
     );
   }
 
-  // Error or not found
   if (villaError || !villa) {
     return (
       <div className="text-center py-8 sm:py-12">
@@ -95,7 +100,6 @@ export default function SpecificVillaPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-4">
         <Button
           variant="ghost"
@@ -109,7 +113,6 @@ export default function SpecificVillaPage() {
         </Button>
       </div>
 
-      {/* Loading overlay during deletion */}
       {isDeleting && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg p-4 sm:p-6 text-center max-w-md">
@@ -122,7 +125,6 @@ export default function SpecificVillaPage() {
         </div>
       )}
 
-      {/* Villa Header */}
       <VillaHeaderComponent
         villa={villa}
         onEditClick={() => setIsEditModalOpen(true)}
@@ -131,10 +133,8 @@ export default function SpecificVillaPage() {
         onDeleteVilla={handleDeleteVilla}
       />
 
-      {/* Stats Cards */}
       <VillaStatsComponent stats={mockStats} />
 
-      {/* All Bookings View - only show if toggled AND data exists */}
       {showAllBookings && Array.isArray(allBookingsData) && allBookingsData.length > 0 && (
         <VillaBookingsTableComponent
           villa={villa}
@@ -142,10 +142,8 @@ export default function SpecificVillaPage() {
         />
       )}
 
-      {/* Detailed Information */}
       <VillaTabsComponent villa={villa} bookingsData={recentBookingsData} />
 
-      {/* Edit Modal */}
       <EditVillaModalComponent
         villa={villa}
         isOpen={isEditModalOpen}

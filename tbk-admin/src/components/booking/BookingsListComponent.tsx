@@ -1,33 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import BookingCardComponent from '@/components/booking/BookingCardComponent';
 import BookingsEmptyStateComponent from "./BookingsEmptyStateComponent";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 
-export default function BookingsListComponent() {
+// ✅ useSelector hataya — props se data lelo
+interface BookingsListProps {
+  bookings: any[];
+}
 
-  // useSelector
-  const bookings = useSelector((state: RootState) => state.bookings);
-
+export default function BookingsListComponent({ bookings }: BookingsListProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bookings ({bookings.listOfBookings.length})</CardTitle>
+        <CardTitle>Bookings ({bookings.length})</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {
-            bookings.listOfBookings.map((booking) => (
-              <BookingCardComponent key={booking.id} booking={booking} />
-            ))
-          }
-          {
-            (bookings.listOfBookings.length === 0)
-            &&
-            (
-              <BookingsEmptyStateComponent />
-            )
-          }
+          {bookings.map((booking) => (
+            <BookingCardComponent key={booking.id} booking={booking} />
+          ))}
+          {bookings.length === 0 && <BookingsEmptyStateComponent />}
         </div>
       </CardContent>
     </Card>

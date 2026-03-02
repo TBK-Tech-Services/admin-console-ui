@@ -2,7 +2,7 @@ import { DayBlockComponent } from "./DayBlockComponent";
 import { useQuery } from "@tanstack/react-query";
 import { getCalendarBookingsService } from "@/services/booking.service";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useMemo } from "react";
 
 interface CalendarGridComponentProps {
     selectedVilla: string;
@@ -10,13 +10,12 @@ interface CalendarGridComponentProps {
     currentYear: number;
 }
 
-// Booking structure with ranges
 interface BookingRange {
     id: string;
     villaId: string;
     villaName: string;
-    checkIn: string; // YYYY-MM-DD
-    checkOut: string; // YYYY-MM-DD
+    checkIn: string;
+    checkOut: string;
 }
 
 const WEEKDAYS_FULL = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -28,18 +27,15 @@ interface DayBooking extends BookingRange {
     isContinuation: boolean;
 }
 
-// Helper function to convert date string to date-only format (ignoring time)
 const getDateOnly = (dateString: string): Date => {
     const [year, month, day] = dateString.split('-').map(Number);
     return new Date(year, month - 1, day);
 };
 
-// Helper function to create date-only from year, month, day
 const createDateOnly = (year: number, month: number, day: number): Date => {
     return new Date(year, month, day);
 };
 
-// Helper function to check if two dates are the same day
 const isSameDay = (date1: Date, date2: Date): boolean => {
     return date1.getFullYear() === date2.getFullYear() &&
         date1.getMonth() === date2.getMonth() &&
@@ -57,65 +53,46 @@ export function CalendarGridComponent({
     const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
     const emptyCells = Array.from({ length: firstDayOfMonth }, (_, i) => i);
 
-    // ✅ Fetch bookings from API
+    // ✅ Today — sirf ek baar calculate karo
+    const today = useMemo(() => new Date(), []);
+    const todayDate = today.getDate();
+    const todayMonth = today.getMonth();
+    const todayYear = today.getFullYear();
+
     const { data: bookingsResponse, isLoading, isError, error } = useQuery({
         queryKey: ['calendar-bookings', selectedVilla, currentMonth, currentYear],
-        queryFn: () => {
-            return getCalendarBookingsService(
-                currentMonth + 1,
-                currentYear,
-                selectedVilla
-            );
-        },
+        queryFn: () => getCalendarBookingsService(currentMonth + 1, currentYear, selectedVilla),
         staleTime: 1000 * 60 * 5,
     });
 
-    // Debug: Log the response
-    useEffect(() => {
-        if (bookingsResponse) {
-            console.log('📦 Raw API Response:', bookingsResponse);
-            console.log('📊 Bookings Data:', bookingsResponse?.data);
-            console.log('📈 Total Bookings:', bookingsResponse?.data?.length || 0);
-        }
-    }, [bookingsResponse]);
+    const BOOKING_RANGES: BookingRange[] = bookingsResponse || [];
 
-    useEffect(() => {
-        if (isError) {
-            console.error('❌ Error fetching bookings:', error);
-        }
-    }, [isError, error]);
+    const bookingsByDay = useMemo(() => {
+        const map = new Map<string, DayBooking[]>();
 
-    const BOOKING_RANGES: BookingRange[] = bookingsResponse || []
-
-    // Get bookings for a specific day
-    const getBookingsForDay = (day: number): DayBooking[] => {
-        const currentDate = createDateOnly(currentYear, currentMonth, day);
-
-        let bookings = BOOKING_RANGES.filter(booking => {
+        BOOKING_RANGES.forEach(booking => {
             const checkIn = getDateOnly(booking.checkIn);
             const checkOut = getDateOnly(booking.checkOut);
 
-            // Check if current date falls within booking range (date-only comparison)
-            const isWithinRange = currentDate >= checkIn && currentDate <= checkOut;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDate = createDateOnly(currentYear, currentMonth, day);
 
-            return isWithinRange;
+                if (currentDate >= checkIn && currentDate <= checkOut) {
+                    const key = String(day);
+                    if (!map.has(key)) map.set(key, []);
+                    map.get(key)!.push({
+                        ...booking,
+                        isStart: isSameDay(checkIn, currentDate),
+                        isEnd: isSameDay(checkOut, currentDate),
+                        isContinuation: !(isSameDay(checkIn, currentDate) || isSameDay(checkOut, currentDate)),
+                    });
+                }
+            }
         });
 
-        // Add metadata about booking position
-        return bookings.map(booking => {
-            const checkIn = getDateOnly(booking.checkIn);
-            const checkOut = getDateOnly(booking.checkOut);
+        return map;
+    }, [BOOKING_RANGES, currentYear, currentMonth, daysInMonth]);
 
-            return {
-                ...booking,
-                isStart: isSameDay(checkIn, currentDate),
-                isEnd: isSameDay(checkOut, currentDate),
-                isContinuation: !(isSameDay(checkIn, currentDate) || isSameDay(checkOut, currentDate))
-            };
-        });
-    };
-
-    // Loading State
     if (isLoading) {
         return (
             <div className="bg-card border-2 border-border rounded-xl shadow-medium p-8 sm:p-12 flex items-center justify-center">
@@ -127,14 +104,12 @@ export function CalendarGridComponent({
         );
     }
 
-    // Error State
     if (isError) {
         return (
             <div className="bg-card border-2 border-border rounded-xl shadow-medium p-8 sm:p-12 flex items-center justify-center">
                 <div className="text-center space-y-4">
                     <p className="text-destructive font-semibold">Failed to load bookings</p>
                     <p className="text-muted-foreground text-sm">{error?.message || 'Please try again later'}</p>
-                    <p className="text-xs text-muted-foreground">Check console for details</p>
                 </div>
             </div>
         );
@@ -142,28 +117,19 @@ export function CalendarGridComponent({
 
     return (
         <div className="bg-card border-2 border-border rounded-xl shadow-medium overflow-visible">
-            {/* Total Bookings */}
-            <div className="bg-muted/50 p-1.5 sm:p-2 text-[10px] sm:text-xs text-center border-b">
-                Found {BOOKING_RANGES.length} booking(s) for {currentMonth + 1}/{currentYear}
-            </div>
-
-            {/* Weekday Headers */}
             <div className="grid grid-cols-7 bg-gradient-primary">
                 {WEEKDAYS_FULL.map((day, index) => (
                     <div
                         key={day}
                         className="py-2 sm:py-3 lg:py-4 text-center text-[10px] sm:text-xs lg:text-sm font-semibold text-white border-r border-white/20 last:border-r-0"
                     >
-                        {/* Show short version on mobile, full on larger screens */}
                         <span className="sm:hidden">{WEEKDAYS_SHORT[index]}</span>
                         <span className="hidden sm:inline">{day}</span>
                     </div>
                 ))}
             </div>
 
-            {/* Days Grid */}
             <div className="grid grid-cols-7 overflow-visible">
-                {/* Empty cells for alignment */}
                 {emptyCells.map((index) => (
                     <div
                         key={`empty-${index}`}
@@ -171,13 +137,14 @@ export function CalendarGridComponent({
                     />
                 ))}
 
-                {/* Actual days */}
                 {days.map((day) => {
-                    const bookings = getBookingsForDay(day);
+                    const bookings = bookingsByDay.get(String(day)) ?? [];
+
+                    // ✅ 93 Date objects → 1 Date object
                     const isToday =
-                        day === new Date().getDate() &&
-                        currentMonth === new Date().getMonth() &&
-                        currentYear === new Date().getFullYear();
+                        day === todayDate &&
+                        currentMonth === todayMonth &&
+                        currentYear === todayYear;
 
                     return (
                         <DayBlockComponent

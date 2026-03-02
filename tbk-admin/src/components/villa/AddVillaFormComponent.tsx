@@ -4,18 +4,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ChevronDown, Loader2, Upload, Home, MapPin, Bed, Bath, Users, IndianRupee, FileText, Image as ImageIcon, X, CheckCircle2 } from "lucide-react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-import { addVillaService } from "@/services/villa.service";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { addVillaService, getAllAmenityCategoriesService } from "@/services/villa.service";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary";
 
 export default function AddVillaFormComponent({ onClose }) {
+  const { data: amenities = [] } = useQuery({
+    queryKey: ['amenities'],
+    queryFn: getAllAmenityCategoriesService,
+  });
 
-  const amenities = useSelector((state: RootState) => state.amenities.listOfAmenities);
   const queryClient = useQueryClient();
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
@@ -34,6 +35,16 @@ export default function AddVillaFormComponent({ onClose }) {
     status: "AVAILABLE",
     description: "",
   });
+
+  const categorySelectedCounts = useMemo(() => {
+    const counts: Record<number, number> = {};
+    amenities.forEach(category => {
+      counts[category.id] = category.amenities.filter(a =>
+        selectedAmenities.includes(a.id)
+      ).length;
+    });
+    return counts;
+  }, [amenities, selectedAmenities]);
 
   const addVillaMutation = useMutation({
     mutationFn: addVillaService,
@@ -79,24 +90,6 @@ export default function AddVillaFormComponent({ onClose }) {
   const handleAmenityChange = (amenityId: number, checked: boolean) => {
     if (checked) setSelectedAmenities([...selectedAmenities, amenityId]);
     else setSelectedAmenities(selectedAmenities.filter(id => id !== amenityId));
-  };
-
-  const getCategorySelectedCount = (categoryId: number) => {
-    const category = amenities.find(cat => cat.id === categoryId);
-    if (!category) return 0;
-    return category.amenities.filter(amenity => selectedAmenities.includes(amenity.id)).length;
-  };
-
-  const isCategoryPartiallySelected = (categoryId: number) => {
-    const selectedCount = getCategorySelectedCount(categoryId);
-    const category = amenities.find(cat => cat.id === categoryId);
-    return selectedCount > 0 && selectedCount < (category?.amenities.length || 0);
-  };
-
-  const isCategoryFullySelected = (categoryId: number) => {
-    const selectedCount = getCategorySelectedCount(categoryId);
-    const category = amenities.find(cat => cat.id === categoryId);
-    return selectedCount === (category?.amenities.length || 0) && selectedCount > 0;
   };
 
   const handleCategorySelectAll = (categoryId: number, checked: boolean) => {
@@ -152,7 +145,7 @@ export default function AddVillaFormComponent({ onClose }) {
   return (
     <div className="animate-in fade-in duration-300 space-y-6">
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Left Column - Basic Info */}
+        {/* Left Column */}
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
@@ -165,8 +158,7 @@ export default function AddVillaFormComponent({ onClose }) {
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
-                  <Home className="h-4 w-4 text-muted-foreground" />
-                  Villa Name *
+                  <Home className="h-4 w-4 text-muted-foreground" />Villa Name *
                 </Label>
                 <Input
                   id="name"
@@ -179,8 +171,7 @@ export default function AddVillaFormComponent({ onClose }) {
 
               <div className="space-y-2">
                 <Label htmlFor="location" className="text-sm font-medium flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  Location *
+                  <MapPin className="h-4 w-4 text-muted-foreground" />Location *
                 </Label>
                 <div className="relative">
                   <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -271,7 +262,6 @@ export default function AddVillaFormComponent({ onClose }) {
             />
           </div>
 
-          {/* Image Upload */}
           <div className="space-y-3">
             <Label htmlFor="image" className="text-sm font-medium flex items-center gap-2">
               <ImageIcon className="h-4 w-4 text-muted-foreground" />Villa Image *
@@ -294,11 +284,8 @@ export default function AddVillaFormComponent({ onClose }) {
             ) : (
               <div className="animate-in fade-in duration-200 relative border-2 border-primary/30 rounded-xl overflow-hidden">
                 <img src={imagePreview} alt="Villa preview" className="w-full h-48 object-cover" />
-                <button
-                  type="button"
-                  onClick={removeImage}
-                  className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 hover:bg-destructive/90 transition-all shadow-lg"
-                >
+                <button type="button" onClick={removeImage}
+                  className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-1.5 hover:bg-destructive/90 transition-all shadow-lg">
                   <X className="h-4 w-4" />
                 </button>
                 <div className="p-2 bg-gradient-to-t from-black/60 to-transparent absolute bottom-0 left-0 right-0">
@@ -323,9 +310,10 @@ export default function AddVillaFormComponent({ onClose }) {
             <div className="overflow-y-auto max-h-full">
               {amenities.map((category) => {
                 const isExpanded = expandedCategories.includes(category.id);
-                const selectedCount = getCategorySelectedCount(category.id);
-                const isPartiallySelected = isCategoryPartiallySelected(category.id);
-                const isFullySelected = isCategoryFullySelected(category.id);
+                const selectedCount = categorySelectedCounts[category.id] ?? 0;
+                const totalCount = category.amenities.length;
+                const isPartiallySelected = selectedCount > 0 && selectedCount < totalCount;
+                const isFullySelected = selectedCount === totalCount && selectedCount > 0;
 
                 return (
                   <div key={category.id} className="bg-card">
@@ -349,28 +337,22 @@ export default function AddVillaFormComponent({ onClose }) {
                           </div>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => toggleCategory(category.id)}
-                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all"
-                      >
+                      <button type="button" onClick={() => toggleCategory(category.id)}
+                        className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all">
                         <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                       </button>
                     </div>
 
-                    {/* Replaced AnimatePresence + motion.div with CSS transition */}
                     <div className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}>
                       <div className="px-3 pb-3 bg-muted/30">
                         <div className="grid grid-cols-1 gap-2 pt-2">
                           {category.amenities.map((amenity) => (
-                            <div
-                              key={amenity.id}
+                            <div key={amenity.id}
                               className={`flex items-center space-x-2 p-2 rounded-lg transition-all hover:translate-x-0.5 ${
                                 selectedAmenities.includes(amenity.id)
                                   ? 'bg-primary/10 border border-primary/20'
                                   : 'hover:bg-muted'
-                              }`}
-                            >
+                              }`}>
                               <Checkbox
                                 checked={selectedAmenities.includes(amenity.id)}
                                 onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)}
@@ -399,7 +381,7 @@ export default function AddVillaFormComponent({ onClose }) {
               </div>
               <div className="text-xs text-muted-foreground">
                 {amenities.map(category => {
-                  const count = getCategorySelectedCount(category.id);
+                  const count = categorySelectedCounts[category.id] ?? 0;
                   return count > 0 ? `${category.name}: ${count}` : null;
                 }).filter(Boolean).join(' • ')}
               </div>

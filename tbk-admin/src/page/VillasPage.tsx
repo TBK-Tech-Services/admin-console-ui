@@ -1,48 +1,24 @@
 import { Home, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import AddVillaFormComponent from "@/components/villa/AddVillaFormComponent";
 import VillaCardComponent from "@/components/villa/VillaCardComponent";
-import { useDispatch } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
-import { getAllAmenityCategoriesService, getAllVillasService } from "@/services/villa.service";
-import { setAmenities } from "@/store/slices/amenitiesSlice";
+import { getAllVillasService } from "@/services/villa.service";
 
 export default function VillasPage() {
-
-  // useDispatch 
-  const dispatch = useDispatch();
-
-  // useNavigate
   const navigate = useNavigate();
-
-  // State Variables
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // useQuery for Fetching Amenitites Category
-  const { data } = useQuery({
-    queryKey: ['amenities'],
-    queryFn: getAllAmenityCategoriesService,
-  });
-
-  // useQuery for Fetching all Villas
   const { data: villas } = useQuery({
     queryKey: ['villas'],
     queryFn: getAllVillasService,
   });
 
-  // useEffect
-  useEffect(() => {
-    if (data) {
-      dispatch(setAmenities(data));
-    }
-  }, [data, dispatch]);
-
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header - Stack on mobile, row on sm+ */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
@@ -73,30 +49,22 @@ export default function VillasPage() {
         </Dialog>
       </div>
 
-      {
-        (villas?.length === 0)
-          ?
-          (
-            <div className="text-center py-8 sm:py-12 text-muted-foreground">
-              <p className="text-sm sm:text-base">No villas found. Add your first villa to get started!</p>
-            </div>
-          )
-          :
-          (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-              {
-                villas?.map((villa , index) => (
-                  <VillaCardComponent
-                    key={villa?.id}
-                    villa={villa}
-                    onClick={() => navigate(`/villas/${villa?.id}`)}
-                    isPriority={index === 0}
-                  />
-                ))
-              }
-            </div>
-          )
-      }
+      {(villas?.length === 0) ? (
+        <div className="text-center py-8 sm:py-12 text-muted-foreground">
+          <p className="text-sm sm:text-base">No villas found. Add your first villa to get started!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+          {villas?.map((villa, index) => (
+            <VillaCardComponent
+              key={villa?.id}
+              villa={villa}
+              onClick={() => navigate(`/villas/${villa?.id}`)}
+              isPriority={index === 0}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

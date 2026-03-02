@@ -1,14 +1,10 @@
 import { NavLink, useLocation } from "react-router-dom";
-import {
-  Menu,
-  LogOut,
-  ChevronUp
-} from "lucide-react";
+import { Menu, LogOut, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useState, useCallback, memo } from "react";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -20,7 +16,6 @@ import { AxiosError } from "axios";
 import { ApiErrorResponse } from "@/types/global/apiErrorResponse";
 import { getNavigationItems } from "@/utils/navigationItems";
 
-// Logo Component
 const TBKLogo = ({ className = "h-10 w-auto" }: { className?: string }) => (
   <svg viewBox="0 0 140 205" fill="none" xmlns="http://www.w3.org/2000/svg" className={className}>
     <path d="M117.178 156.4L102.975 120.52L102.573 119.511L74.8607 49.5363L80.2813 35.9442L113.381 119.524L113.783 120.533L127.986 156.413L117.178 156.4ZM76.2334 156.351L61.4123 156.333L61.4558 120.47L76.2769 120.488L76.2334 156.351ZM129.7 156.415L115.497 120.535L115.095 119.526L81.151 33.7965L49.8508 112.274L74.0212 51.674L100.879 119.509L101.281 120.518L115.494 156.398L77.4232 156.352L77.4679 119.48L57.7467 119.456L57.702 156.328L32.3044 156.297L31.8089 157.558L130.213 157.677L129.71 156.415L129.7 156.415Z" fill="currentColor" />
@@ -32,44 +27,107 @@ const TBKLogo = ({ className = "h-10 w-auto" }: { className?: string }) => (
   </svg>
 );
 
-export function Navigation() {
-  // useLocation
-  const location = useLocation();
+interface NavItemsProps {
+  userRole: string | undefined;
+  isActive: (path: string) => boolean;
+  onItemClick: () => void;
+}
 
-  // State Variables
+const NavItems = memo(function NavItems({ userRole, isActive, onItemClick }: NavItemsProps) {
+  const navigationItems = getNavigationItems(userRole);
+  return (
+    <>
+      {navigationItems.map((item) => (
+        <NavLink
+          key={item.name}
+          to={item.href}
+          className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
+            "hover:bg-secondary/80 hover:shadow-soft",
+            isActive(item.href)
+              ? "bg-gradient-primary text-primary-foreground shadow-medium"
+              : "text-foreground"
+          )}
+          onClick={onItemClick}
+        >
+          <item.icon className="h-5 w-5" />
+          <span className="font-medium">{item.name}</span>
+        </NavLink>
+      ))}
+    </>
+  );
+});
+
+interface ProfileSectionProps {
+  firstName: string;
+  lastName: string;
+  email: string;
+  onLogout: () => void;
+}
+
+const ProfileSection = ({ firstName, lastName, email, onLogout }: ProfileSectionProps) => (
+  <div className="mt-auto pt-6 border-t border-border">
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className="w-full flex items-center justify-between px-4 py-3 h-auto hover:bg-secondary/80 transition-all duration-200"
+        >
+          <div className="flex items-center gap-3">
+            <Avatar className="h-8 w-8">
+              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+                {firstName.charAt(0).toUpperCase()}{lastName.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex flex-col items-start text-left">
+              <span className="text-sm font-medium text-foreground">
+                {firstName} {lastName}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                {email}
+              </span>
+            </div>
+          </div>
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56" side="top" sideOffset={8}>
+        <DropdownMenuItem
+          onClick={onLogout}
+          className="cursor-pointer hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </div>
+);
+
+export function Navigation() {
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // useSelector
-  const user = useSelector(
-    (state: RootState) => state.auth.user
-  );
+  const user = useSelector((state: RootState) => state.auth.user);
 
-  // Extract role value (consistent with other components)
   let userRole;
   if (typeof user?.role === 'string') {
     userRole = user?.role;
-  }
-  else if (user?.role && user?.role.name) {
+  } else if (user?.role && user?.role.name) {
     userRole = user?.role.name;
   }
 
-  // useDispatch
   const dispatch = useDispatch();
 
-  // Extracting Data
   const firstName = user?.firstName ?? "";
   const lastName = user?.lastName ?? "";
   const email = user?.email ?? "";
 
-  // Checking Active Tab
-  const isActive = (path: string) => {
-    if (path === "/") {
-      return location.pathname === "/";
-    }
+  const isActive = useCallback((path: string) => {
+    if (path === "/") return location.pathname === "/";
     return location.pathname === path;
-  };
+  }, [location.pathname]);
 
-  // useMutation
   const logoutMutation = useMutation({
     mutationFn: async (): Promise<void> => {
       return await logoutService();
@@ -84,80 +142,11 @@ export function Navigation() {
       const backendMessage = err.response?.data?.message || "Something went wrong!";
       toast.error(backendMessage);
     }
-  })
+  });
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     logoutMutation.mutate();
-  }
-
-  // Listing NavItems
-  const NavItems = () => {
-    const navigationItems = getNavigationItems(userRole);
-
-    return (
-      <>
-        {navigationItems.map((item) => (
-          <NavLink
-            key={item.name}
-            to={item.href}
-            className={cn(
-              "flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200",
-              "hover:bg-secondary/80 hover:shadow-soft",
-              isActive(item.href)
-                ? "bg-gradient-primary text-primary-foreground shadow-medium"
-                : "text-foreground"
-            )}
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <item.icon className="h-5 w-5" />
-            <span className="font-medium">{item.name}</span>
-          </NavLink>
-        ))}
-      </>
-    )
-  };
-
-  // Profile Section 
-  const ProfileSection = () => (
-    <div className="mt-auto pt-6 border-t border-border">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className="w-full flex items-center justify-between px-4 py-3 h-auto hover:bg-secondary/80 transition-all duration-200"
-          >
-            <div className="flex items-center gap-3">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                  {firstName.charAt(0).toUpperCase()}{lastName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col items-start text-left">
-                <span className="text-sm font-medium text-foreground">
-                  {firstName} {lastName}
-                </span>
-                <span className="text-xs text-muted-foreground">
-                  {email}
-                </span>
-              </div>
-            </div>
-            <ChevronUp className="h-4 w-4 text-muted-foreground" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="end"
-          className="w-56"
-          side="top"
-          sideOffset={8}
-        >
-          <DropdownMenuItem onClick={handleLogout} className="cursor-pointer hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive">
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
-  );
+  }, [logoutMutation]);
 
   return (
     <>
@@ -176,9 +165,18 @@ export function Navigation() {
                 <TBKLogo className="h-12 w-auto" />
               </div>
               <nav className="space-y-2 flex-1">
-                <NavItems />
+                <NavItems
+                  userRole={userRole}
+                  isActive={isActive}
+                  onItemClick={() => setIsMobileMenuOpen(false)}
+                />
               </nav>
-              <ProfileSection />
+              <ProfileSection
+                firstName={firstName}
+                lastName={lastName}
+                email={email}
+                onLogout={handleLogout}
+              />
             </SheetContent>
           </Sheet>
         </div>
@@ -192,14 +190,23 @@ export function Navigation() {
               <TBKLogo className="h-12 w-auto" />
             </div>
             <nav className="space-y-2">
-              <NavItems />
+              <NavItems
+                userRole={userRole}
+                isActive={isActive}
+                onItemClick={() => setIsMobileMenuOpen(false)}
+              />
             </nav>
           </div>
           <div className="p-6 pt-0">
-            <ProfileSection />
+            <ProfileSection
+              firstName={firstName}
+              lastName={lastName}
+              email={email}
+              onLogout={handleLogout}
+            />
           </div>
         </div>
       </div>
     </>
   );
-}
+};

@@ -19,8 +19,9 @@ export default function CalendarPage() {
     const handleNextMonth = () => {
         if (currentMonth === 11) {
             setCurrentMonth(0);
-            setCurrentYear(currentMonth + 1);
-        } else {
+            setCurrentYear(currentYear + 1); 
+        } 
+        else {
             setCurrentMonth(currentMonth + 1);
         }
     };
