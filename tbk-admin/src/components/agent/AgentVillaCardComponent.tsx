@@ -8,6 +8,7 @@ import {
     ExternalLink,
 } from "lucide-react";
 import AgentVillaAvailabilityComponent from "./AgentVillaAvailabilityComponent";
+import villaPlaceholder from '@/assets/villa-placeholder.svg';
 
 export default function AgentVillaCardComponent({ villa, onViewDetails }) {
 
@@ -51,8 +52,10 @@ export default function AgentVillaCardComponent({ villa, onViewDetails }) {
         <Card className="overflow-hidden hover:shadow-large transition-all duration-300 group">
             <div className="relative">
                 <img
-                    src={villaImage}
+                    src={villaImage || villaPlaceholder}
                     alt={villa.name}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-48 sm:h-56 md:h-64 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute top-3 right-3 sm:top-4 sm:right-4">

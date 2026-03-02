@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export function CalendarPage() {
     const [selectedVilla, setSelectedVilla] = useState<string>("all");
-    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth()); // 0-11
+    const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
     const handlePrevMonth = () => {

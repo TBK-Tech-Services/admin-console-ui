@@ -127,7 +127,6 @@ export default function NewBookingPage() {
   // Handler Function to Handle Form Submission
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
     addBookingMutation.mutate();
   };
 

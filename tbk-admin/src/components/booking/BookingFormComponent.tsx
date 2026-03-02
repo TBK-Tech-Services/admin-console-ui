@@ -4,7 +4,6 @@ import AdditionalInformationComponent from './AdditionalInformationComponent';
 import { Button } from "@/components/ui/button";
 import GSTPricingConfigurationComponent from './GSTPricingConfigurationComponent';
 import { CheckCircle, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export default function BookingFormComponent({ formData, villaData, totalDaysOfStay, onInputChange, onSubmit, isLoading = false }) {
   return (
@@ -32,11 +31,9 @@ export default function BookingFormComponent({ formData, villaData, totalDaysOfS
         onInputChange={onInputChange}
       />
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="flex justify-end"
+      <div
+        className="flex justify-end animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both"
+        style={{ animationDelay: '400ms' }}
       >
         <Button
           onClick={onSubmit}
@@ -56,7 +53,7 @@ export default function BookingFormComponent({ formData, villaData, totalDaysOfS
             </>
           )}
         </Button>
-      </motion.div>
+      </div>
     </div>
   );
 }

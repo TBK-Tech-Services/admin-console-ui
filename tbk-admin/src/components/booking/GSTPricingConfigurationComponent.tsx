@@ -8,7 +8,6 @@ import { CreditCard, Calendar, IndianRupee, Percent, Gift, Wallet, TrendingUp, G
 import { getBookingSubtotal } from "@/utils/getBookingSubtotal";
 import { calculateGST } from "@/utils/calculateGST";
 import { getDueAmount } from "@/utils/getDueAmount";
-import { motion } from 'framer-motion';
 
 interface GSTPricingConfigurationComponentProps {
   formData: any;
@@ -28,7 +27,6 @@ const BOOKING_SOURCES = [
 ];
 
 export default function GSTPricingConfigurationComponent({ formData, villaData, totalDaysOfStay, onInputChange }: GSTPricingConfigurationComponentProps) {
-  // Convert string values to numbers
   const customPrice = Number(formData.customPrice) || 0;
   const extraPersonCharge = Number(formData.extraPersonCharge) || 0;
   const discount = Number(formData.discount) || 0;
@@ -51,10 +49,8 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
   const totalPayableAmount: number = (subTotalAmount + gstAmount);
   const dueAmount: number = getDueAmount(totalPayableAmount, advancePaid);
 
-  // Handler for GST mode change
   const handleGstModeChange = (value: string) => {
     onInputChange("gstMode", value);
-    // Reset selective toggles when mode changes
     if (value !== "SELECTIVE") {
       onInputChange("gstOnBasePrice", false);
       onInputChange("gstOnExtraCharge", false);
@@ -62,11 +58,7 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.3 }}
-    >
+    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
       <Card className="border-border/50 shadow-medium hover:shadow-large transition-all duration-300">
         <CardHeader className="bg-gradient-primary/5 pb-3 sm:pb-4">
           <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -77,7 +69,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6 pt-4 sm:pt-6">
-          {/* Booking Summary Info */}
           <div className="grid grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl border border-border/50">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 shrink-0">
@@ -101,7 +92,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </div>
           </div>
 
-          {/* Booking Source Dropdown */}
           <div className="p-3 sm:p-4 rounded-lg border border-border/50 bg-card">
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 shrink-0">
@@ -129,7 +119,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </Select>
           </div>
 
-          {/* GST Configuration */}
           <div className="p-3 sm:p-4 rounded-lg border border-border/50 bg-card space-y-3 sm:space-y-4">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-accent/10 shrink-0">
@@ -153,7 +142,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                   <p className="text-xs text-muted-foreground">No tax will be applied</p>
                 </Label>
               </div>
-
               <div className="flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-md border border-border/50 hover:bg-accent/5 transition-colors">
                 <RadioGroupItem value="ALL" id="gst-all" />
                 <Label htmlFor="gst-all" className="flex-1 cursor-pointer">
@@ -161,7 +149,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                   <p className="text-xs text-muted-foreground">Apply 18% GST on entire subtotal</p>
                 </Label>
               </div>
-
               <div className="flex items-center space-x-2 sm:space-x-3 p-2.5 sm:p-3 rounded-md border border-border/50 hover:bg-accent/5 transition-colors">
                 <RadioGroupItem value="SELECTIVE" id="gst-selective" />
                 <Label htmlFor="gst-selective" className="flex-1 cursor-pointer">
@@ -171,26 +158,19 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
               </div>
             </RadioGroup>
 
-            {/* Selective GST Toggles */}
             {formData.gstMode === "SELECTIVE" && (
               <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/50 space-y-2 sm:space-y-3">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Select items to apply GST:</p>
-
                 <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-md bg-card border border-border/50">
-                  <Label htmlFor="gst-base" className="text-xs sm:text-sm cursor-pointer">
-                    Base / Custom Price
-                  </Label>
+                  <Label htmlFor="gst-base" className="text-xs sm:text-sm cursor-pointer">Base / Custom Price</Label>
                   <Switch
                     id="gst-base"
                     checked={formData.gstOnBasePrice}
                     onCheckedChange={(checked) => onInputChange("gstOnBasePrice", checked)}
                   />
                 </div>
-
                 <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-md bg-card border border-border/50">
-                  <Label htmlFor="gst-extra" className="text-xs sm:text-sm cursor-pointer">
-                    Extra Person Charge
-                  </Label>
+                  <Label htmlFor="gst-extra" className="text-xs sm:text-sm cursor-pointer">Extra Person Charge</Label>
                   <Switch
                     id="gst-extra"
                     checked={formData.gstOnExtraCharge}
@@ -201,13 +181,11 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             )}
           </div>
 
-          {/* Pricing Fields */}
           <div className="space-y-3 sm:space-y-4 pt-2">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
               <h3 className="font-semibold text-sm">Price Adjustments</h3>
             </div>
-
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="customPrice" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
@@ -223,11 +201,8 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                   onChange={(e) => onInputChange("customPrice", e.target.value)}
                   className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
                 />
-                <p className="text-[10px] sm:text-xs text-muted-foreground">
-                  Leave empty to use base price (₹{basePrice})
-                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Leave empty to use base price (₹{basePrice})</p>
               </div>
-
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="extraPersonCharge" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
                   <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
@@ -244,7 +219,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                 />
               </div>
             </div>
-
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="discount" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
@@ -260,7 +234,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                   className="h-10 sm:h-11 border-border/60 focus:border-green-500 transition-colors text-sm"
                 />
               </div>
-
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="advancePaid" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
                   <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
@@ -278,13 +251,11 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </div>
           </div>
 
-          {/* Billing Details Section */}
           <div className="space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t border-border/50">
             <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
               <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Billing Details
             </h3>
-
             <div className="bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl p-3 sm:p-5 space-y-2 sm:space-y-3 border border-border/50">
               {customPrice > 0 ? (
                 <>
@@ -299,76 +270,59 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                 </>
               ) : (
                 <div className="flex justify-between text-xs sm:text-sm pb-2">
-                  <span className="text-muted-foreground">
-                    Base Price ({totalDaysOfStay || 0} nights × ₹{villaData?.price || 0})
-                  </span>
+                  <span className="text-muted-foreground">Base Price ({totalDaysOfStay || 0} nights × ₹{villaData?.price || 0})</span>
                   <span className="font-semibold">₹{basePrice}</span>
                 </div>
               )}
-
               {extraPersonCharge > 0 && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Extra Person Charge</span>
                   <span className="font-medium text-primary">+ ₹{extraPersonCharge}</span>
                 </div>
               )}
-
               {discount > 0 && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Discount</span>
                   <span className="font-medium text-green-600">- ₹{discount}</span>
                 </div>
               )}
-
               <div className="flex justify-between text-xs sm:text-sm pt-2 border-t border-border/30">
                 <span className="text-muted-foreground font-medium">Subtotal</span>
                 <span className="font-semibold">₹{subTotalAmount}</span>
               </div>
-
               {gstAmount > 0 && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">
                     GST (18%)
                     {formData.gstMode === "SELECTIVE" && (
                       <span className="text-[10px] sm:text-xs ml-1">
-                        ({[
-                          formData.gstOnBasePrice && "Base",
-                          formData.gstOnExtraCharge && "Extra"
-                        ].filter(Boolean).join(" + ")})
+                        ({[formData.gstOnBasePrice && "Base", formData.gstOnExtraCharge && "Extra"].filter(Boolean).join(" + ")})
                       </span>
                     )}
                   </span>
                   <span className="font-medium text-accent">+ ₹{gstAmount.toFixed(2)}</span>
                 </div>
               )}
-
               <div className="border-t border-border/30 pt-2 sm:pt-3 mt-2">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-sm sm:text-base">Total Payable Amount</span>
-                  <span className="font-bold text-primary text-xl sm:text-2xl">
-                    ₹{totalPayableAmount.toFixed(2)}
-                  </span>
+                  <span className="font-bold text-primary text-xl sm:text-2xl">₹{totalPayableAmount.toFixed(2)}</span>
                 </div>
               </div>
-
               <div className="border-t border-border/30 pt-2 sm:pt-3 mt-2 sm:mt-3 space-y-2 bg-white/50 rounded-lg p-2 sm:p-3">
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Advance Paid</span>
-                  <span className="font-medium text-green-600">
-                    - ₹{advancePaid}
-                  </span>
+                  <span className="font-medium text-green-600">- ₹{advancePaid}</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-border/30">
                   <span className="font-semibold text-sm">Due Amount</span>
-                  <span className="font-bold text-orange-600 text-xl sm:text-2xl">
-                    ₹{dueAmount.toFixed(2)}
-                  </span>
+                  <span className="font-bold text-orange-600 text-xl sm:text-2xl">₹{dueAmount.toFixed(2)}</span>
                 </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   );
 }

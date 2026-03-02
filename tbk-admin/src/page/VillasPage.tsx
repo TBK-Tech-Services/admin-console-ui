@@ -33,8 +33,6 @@ export default function VillasPage() {
     queryFn: getAllVillasService,
   });
 
-  console.log(villas)
-
   // useEffect
   useEffect(() => {
     if (data) {
@@ -87,11 +85,12 @@ export default function VillasPage() {
           (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {
-                villas?.map((villa) => (
+                villas?.map((villa , index) => (
                   <VillaCardComponent
                     key={villa?.id}
                     villa={villa}
                     onClick={() => navigate(`/villas/${villa?.id}`)}
+                    isPriority={index === 0}
                   />
                 ))
               }

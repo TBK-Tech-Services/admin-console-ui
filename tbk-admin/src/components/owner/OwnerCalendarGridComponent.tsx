@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getOwnerCalendarBookingsService } from "@/services/ownerCalendar.service";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 import { OwnerDayBlockComponent } from "./OwnerDayBlockComponent";
 
 interface OwnerCalendarGridComponentProps {
@@ -66,12 +65,6 @@ export function OwnerCalendarGridComponent({
         staleTime: 1000 * 60 * 5,
         enabled: !!ownerId
     });
-
-    useEffect(() => {
-        if (bookingsResponse) {
-            console.log('📦 Owner Calendar Response:', bookingsResponse);
-        }
-    }, [bookingsResponse]);
 
     const BOOKING_RANGES: BookingRange[] = bookingsResponse || [];
 

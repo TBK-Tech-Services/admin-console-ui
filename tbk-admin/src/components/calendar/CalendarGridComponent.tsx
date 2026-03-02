@@ -61,18 +61,13 @@ export function CalendarGridComponent({
     const { data: bookingsResponse, isLoading, isError, error } = useQuery({
         queryKey: ['calendar-bookings', selectedVilla, currentMonth, currentYear],
         queryFn: () => {
-            console.log('🔍 Fetching calendar bookings...', {
-                selectedVilla,
-                month: currentMonth + 1,
-                year: currentYear
-            });
             return getCalendarBookingsService(
-                currentMonth + 1, // Backend expects 1-12, JS uses 0-11
+                currentMonth + 1,
                 currentYear,
                 selectedVilla
             );
         },
-        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+        staleTime: 1000 * 60 * 5,
     });
 
     // Debug: Log the response
@@ -92,8 +87,6 @@ export function CalendarGridComponent({
 
     const BOOKING_RANGES: BookingRange[] = bookingsResponse || []
 
-    console.log('🎯 BOOKING_RANGES:', BOOKING_RANGES);
-
     // Get bookings for a specific day
     const getBookingsForDay = (day: number): DayBooking[] => {
         const currentDate = createDateOnly(currentYear, currentMonth, day);
@@ -104,17 +97,6 @@ export function CalendarGridComponent({
 
             // Check if current date falls within booking range (date-only comparison)
             const isWithinRange = currentDate >= checkIn && currentDate <= checkOut;
-
-            // Debug for first day
-            if (day === 1) {
-                console.log(`📅 Day ${day} - Checking booking:`, {
-                    villaName: booking.villaName,
-                    checkIn: booking.checkIn,
-                    checkOut: booking.checkOut,
-                    currentDate: currentDate.toISOString().split('T')[0],
-                    isWithinRange
-                });
-            }
 
             return isWithinRange;
         });
@@ -160,7 +142,7 @@ export function CalendarGridComponent({
 
     return (
         <div className="bg-card border-2 border-border rounded-xl shadow-medium overflow-visible">
-            {/* Debug Info */}
+            {/* Total Bookings */}
             <div className="bg-muted/50 p-1.5 sm:p-2 text-[10px] sm:text-xs text-center border-b">
                 Found {BOOKING_RANGES.length} booking(s) for {currentMonth + 1}/{currentYear}
             </div>

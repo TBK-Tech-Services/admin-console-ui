@@ -23,3 +23,8 @@ dist-ssr
 *.sln
 *.sw?
 .env
+
+# Internal notes
+Scaling_And_Performance_Tips.md
+runtime.md
+loadtime.md

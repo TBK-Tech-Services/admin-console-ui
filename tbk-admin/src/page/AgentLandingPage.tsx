@@ -47,7 +47,7 @@ export default function AgentLandingPage() {
 
     // Handler Function to Handle Search
     const handleSearch = () => {
-        console.log('Search triggered - useQuery will handle the API call automatically');
+        
     };
 
     // Handler to close modal

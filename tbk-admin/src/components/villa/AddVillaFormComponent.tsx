@@ -12,24 +12,18 @@ import { addVillaService } from "@/services/villa.service";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { uploadImageToCloudinary, validateImageFile } from "@/utils/cloudinary";
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function AddVillaFormComponent({ onClose }) {
 
-  // useSelector
   const amenities = useSelector((state: RootState) => state.amenities.listOfAmenities);
-
-  // useQueryClient for invalidation
   const queryClient = useQueryClient();
 
-  // State Variables
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [selectedAmenities, setSelectedAmenities] = useState<number[]>([]);
   const [expandedCategories, setExpandedCategories] = useState<number[]>([]);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Form data state
   const [formData, setFormData] = useState({
     villaName: "",
     location: "",
@@ -41,7 +35,6 @@ export default function AddVillaFormComponent({ onClose }) {
     description: "",
   });
 
-  // Mutation for adding villa
   const addVillaMutation = useMutation({
     mutationFn: addVillaService,
     onSuccess: () => {
@@ -54,117 +47,86 @@ export default function AddVillaFormComponent({ onClose }) {
     }
   });
 
-  // Handler Function to Handle Image Upload
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-
     const validation = validateImageFile(file);
     if (!validation.valid) {
       toast.error(validation.error);
       return;
     }
-
     setSelectedImage(file);
-
     const reader = new FileReader();
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string);
-    };
+    reader.onloadend = () => setImagePreview(reader.result as string);
     reader.readAsDataURL(file);
   };
 
-  // Handler Function to Remove Image
   const removeImage = () => {
     setSelectedImage(null);
     setImagePreview("");
   };
 
-  // Handler to update form fields
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Handler Function to Handle Toggle Category
   const toggleCategory = (categoryId: number) => {
     setExpandedCategories(prev =>
-      prev.includes(categoryId)
-        ? prev.filter(id => id !== categoryId)
-        : [...prev, categoryId]
+      prev.includes(categoryId) ? prev.filter(id => id !== categoryId) : [...prev, categoryId]
     );
   };
 
-  // Handler Function to Handle Amenity Change
   const handleAmenityChange = (amenityId: number, checked: boolean) => {
-    if (checked) {
-      setSelectedAmenities([...selectedAmenities, amenityId]);
-    }
-    else {
-      setSelectedAmenities(selectedAmenities.filter(id => id !== amenityId));
-    }
+    if (checked) setSelectedAmenities([...selectedAmenities, amenityId]);
+    else setSelectedAmenities(selectedAmenities.filter(id => id !== amenityId));
   };
 
-  // Handler Function to Handle Get Category Selected Count
   const getCategorySelectedCount = (categoryId: number) => {
     const category = amenities.find(cat => cat.id === categoryId);
     if (!category) return 0;
-
-    return category.amenities.filter(amenity =>
-      selectedAmenities.includes(amenity.id)
-    ).length;
+    return category.amenities.filter(amenity => selectedAmenities.includes(amenity.id)).length;
   };
 
-  // Handler Function to Handle Category Partially Selected
   const isCategoryPartiallySelected = (categoryId: number) => {
     const selectedCount = getCategorySelectedCount(categoryId);
     const category = amenities.find(cat => cat.id === categoryId);
     return selectedCount > 0 && selectedCount < (category?.amenities.length || 0);
   };
 
-  // Handler Function to Handle Is Category Fully Selected
   const isCategoryFullySelected = (categoryId: number) => {
     const selectedCount = getCategorySelectedCount(categoryId);
     const category = amenities.find(cat => cat.id === categoryId);
     return selectedCount === (category?.amenities.length || 0) && selectedCount > 0;
   };
 
-  // Handler Function to Handle Category Select All
   const handleCategorySelectAll = (categoryId: number, checked: boolean) => {
     const category = amenities.find(cat => cat.id === categoryId);
     if (!category) return;
-
     if (checked) {
       const newAmenities = category.amenities.map(amenity => amenity.id);
       setSelectedAmenities(prev => [...prev, ...newAmenities.filter(id => !prev.includes(id))]);
-    }
-    else {
+    } else {
       const amenityIds = category.amenities.map(amenity => amenity.id);
       setSelectedAmenities(prev => prev.filter(id => !amenityIds.includes(id)));
     }
   };
 
-  // Main Form Submit Handler
   const handleSubmit = async () => {
     if (!formData.villaName || !formData.location || !formData.description) {
       toast.error("Please fill all required fields");
       return;
     }
-
     if (!selectedImage) {
       toast.error("Please upload a villa image");
       return;
     }
-
     if (selectedAmenities.length === 0) {
       toast.error("Please select at least one amenity");
       return;
     }
-
     try {
       setIsUploading(true);
-
       const imageUrl = await uploadImageToCloudinary(selectedImage);
-
       const payload = {
         villaName: formData.villaName,
         location: formData.location,
@@ -177,9 +139,7 @@ export default function AddVillaFormComponent({ onClose }) {
         imageUrl: imageUrl,
         amenities: selectedAmenities,
       };
-
       await addVillaMutation.mutateAsync(payload);
-
     } catch (error: any) {
       toast.error(error.message || "Failed to add villa");
     } finally {
@@ -190,17 +150,10 @@ export default function AddVillaFormComponent({ onClose }) {
   const isLoading = isUploading || addVillaMutation.isPending;
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.3 }}
-      className="space-y-6"
-    >
-      {/* Horizontal Layout: Two Columns for Desktop, Single Column for Mobile */}
+    <div className="animate-in fade-in duration-300 space-y-6">
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Left Column - Basic Info */}
         <div className="space-y-6">
-          {/* Basic Information Section */}
           <div className="space-y-4">
             <div className="flex items-center gap-2 mb-3">
               <div className="p-1.5 rounded-lg bg-primary/10">
@@ -244,74 +197,45 @@ export default function AddVillaFormComponent({ onClose }) {
               <div className="grid grid-cols-3 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="bedrooms" className="text-sm font-medium">
-                    <Bed className="h-4 w-4 inline mr-1 text-muted-foreground" />
-                    Bedrooms
+                    <Bed className="h-4 w-4 inline mr-1 text-muted-foreground" />Bedrooms
                   </Label>
-                  <Input
-                    id="bedrooms"
-                    type="number"
-                    placeholder="3"
-                    min="1"
-                    value={formData.bedrooms}
+                  <Input id="bedrooms" type="number" placeholder="3" min="1" value={formData.bedrooms}
                     onChange={(e) => handleInputChange('bedrooms', parseInt(e.target.value))}
-                    className="h-11 border-border/60 focus:border-primary transition-colors"
-                  />
+                    className="h-11 border-border/60 focus:border-primary transition-colors" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="bathrooms" className="text-sm font-medium">
-                    <Bath className="h-4 w-4 inline mr-1 text-muted-foreground" />
-                    Bathrooms
+                    <Bath className="h-4 w-4 inline mr-1 text-muted-foreground" />Bathrooms
                   </Label>
-                  <Input
-                    id="bathrooms"
-                    type="number"
-                    placeholder="2"
-                    min="1"
-                    value={formData.bathrooms}
+                  <Input id="bathrooms" type="number" placeholder="2" min="1" value={formData.bathrooms}
                     onChange={(e) => handleInputChange('bathrooms', parseInt(e.target.value))}
-                    className="h-11 border-border/60 focus:border-primary transition-colors"
-                  />
+                    className="h-11 border-border/60 focus:border-primary transition-colors" />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="maxGuests" className="text-sm font-medium">
-                    <Users className="h-4 w-4 inline mr-1 text-muted-foreground" />
-                    Guests
+                    <Users className="h-4 w-4 inline mr-1 text-muted-foreground" />Guests
                   </Label>
-                  <Input
-                    id="maxGuests"
-                    type="number"
-                    placeholder="8"
-                    min="1"
-                    value={formData.maxGuests}
+                  <Input id="maxGuests" type="number" placeholder="8" min="1" value={formData.maxGuests}
                     onChange={(e) => handleInputChange('maxGuests', parseInt(e.target.value))}
-                    className="h-11 border-border/60 focus:border-primary transition-colors"
-                  />
+                    className="h-11 border-border/60 focus:border-primary transition-colors" />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
-                    <IndianRupee className="h-4 w-4 text-muted-foreground" />
-                    Price/Night *
+                    <IndianRupee className="h-4 w-4 text-muted-foreground" />Price/Night *
                   </Label>
                   <div className="relative">
                     <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      id="price"
-                      type="number"
-                      placeholder="15000"
-                      min="0"
-                      value={formData.pricePerNight}
+                    <Input id="price" type="number" placeholder="15000" min="0" value={formData.pricePerNight}
                       onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
-                      className="pl-10 h-11 border-border/60 focus:border-primary transition-colors"
-                    />
+                      className="pl-10 h-11 border-border/60 focus:border-primary transition-colors" />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
-                    <CheckCircle2 className="h-4 w-4 text-muted-foreground" />
-                    Status
+                    <CheckCircle2 className="h-4 w-4 text-muted-foreground" />Status
                   </Label>
                   <Select value={formData.status} onValueChange={(value) => handleInputChange('status', value)}>
                     <SelectTrigger className="h-11 border-border/60 focus:border-primary transition-colors">
@@ -319,22 +243,13 @@ export default function AddVillaFormComponent({ onClose }) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="AVAILABLE">
-                        <div className="flex items-center gap-2">
-                          <div className="h-2 w-2 rounded-full bg-green-500" />
-                          Available
-                        </div>
+                        <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-green-500" />Available</div>
                       </SelectItem>
                       <SelectItem value="OCCUPIED">
-                        <div className="flex items-center gap-2">
-                          <div className="h-2 w-2 rounded-full bg-orange-500" />
-                          Occupied
-                        </div>
+                        <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-orange-500" />Occupied</div>
                       </SelectItem>
                       <SelectItem value="MAINTENANCE">
-                        <div className="flex items-center gap-2">
-                          <div className="h-2 w-2 rounded-full bg-red-500" />
-                          Maintenance
-                        </div>
+                        <div className="flex items-center gap-2"><div className="h-2 w-2 rounded-full bg-red-500" />Maintenance</div>
                       </SelectItem>
                     </SelectContent>
                   </Select>
@@ -343,11 +258,9 @@ export default function AddVillaFormComponent({ onClose }) {
             </div>
           </div>
 
-          {/* Description Section */}
           <div className="space-y-2">
             <Label htmlFor="description" className="text-sm font-medium flex items-center gap-2">
-              <FileText className="h-4 w-4 text-muted-foreground" />
-              Description *
+              <FileText className="h-4 w-4 text-muted-foreground" />Description *
             </Label>
             <Textarea
               id="description"
@@ -358,24 +271,14 @@ export default function AddVillaFormComponent({ onClose }) {
             />
           </div>
 
-          {/* Image Upload Section */}
+          {/* Image Upload */}
           <div className="space-y-3">
             <Label htmlFor="image" className="text-sm font-medium flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-muted-foreground" />
-              Villa Image *
+              <ImageIcon className="h-4 w-4 text-muted-foreground" />Villa Image *
             </Label>
             {!imagePreview ? (
-              <motion.div
-                whileHover={{ scale: 1.01 }}
-                className="border-2 border-dashed border-primary/30 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer"
-              >
-                <Input
-                  id="image"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                />
+              <div className="border-2 border-dashed border-primary/30 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer hover:scale-[1.01] transition-transform duration-200">
+                <Input id="image" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 <Label htmlFor="image" className="cursor-pointer">
                   <div className="flex flex-col items-center gap-2">
                     <div className="p-3 rounded-full bg-primary/10">
@@ -383,24 +286,14 @@ export default function AddVillaFormComponent({ onClose }) {
                     </div>
                     <div>
                       <p className="text-sm font-medium">Click to upload</p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        PNG, JPG, WebP (max 5MB)
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WebP (max 5MB)</p>
                     </div>
                   </div>
                 </Label>
-              </motion.div>
+              </div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="relative border-2 border-primary/30 rounded-xl overflow-hidden"
-              >
-                <img
-                  src={imagePreview}
-                  alt="Villa preview"
-                  className="w-full h-48 object-cover"
-                />
+              <div className="animate-in fade-in duration-200 relative border-2 border-primary/30 rounded-xl overflow-hidden">
+                <img src={imagePreview} alt="Villa preview" className="w-full h-48 object-cover" />
                 <button
                   type="button"
                   onClick={removeImage}
@@ -410,11 +303,9 @@ export default function AddVillaFormComponent({ onClose }) {
                 </button>
                 <div className="p-2 bg-gradient-to-t from-black/60 to-transparent absolute bottom-0 left-0 right-0">
                   <p className="text-xs text-white font-medium truncate">{selectedImage?.name}</p>
-                  <p className="text-xs text-white/80">
-                    {selectedImage && (selectedImage.size / 1024 / 1024).toFixed(2)} MB
-                  </p>
+                  <p className="text-xs text-white/80">{selectedImage && (selectedImage.size / 1024 / 1024).toFixed(2)} MB</p>
                 </div>
-              </motion.div>
+              </div>
             )}
           </div>
         </div>
@@ -437,18 +328,12 @@ export default function AddVillaFormComponent({ onClose }) {
                 const isFullySelected = isCategoryFullySelected(category.id);
 
                 return (
-                  <motion.div
-                    key={category.id}
-                    initial={false}
-                    className="bg-card"
-                  >
+                  <div key={category.id} className="bg-card">
                     <div className="flex items-center justify-between p-3 hover:bg-accent/5 transition-colors cursor-pointer">
                       <div className="flex items-center space-x-3 flex-1">
                         <Checkbox
                           checked={isFullySelected}
-                          ref={(el) => {
-                            if (el) el.indeterminate = isPartiallySelected;
-                          }}
+                          ref={(el) => { if (el) el.indeterminate = isPartiallySelected; }}
                           onCheckedChange={(checked) => handleCategorySelectAll(category.id, checked as boolean)}
                           className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
                         />
@@ -464,71 +349,50 @@ export default function AddVillaFormComponent({ onClose }) {
                           </div>
                         </div>
                       </div>
-
                       <button
                         type="button"
                         onClick={() => toggleCategory(category.id)}
                         className="p-1.5 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-all"
                       >
-                        <motion.div
-                          animate={{ rotate: isExpanded ? 180 : 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <ChevronDown className="h-4 w-4" />
-                        </motion.div>
+                        <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
                       </button>
                     </div>
 
-                    <AnimatePresence>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.2 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="px-3 pb-3 bg-muted/30">
-                            <div className="grid grid-cols-1 gap-2 pt-2">
-                              {category.amenities.map((amenity) => (
-                                <motion.div
-                                  key={amenity.id}
-                                  whileHover={{ x: 2 }}
-                                  className={`flex items-center space-x-2 p-2 rounded-lg transition-all ${selectedAmenities.includes(amenity.id)
-                                      ? 'bg-primary/10 border border-primary/20'
-                                      : 'hover:bg-muted'
-                                    }`}
-                                >
-                                  <Checkbox
-                                    checked={selectedAmenities.includes(amenity.id)}
-                                    onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)}
-                                    className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
-                                  />
-                                  <Label className="text-sm cursor-pointer flex-1">
-                                    {amenity.name}
-                                  </Label>
-                                  {selectedAmenities.includes(amenity.id) && (
-                                    <CheckCircle2 className="h-4 w-4 text-primary" />
-                                  )}
-                                </motion.div>
-                              ))}
+                    {/* Replaced AnimatePresence + motion.div with CSS transition */}
+                    <div className={`overflow-hidden transition-all duration-200 ${isExpanded ? 'max-h-[400px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                      <div className="px-3 pb-3 bg-muted/30">
+                        <div className="grid grid-cols-1 gap-2 pt-2">
+                          {category.amenities.map((amenity) => (
+                            <div
+                              key={amenity.id}
+                              className={`flex items-center space-x-2 p-2 rounded-lg transition-all hover:translate-x-0.5 ${
+                                selectedAmenities.includes(amenity.id)
+                                  ? 'bg-primary/10 border border-primary/20'
+                                  : 'hover:bg-muted'
+                              }`}
+                            >
+                              <Checkbox
+                                checked={selectedAmenities.includes(amenity.id)}
+                                onCheckedChange={(checked) => handleAmenityChange(amenity.id, checked as boolean)}
+                                className="data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                              />
+                              <Label className="text-sm cursor-pointer flex-1">{amenity.name}</Label>
+                              {selectedAmenities.includes(amenity.id) && (
+                                <CheckCircle2 className="h-4 w-4 text-primary" />
+                              )}
                             </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </div>
           </div>
 
           {selectedAmenities.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="p-3 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border-2 border-primary/20"
-            >
+            <div className="animate-in fade-in slide-in-from-top-2 duration-200 p-3 bg-gradient-to-br from-primary/10 to-accent/10 rounded-lg border-2 border-primary/20">
               <div className="flex items-center gap-2 text-sm font-semibold text-primary mb-1">
                 <CheckCircle2 className="h-4 w-4" />
                 Selected: {selectedAmenities.length}
@@ -539,12 +403,11 @@ export default function AddVillaFormComponent({ onClose }) {
                   return count > 0 ? `${category.name}: ${count}` : null;
                 }).filter(Boolean).join(' • ')}
               </div>
-            </motion.div>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex justify-end gap-3 pt-4 border-t">
         <Button variant="outline" onClick={onClose} disabled={isLoading} className="min-w-[100px]">
           Cancel
@@ -567,6 +430,6 @@ export default function AddVillaFormComponent({ onClose }) {
           )}
         </Button>
       </div>
-    </motion.div>
+    </div>
   );
 }

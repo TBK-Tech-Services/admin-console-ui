@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Users, Bed, Bath, ExternalLink } from "lucide-react";
 import { getVillaStatusColor } from "@/utils/getVillaStatusColor";
+import villaPlaceholder from "@/assets/villa-placeholder.svg";
 
-export default function VillaCardComponent({ villa, onClick }) {
+export default function VillaCardComponent({ villa, onClick , isPriority = false }) {
 
   // Get amenities names for display
   const amenityNames = villa.amenities?.map(amenityObj => amenityObj.amenity.name) || [];
@@ -26,8 +27,11 @@ export default function VillaCardComponent({ villa, onClick }) {
     >
       <div className="relative">
         <img
-          src={villa.imageUrl || "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=400&h=300&fit=crop"}
+          src={villa.imageUrl || villaPlaceholder}
           alt={villa.name}
+          loading={isPriority ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={isPriority ? "high" : "low"}
           className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
         />
         <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
