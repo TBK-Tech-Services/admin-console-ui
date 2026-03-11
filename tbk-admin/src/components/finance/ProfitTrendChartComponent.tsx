@@ -26,11 +26,12 @@ export default function ProfitTrendChartComponent({ profitTrendData }: ProfitTre
               tickLine={false}
               tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
             />
-            <YAxis 
+            <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-              tickFormatter={(value) => `₹${(value / 1000)}K`}
+              width={80}
+              tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }}
+              tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
             />
             <Tooltip 
               formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Profit']}

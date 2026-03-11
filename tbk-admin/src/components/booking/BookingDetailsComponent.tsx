@@ -73,21 +73,43 @@ export default function BookingDetailsComponent({ formData, onInputChange, villa
           </div>
 
           <div className="space-y-1.5 sm:space-y-2">
-            <Label htmlFor="totalGuests" className="text-sm font-medium flex items-center gap-2">
+            <Label className="text-sm font-medium flex items-center gap-2">
               <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               Number of Guests *
             </Label>
-            <div className="relative">
-              <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-              <Input
-                id="totalGuests"
-                type="number"
-                placeholder="0"
-                min="1"
-                value={formData.totalGuests}
-                onChange={(e) => onInputChange("totalGuests", e.target.value)}
-                className="pl-9 sm:pl-10 h-10 sm:h-11 border-border/60 focus:border-accent transition-colors"
-              />
+            <div className="space-y-2">
+              <div className="flex items-center justify-between border border-border/60 rounded-md px-3 h-10 sm:h-11">
+                <span className="text-sm text-muted-foreground">Adults</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onInputChange("numberOfAdults", Math.max(1, formData.numberOfAdults - 1))}
+                    className="w-7 h-7 rounded-full border border-border/60 flex items-center justify-center text-sm hover:bg-accent/10 transition-colors"
+                  >−</button>
+                  <span className="w-4 text-center text-sm font-medium">{formData.numberOfAdults}</span>
+                  <button
+                    type="button"
+                    onClick={() => onInputChange("numberOfAdults", formData.numberOfAdults + 1)}
+                    className="w-7 h-7 rounded-full border border-border/60 flex items-center justify-center text-sm hover:bg-accent/10 transition-colors"
+                  >+</button>
+                </div>
+              </div>
+              <div className="flex items-center justify-between border border-border/60 rounded-md px-3 h-10 sm:h-11">
+                <span className="text-sm text-muted-foreground">Children</span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onInputChange("numberOfChildren", Math.max(0, formData.numberOfChildren - 1))}
+                    className="w-7 h-7 rounded-full border border-border/60 flex items-center justify-center text-sm hover:bg-accent/10 transition-colors"
+                  >−</button>
+                  <span className="w-4 text-center text-sm font-medium">{formData.numberOfChildren}</span>
+                  <button
+                    type="button"
+                    onClick={() => onInputChange("numberOfChildren", formData.numberOfChildren + 1)}
+                    className="w-7 h-7 rounded-full border border-border/60 flex items-center justify-center text-sm hover:bg-accent/10 transition-colors"
+                  >+</button>
+                </div>
+              </div>
             </div>
           </div>
         </CardContent>

@@ -6,7 +6,8 @@ export const addBookingService = async (formData: Booking_Data): Promise<void> =
     const transformedData = {
         ...formData,
         villaId: Number(formData.villaId),
-        totalGuests: Number(formData.totalGuests),
+        numberOfAdults: Number(formData.numberOfAdults),
+        numberOfChildren: Number(formData.numberOfChildren),
     };
     const response = await apiService.post('/bookings/v1/', transformedData);
     return response.data;
@@ -31,7 +32,8 @@ export const updateBookingService = async (formData: Booking_Data, id: number): 
     const transformedData = {
         ...formData,
         villaId: Number(formData.villaId),
-        totalGuests: Number(formData.totalGuests),
+        numberOfAdults: Number(formData.numberOfAdults),
+        numberOfChildren: Number(formData.numberOfChildren),
     };
 
     const response = await apiService.put(`/bookings/v1/${id}`, transformedData);

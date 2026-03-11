@@ -18,7 +18,8 @@ export default function NewBookingPage() {
     villaId: null,
     checkIn: "",
     checkOut: "",
-    totalGuests: 0,
+    numberOfAdults: 1,
+    numberOfChildren: 0,
     specialRequest: "",
     gstMode: "NONE",
     gstOnBasePrice: false,
@@ -58,7 +59,7 @@ export default function NewBookingPage() {
       });
       setFormData({
         guestName: "", guestEmail: "", guestPhone: "", alternatePhone: "",
-        villaId: null, checkIn: "", checkOut: "", totalGuests: 0,
+        villaId: null, checkIn: "", checkOut: "", numberOfAdults: 1, numberOfChildren: 0,
         specialRequest: "", gstMode: "NONE", gstOnBasePrice: false,
         gstOnExtraCharge: false, bookingSource: null, customPrice: 0,
         extraPersonCharge: 0, discount: 0, advancePaid: 0,
