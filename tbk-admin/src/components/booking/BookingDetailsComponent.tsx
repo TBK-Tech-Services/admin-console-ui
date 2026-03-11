@@ -28,7 +28,6 @@ export default function BookingDetailsComponent({ formData, onInputChange, villa
                 <SelectValue placeholder="Choose a villa" />
               </SelectTrigger>
               <SelectContent>
-                {/* ✅ villas prop directly — Redux nahi */}
                 {villas?.map((villa) => (
                   <SelectItem key={villa.id} value={villa.id}>
                     <div className="flex items-center gap-2">
