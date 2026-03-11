@@ -18,7 +18,7 @@ export default function GuestPhoneFieldComponent({ value, onChange }: GuestPhone
           type="tel"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          placeholder="+91 98765 43210"
+          placeholder="98765 43210"
           className="h-12 pl-10"
           required
         />

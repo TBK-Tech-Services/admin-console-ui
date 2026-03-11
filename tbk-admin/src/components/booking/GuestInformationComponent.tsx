@@ -62,7 +62,7 @@ export default function GuestInformationComponent({ formData, onInputChange }) {
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 id="guestPhone"
-                placeholder="+91 98765 43210"
+                placeholder="98765 43210"
                 value={formData.guestPhone}
                 onChange={(e) => onInputChange("guestPhone", e.target.value)}
                 className="pl-9 sm:pl-10 h-10 sm:h-11 border-border/60 focus:border-primary transition-colors"
@@ -79,7 +79,7 @@ export default function GuestInformationComponent({ formData, onInputChange }) {
               <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
               <Input
                 id="alternatePhone"
-                placeholder="+91 98765 43210"
+                placeholder="98765 43210"
                 value={formData.alternatePhone}
                 onChange={(e) => onInputChange("alternatePhone", e.target.value)}
                 className="pl-9 sm:pl-10 h-10 sm:h-11 border-border/60 focus:border-primary transition-colors"

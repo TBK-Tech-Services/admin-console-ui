@@ -74,7 +74,7 @@ export default function SendOptionsComponent({
                         type={sendType === "whatsapp" ? "tel" : "email"}
                         placeholder={
                             sendType === "whatsapp"
-                                ? "+91 98765 43210"
+                                ? "98765 43210"
                                 : "guest@example.com"
                         }
                         value={contactInfo}
@@ -83,7 +83,7 @@ export default function SendOptionsComponent({
                     />
                     <p className="text-xs text-muted-foreground">
                         {sendType === "whatsapp"
-                            ? "Include country code (e.g., +91 for India)"
+                            ? "Enter 10-digit phone number"
                             : "Voucher will be sent to this email address"}
                     </p>
                 </div>

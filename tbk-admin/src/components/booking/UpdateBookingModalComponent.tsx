@@ -121,7 +121,7 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                   <Label htmlFor="update-guestPhone">Phone Number *</Label>
                   <Input
                     id="update-guestPhone"
-                    placeholder="+91 98765 43210"
+                    placeholder="98765 43210"
                     value={formData.guestPhone}
                     onChange={(e) => handleInputChange("guestPhone", e.target.value)}
                   />
