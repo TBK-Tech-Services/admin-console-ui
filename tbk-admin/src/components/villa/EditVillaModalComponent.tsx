@@ -136,18 +136,17 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
           </div>
 
           <div>
-              <Label htmlFor="edit-status">Status</Label>
-              <Select defaultValue={villa?.status}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AVAILABLE">Available</SelectItem>
-                  <SelectItem value="OCCUPIED">Occupied</SelectItem>
-                  <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <Label htmlFor="edit-status">Status</Label>
+            <Select defaultValue={villa?.status}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="AVAILABLE">Available</SelectItem>
+                <SelectItem value="OCCUPIED">Occupied</SelectItem>
+                <SelectItem value="MAINTENANCE">Maintenance</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {/* Updated Amenities Section - Same as AddVilla */}
