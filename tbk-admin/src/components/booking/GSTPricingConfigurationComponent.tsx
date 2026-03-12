@@ -128,6 +128,77 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </Select>
           </div>
 
+          {/* Price Adjustments */}
+          <div className="space-y-3 sm:space-y-4 pt-2">
+            <div className="flex items-center gap-2 mb-3 sm:mb-4">
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              <h3 className="font-semibold text-sm">Price Adjustments</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="customPrice" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                  <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                  Custom Price
+                </Label>
+                <Input
+                  id="customPrice"
+                  type="number"
+                  min="0"
+                  placeholder="Total price for the stay"
+                  value={formData.customPrice || ''}
+                  onChange={(e) => onInputChange("customPrice", e.target.value)}
+                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
+                />
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Total price for the entire stay</p>
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="extraPersonCharge" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                  <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                  <span className="hidden xs:inline">Extra Person Charge</span>
+                  <span className="xs:hidden">Extra Charge</span>
+                </Label>
+                <Input
+                  id="extraPersonCharge"
+                  type="number"
+                  placeholder="0"
+                  value={formData.extraPersonCharge || ''}
+                  onChange={(e) => onInputChange("extraPersonCharge", e.target.value)}
+                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="discount" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                  <Gift className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
+                  Discount
+                </Label>
+                <Input
+                  id="discount"
+                  type="number"
+                  placeholder="0"
+                  value={formData.discount || ''}
+                  onChange={(e) => onInputChange("discount", e.target.value)}
+                  className="h-10 sm:h-11 border-border/60 focus:border-green-500 transition-colors text-sm"
+                />
+              </div>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="advancePaid" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                  <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                  Advance Paid
+                </Label>
+                <Input
+                  id="advancePaid"
+                  type="number"
+                  placeholder="0"
+                  value={formData.advancePaid || ''}
+                  onChange={(e) => onInputChange("advancePaid", e.target.value)}
+                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
+                />
+              </div>
+            </div>
+          </div>
+
           {/* GST Configuration */}
           <div className="p-3 sm:p-4 rounded-lg border border-border/50 bg-card space-y-3 sm:space-y-4">
             <div className="flex items-center gap-2 sm:gap-3">
@@ -231,77 +302,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             )}
           </div>
 
-          {/* Price Adjustments */}
-          <div className="space-y-3 sm:space-y-4 pt-2">
-            <div className="flex items-center gap-2 mb-3 sm:mb-4">
-              <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm">Price Adjustments</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="customPrice" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-                  Custom Price
-                </Label>
-                <Input
-                  id="customPrice"
-                  type="number"
-                  min="0"
-                  placeholder="Total price for the stay"
-                  value={formData.customPrice || ''}
-                  onChange={(e) => onInputChange("customPrice", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
-                />
-                <p className="text-[10px] sm:text-xs text-muted-foreground">Total price for the entire stay</p>
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="extraPersonCharge" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-                  <span className="hidden xs:inline">Extra Person Charge</span>
-                  <span className="xs:hidden">Extra Charge</span>
-                </Label>
-                <Input
-                  id="extraPersonCharge"
-                  type="number"
-                  placeholder="0"
-                  value={formData.extraPersonCharge || ''}
-                  onChange={(e) => onInputChange("extraPersonCharge", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
-                />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="discount" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <Gift className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                  Discount
-                </Label>
-                <Input
-                  id="discount"
-                  type="number"
-                  placeholder="0"
-                  value={formData.discount || ''}
-                  onChange={(e) => onInputChange("discount", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-green-500 transition-colors text-sm"
-                />
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="advancePaid" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
-                  Advance Paid
-                </Label>
-                <Input
-                  id="advancePaid"
-                  type="number"
-                  placeholder="0"
-                  value={formData.advancePaid || ''}
-                  onChange={(e) => onInputChange("advancePaid", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Billing Details */}
           <div className="space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t border-border/50">
             <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
@@ -329,11 +329,11 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                 <span className="text-muted-foreground font-medium">Subtotal</span>
                 <span className="font-semibold">₹{subTotalAmount}</span>
               </div>
-              {gstAmount > 0 && (
+              {formData.gstMode !== "NONE" && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">
                     GST (18%)
-                    {formData.gstMode !== "NONE" && gstDays > 0 && (
+                    {gstDays > 0 && (
                       <span className="text-[10px] sm:text-xs ml-1 text-accent">({gstDays} day{gstDays !== 1 ? "s" : ""})</span>
                     )}
                     {formData.gstMode === "SELECTIVE" && (
