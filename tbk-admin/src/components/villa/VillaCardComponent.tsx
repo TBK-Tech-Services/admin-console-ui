@@ -10,7 +10,6 @@ export default function VillaCardComponent({ villa, onClick , isPriority = false
   const amenityNames = villa.amenities?.map(amenityObj => amenityObj.amenity.name) || [];
 
   // Format price
-  const formattedPrice = `₹${villa.price?.toLocaleString()}/night`;
 
   // Handle location click
   const handleLocationClick = (e: React.MouseEvent) => {
@@ -55,7 +54,6 @@ export default function VillaCardComponent({ villa, onClick , isPriority = false
             </button>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-bold text-primary text-sm sm:text-base">{formattedPrice}</div>
             <div className="text-[10px] sm:text-xs text-muted-foreground">
               ID: {villa.id}
             </div>

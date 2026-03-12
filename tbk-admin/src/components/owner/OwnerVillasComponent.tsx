@@ -86,7 +86,6 @@ export default function OwnerVillasComponent({ data, isLoading }: OwnerVillasCom
 
                 <div className="flex items-center gap-1 sm:gap-2">
                   <IndianRupee className="h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
-                  <span className="text-foreground truncate">₹{villa.pricePerNight?.toLocaleString('en-IN')}</span>
                 </div>
               </div>
             </div>

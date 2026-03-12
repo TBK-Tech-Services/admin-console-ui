@@ -4,7 +4,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CreditCard, Calendar, IndianRupee, Percent, Gift, Wallet, TrendingUp, Globe } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CreditCard, Calendar, IndianRupee, Percent, Gift, Wallet, TrendingUp, Globe, Minus, Plus } from "lucide-react";
 import { getBookingSubtotal } from "@/utils/getBookingSubtotal";
 import { calculateGST } from "@/utils/calculateGST";
 import { getDueAmount } from "@/utils/getDueAmount";
@@ -13,7 +14,7 @@ interface GSTPricingConfigurationComponentProps {
   formData: any;
   villaData: any;
   totalDaysOfStay: number | null;
-  onInputChange: (field: string, value: boolean | string) => void;
+  onInputChange: (field: string, value: boolean | string | number) => void;
 }
 
 const BOOKING_SOURCES = [
@@ -31,10 +32,11 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
   const extraPersonCharge = Number(formData.extraPersonCharge) || 0;
   const discount = Number(formData.discount) || 0;
   const advancePaid = Number(formData.advancePaid) || 0;
-  const basePrice = (villaData?.price * (totalDaysOfStay || 0)) || 0;
-  const effectivePrice = customPrice > 0 ? customPrice : basePrice;
+  const nights = totalDaysOfStay || 0;
+  const gstDays = Math.min(Number(formData.gstDays) || 0, nights);
+  const effectivePrice = customPrice;
 
-  const subTotalAmount: number = getBookingSubtotal(formData, villaData, totalDaysOfStay);
+  const subTotalAmount: number = getBookingSubtotal(formData);
 
   const gstAmount: number = calculateGST({
     gstMode: formData.gstMode,
@@ -43,7 +45,9 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
     effectivePrice,
     extraPersonCharge,
     discount,
-    subTotalAmount
+    subTotalAmount,
+    gstDays,
+    numberOfNights: nights,
   });
 
   const totalPayableAmount: number = (subTotalAmount + gstAmount);
@@ -51,11 +55,24 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
 
   const handleGstModeChange = (value: string) => {
     onInputChange("gstMode", value);
-    if (value !== "SELECTIVE") {
+    if (value === "NONE") {
       onInputChange("gstOnBasePrice", false);
       onInputChange("gstOnExtraCharge", false);
+      onInputChange("gstDays", 0);
     }
   };
+
+  const handleGstDaysDecrement = () => {
+    const current = Number(formData.gstDays) || 0;
+    if (current > 0) onInputChange("gstDays", current - 1);
+  };
+
+  const handleGstDaysIncrement = () => {
+    const current = Number(formData.gstDays) || 0;
+    if (current < nights) onInputChange("gstDays", current + 1);
+  };
+
+  const showGstDays = formData.gstMode !== "NONE";
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
@@ -69,29 +86,21 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 sm:space-y-6 pt-4 sm:pt-6">
-          <div className="grid grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl border border-border/50">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 shrink-0">
-                <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">Number of Nights</p>
-                <p className="text-base sm:text-lg font-bold text-foreground">
-                  {totalDaysOfStay === null ? 0 : totalDaysOfStay} <span className="text-sm font-medium">{totalDaysOfStay === 1 ? "Night" : "Nights"}</span>
-                </p>
-              </div>
+
+          {/* Number of Nights stat */}
+          <div className="flex items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-gradient-to-br from-muted/50 to-muted/30 rounded-xl border border-border/50">
+            <div className="p-1.5 sm:p-2 rounded-lg bg-primary/10 shrink-0">
+              <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
             </div>
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 rounded-lg bg-success/10 shrink-0">
-                <IndianRupee className="h-4 w-4 sm:h-5 sm:w-5 text-success" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">Per Night Rate</p>
-                <p className="text-base sm:text-lg font-bold text-foreground">₹{villaData?.price || 0}</p>
-              </div>
+            <div className="min-w-0">
+              <p className="text-[10px] sm:text-xs text-muted-foreground font-medium">Number of Nights</p>
+              <p className="text-base sm:text-lg font-bold text-foreground">
+                {nights} <span className="text-sm font-medium">{nights === 1 ? "Night" : "Nights"}</span>
+              </p>
             </div>
           </div>
 
+          {/* Booking Source */}
           <div className="p-3 sm:p-4 rounded-lg border border-border/50 bg-card">
             <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/10 shrink-0">
@@ -119,6 +128,7 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </Select>
           </div>
 
+          {/* GST Configuration */}
           <div className="p-3 sm:p-4 rounded-lg border border-border/50 bg-card space-y-3 sm:space-y-4">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="p-1.5 sm:p-2 rounded-lg bg-accent/10 shrink-0">
@@ -158,6 +168,7 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
               </div>
             </RadioGroup>
 
+            {/* SELECTIVE toggles */}
             {formData.gstMode === "SELECTIVE" && (
               <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/50 space-y-2 sm:space-y-3">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Select items to apply GST:</p>
@@ -179,8 +190,48 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                 </div>
               </div>
             )}
+
+            {/* GST Days control — shown for ALL and SELECTIVE modes */}
+            {showGstDays && (
+              <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/50">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs sm:text-sm font-medium">GST Days</p>
+                    <p className="text-[10px] sm:text-xs text-muted-foreground">
+                      Days to apply GST on (max {nights})
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={handleGstDaysDecrement}
+                      disabled={gstDays <= 0}
+                    >
+                      <Minus className="h-3.5 w-3.5" />
+                    </Button>
+                    <span className="w-16 text-center text-sm font-semibold tabular-nums">
+                      {gstDays} / {nights}
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8 rounded-full"
+                      onClick={handleGstDaysIncrement}
+                      disabled={gstDays >= nights || nights === 0}
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* Price Adjustments */}
           <div className="space-y-3 sm:space-y-4 pt-2">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
@@ -196,12 +247,12 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                   id="customPrice"
                   type="number"
                   min="0"
-                  placeholder="Override base price"
+                  placeholder="Total price for the stay"
                   value={formData.customPrice || ''}
                   onChange={(e) => onInputChange("customPrice", e.target.value)}
                   className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
                 />
-                <p className="text-[10px] sm:text-xs text-muted-foreground">Leave empty to use base price (₹{basePrice})</p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Total price for the entire stay</p>
               </div>
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="extraPersonCharge" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
@@ -251,29 +302,17 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </div>
           </div>
 
+          {/* Billing Details */}
           <div className="space-y-3 sm:space-y-4 pt-4 sm:pt-6 border-t border-border/50">
             <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
               <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Billing Details
             </h3>
             <div className="bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl p-3 sm:p-5 space-y-2 sm:space-y-3 border border-border/50">
-              {customPrice > 0 ? (
-                <>
-                  <div className="flex justify-between text-xs sm:text-sm pb-2 line-through text-muted-foreground/60">
-                    <span>Base Price ({totalDaysOfStay || 0} nights × ₹{villaData?.price || 0})</span>
-                    <span>₹{basePrice}</span>
-                  </div>
-                  <div className="flex justify-between text-xs sm:text-sm bg-primary/10 px-2 sm:px-3 py-1.5 sm:py-2 rounded-md border border-primary/20">
-                    <span className="text-primary font-semibold">Custom Price (Override)</span>
-                    <span className="font-bold text-primary">₹{customPrice}</span>
-                  </div>
-                </>
-              ) : (
-                <div className="flex justify-between text-xs sm:text-sm pb-2">
-                  <span className="text-muted-foreground">Base Price ({totalDaysOfStay || 0} nights × ₹{villaData?.price || 0})</span>
-                  <span className="font-semibold">₹{basePrice}</span>
-                </div>
-              )}
+              <div className="flex justify-between text-xs sm:text-sm">
+                <span className="text-muted-foreground">Custom Price</span>
+                <span className="font-semibold">₹{customPrice}</span>
+              </div>
               {extraPersonCharge > 0 && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Extra Person Charge</span>
@@ -294,6 +333,9 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">
                     GST (18%)
+                    {formData.gstMode !== "NONE" && gstDays > 0 && (
+                      <span className="text-[10px] sm:text-xs ml-1 text-accent">({gstDays} day{gstDays !== 1 ? "s" : ""})</span>
+                    )}
                     {formData.gstMode === "SELECTIVE" && (
                       <span className="text-[10px] sm:text-xs ml-1">
                         ({[formData.gstOnBasePrice && "Base", formData.gstOnExtraCharge && "Extra"].filter(Boolean).join(" + ")})

@@ -1,4 +1,3 @@
-
 export interface Booking_Data {
     guestName: string,
     guestEmail: string,
@@ -10,7 +9,11 @@ export interface Booking_Data {
     numberOfAdults: number,
     numberOfChildren: number,
     specialRequest: string,
-    isGSTIncluded: boolean,
+    gstMode: string,
+    gstOnBasePrice: boolean,
+    gstOnExtraCharge: boolean,
+    gstDays: number,
+    bookingSource: string | null,
     customPrice: number,
     extraPersonCharge: number,
     discount: number,

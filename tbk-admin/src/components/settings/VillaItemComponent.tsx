@@ -6,8 +6,7 @@ export default function VillaItemComponent({ villa }) {
     <div className="flex items-center justify-between p-4 border border-border rounded-lg">
       <div>
         <div className="font-medium">{villa.name}</div>
-        <div className="text-sm text-muted-foreground">
-          Max {villa.maxGuests} guests • {villa.price} per night
+        <div className="text-sm text-muted-foreground"> Max {villa.maxGuests} guests
         </div>
       </div>
       <div className="flex gap-2">

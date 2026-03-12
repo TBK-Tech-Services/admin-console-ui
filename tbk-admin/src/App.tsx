@@ -45,7 +45,7 @@ const App = () => (
           <Route path="/home" element={<RoleBasedHomeRedirectComponent />} />
 
           {/* Admin Only Routes */}
-          <Route element={<RoleBasedRouteComponent allowedRoles={['Admin']} />}>
+          <Route element={<RoleBasedRouteComponent blockedRoles={['Owner', 'Agent']} />}>
             <Route element={<Layout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/calendar" element={<CalendarPage />} />

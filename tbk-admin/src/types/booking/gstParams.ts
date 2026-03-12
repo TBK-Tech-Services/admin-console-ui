@@ -1,4 +1,3 @@
-
 export interface CalculateGSTParams {
     gstMode: string;
     gstOnBasePrice: boolean;
@@ -7,4 +6,6 @@ export interface CalculateGSTParams {
     extraPersonCharge: number;
     discount: number;
     subTotalAmount: number;
+    gstDays: number;
+    numberOfNights: number;
 };

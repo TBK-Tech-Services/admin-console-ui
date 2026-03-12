@@ -31,7 +31,6 @@ export default function AddVillaFormComponent({ onClose }) {
     bedrooms: 1,
     bathrooms: 1,
     maxGuests: 1,
-    pricePerNight: 0,
     status: "AVAILABLE",
     description: "",
   });
@@ -126,7 +125,6 @@ export default function AddVillaFormComponent({ onClose }) {
         bedRooms: formData.bedrooms,
         bathRooms: formData.bathrooms,
         maxGuest: formData.maxGuests,
-        pricePerNight: formData.pricePerNight,
         status: formData.status,
         description: formData.description,
         imageUrl: imageUrl,
@@ -213,17 +211,7 @@ export default function AddVillaFormComponent({ onClose }) {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-2">
-                  <Label htmlFor="price" className="text-sm font-medium flex items-center gap-2">
-                    <IndianRupee className="h-4 w-4 text-muted-foreground" />Price/Night *
-                  </Label>
-                  <div className="relative">
-                    <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input id="price" type="number" placeholder="15000" min="0" value={formData.pricePerNight}
-                      onChange={(e) => handleInputChange('pricePerNight', parseInt(e.target.value))}
-                      className="pl-10 h-11 border-border/60 focus:border-primary transition-colors" />
-                  </div>
-                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="status" className="text-sm font-medium flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4 text-muted-foreground" />Status

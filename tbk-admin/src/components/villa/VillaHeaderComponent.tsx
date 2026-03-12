@@ -55,7 +55,6 @@ export default function VillaHeaderComponent({ villa, onEditClick, showAllBookin
     setIsGalleryOpen(true);
   };
 
-  const formattedPrice = `₹${villa.price?.toLocaleString()}/night`;
 
   return (
     <>
@@ -182,7 +181,6 @@ export default function VillaHeaderComponent({ villa, onEditClick, showAllBookin
           <div className="space-y-2 sm:space-y-3">
             <div className="flex items-center justify-between py-1.5 sm:py-2 border-b text-sm">
               <span className="text-muted-foreground">Price per night</span>
-              <span className="font-bold text-primary text-base sm:text-lg">{formattedPrice}</span>
             </div>
             <div className="flex items-center justify-between py-1.5 sm:py-2 border-b text-sm">
               <span className="text-muted-foreground">Max Guests</span>

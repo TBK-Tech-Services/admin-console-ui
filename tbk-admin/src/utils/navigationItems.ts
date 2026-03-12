@@ -73,11 +73,12 @@ export const ownerNavigationItems = [
 
 export const getNavigationItems = (userRole: string | undefined) => {
   switch (userRole) {
-    case 'Admin':
-      return adminNavigationItems;
     case 'Owner':
       return ownerNavigationItems;
-    default:
+    case 'Agent':
       return [];
+    default:
+      // Admin, Manager, Staff, or any other non-owner/agent role → admin nav
+      return adminNavigationItems;
   }
 };

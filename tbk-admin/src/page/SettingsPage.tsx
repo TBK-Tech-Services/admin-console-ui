@@ -14,7 +14,12 @@ export default function SettingsPage() {
   const { handleMutationError, handleSuccess } = useErrorHandler();
   const queryClient = useQueryClient();
   const user = useSelector((state: RootState) => state.auth.user);
-  const userRole = user?.role;
+  let userRole: string | undefined;
+  if (typeof user?.role === 'string') {
+    userRole = user?.role;
+  } else if (user?.role && (user?.role as any).name) {
+    userRole = (user?.role as any).name;
+  }
 
   const { data: villasData } = useQuery({
     queryKey: ['villas'],
@@ -52,8 +57,8 @@ export default function SettingsPage() {
           onUpdateSettings={handleUpdateGeneralSettings}
           isUpdating={updateGeneralSettingsMutation.isPending}
         />
-        {userRole === "Admin" && <UserManagementSettingsComponent />}
-        {userRole === "Admin" && <VillaOwnerManagementSettingsComponent />}
+        {(userRole === "Admin" || userRole === "Manager") && <UserManagementSettingsComponent />}
+        {(userRole === "Admin" || userRole === "Manager") && <VillaOwnerManagementSettingsComponent />}
         <SecurityAndBackupSettingsComponent />
       </div>
     </div>

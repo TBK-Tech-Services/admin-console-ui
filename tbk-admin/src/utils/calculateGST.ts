@@ -7,29 +7,33 @@ export const calculateGST = ({
     effectivePrice,
     extraPersonCharge,
     discount,
-    subTotalAmount
+    subTotalAmount,
+    gstDays,
+    numberOfNights,
 }: CalculateGSTParams): number => {
-    if (gstMode === "NONE") {
+    if (gstMode === "NONE" || numberOfNights <= 0 ) {
         return 0;
     }
 
+    const grossTotal = effectivePrice + extraPersonCharge;
+
     if (gstMode === "ALL") {
-        return subTotalAmount * 0.18;
+        if (gstDays <= 0) return 0;
+        return (subTotalAmount / numberOfNights) * gstDays * 0.18;
     }
 
     if (gstMode === "SELECTIVE") {
-        const grossTotal = effectivePrice + extraPersonCharge;
+        let gstOnBase = 0;
+        let gstOnExtra = 0;
 
-        if (grossTotal <= 0) return 0;
+        if (gstOnBasePrice && gstDays > 0 && grossTotal > 0) {
+            const baseAfterDiscount = subTotalAmount * (effectivePrice / grossTotal);
+            gstOnBase = (baseAfterDiscount / numberOfNights) * gstDays * 0.18;
+        }
 
-        const baseRatio = effectivePrice / grossTotal;
-        const extraRatio = extraPersonCharge / grossTotal;
-
-        const baseAfterDiscount = subTotalAmount * baseRatio;
-        const extraAfterDiscount = subTotalAmount * extraRatio;
-
-        const gstOnBase = gstOnBasePrice ? (baseAfterDiscount * 0.18) : 0;
-        const gstOnExtra = gstOnExtraCharge ? (extraAfterDiscount * 0.18) : 0;
+        if (gstOnExtraCharge) {
+            gstOnExtra = extraPersonCharge * 0.18;
+        }
 
         return gstOnBase + gstOnExtra;
     }

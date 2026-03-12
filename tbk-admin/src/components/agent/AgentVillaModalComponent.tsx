@@ -173,7 +173,6 @@ export default function AgentVillaModalComponent({ villa, isOpen, onClose }) {
                                     <ExternalLink className="h-3 w-3 shrink-0" />
                                 </Button>
                                 <Badge className="bg-gradient-primary text-white text-xs sm:text-base px-2 sm:px-4 py-0.5 sm:py-1 rounded-full shrink-0">
-                                    ₹{villa.price?.toLocaleString()}/night
                                 </Badge>
                             </div>
                         </div>

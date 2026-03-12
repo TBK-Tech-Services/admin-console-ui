@@ -5,7 +5,6 @@ export interface Villa_Data {
   bedRooms: number;
   bathRooms: number;
   maxGuest: number;
-  pricePerNight: number;
   status: 'AVAILABLE' | 'OCCUPIED' | 'MAINTENANCE';
   description: string;
   imageUrl: string; // ✅ Cloudinary URL

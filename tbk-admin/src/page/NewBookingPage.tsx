@@ -24,6 +24,7 @@ export default function NewBookingPage() {
     gstMode: "NONE",
     gstOnBasePrice: false,
     gstOnExtraCharge: false,
+    gstDays: 0,
     bookingSource: null,
     customPrice: 0,
     extraPersonCharge: 0,
@@ -61,7 +62,7 @@ export default function NewBookingPage() {
         guestName: "", guestEmail: "", guestPhone: "", alternatePhone: "",
         villaId: null, checkIn: "", checkOut: "", numberOfAdults: 1, numberOfChildren: 0,
         specialRequest: "", gstMode: "NONE", gstOnBasePrice: false,
-        gstOnExtraCharge: false, bookingSource: null, customPrice: 0,
+        gstOnExtraCharge: false, gstDays: 0, bookingSource: null, customPrice: 0,
         extraPersonCharge: 0, discount: 0, advancePaid: 0,
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.recentBookings() });
@@ -79,7 +80,7 @@ export default function NewBookingPage() {
     addBookingMutation.mutate();
   };
 
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string | boolean | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 

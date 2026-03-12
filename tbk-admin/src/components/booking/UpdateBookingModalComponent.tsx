@@ -6,11 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, MapPin, CreditCard } from "lucide-react";
+import { Users, Calendar, MapPin, CreditCard, Percent, Minus, Plus } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { formatDateForInput } from "@/utils/formatDateForInput";
+import { getTotalDaysOfStay } from "@/utils/getTotalDaysOfStay";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateBookingService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
@@ -18,16 +20,10 @@ import { queryKeys } from "@/lib/queryKeys";
 
 export default function UpdateBookingModalComponent({ isOpen, onClose, booking }) {
 
-  // useQueryClient
   const queryClient = useQueryClient();
-
-  // useErrorHanlder
   const { handleMutationError, handleSuccess } = useErrorHandler();
-
-  // useSelector
   const villas = useSelector((state: RootState) => state.villas);
 
-  // State Variables
   const [formData, setFormData] = useState({
     guestName: booking?.guestName || "",
     guestEmail: booking?.guestEmail || "",
@@ -37,41 +33,48 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     checkOut: formatDateForInput(booking?.checkOut) || "",
     totalGuests: booking?.totalGuests || "",
     specialRequest: booking?.specialRequest || "",
-    isGSTIncluded: booking?.isGSTIncluded || false
+    gstMode: booking?.gstMode || "NONE",
+    gstOnBasePrice: booking?.gstOnBasePrice || false,
+    gstOnExtraCharge: booking?.gstOnExtraCharge || false,
+    gstDays: booking?.gstDays || 0,
   });
 
-  // Handler Function to Handle Input Change
-  const handleInputChange = (field: string, value: string | boolean) => {
+  const handleInputChange = (field: string, value: string | boolean | number) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const totalDaysOfStay = getTotalDaysOfStay({ checkIn: formData.checkIn, checkOut: formData.checkOut }) || 0;
+
+  const handleGstModeChange = (value: string) => {
     setFormData((prev) => ({
       ...prev,
-      [field]: value
+      gstMode: value,
+      ...(value === "NONE" && { gstOnBasePrice: false, gstOnExtraCharge: false, gstDays: 0 }),
     }));
   };
 
-  // Update Booking Mutation
+  const handleGstDaysDecrement = () => {
+    const current = Number(formData.gstDays) || 0;
+    if (current > 0) handleInputChange("gstDays", current - 1);
+  };
+
+  const handleGstDaysIncrement = () => {
+    const current = Number(formData.gstDays) || 0;
+    if (current < totalDaysOfStay) handleInputChange("gstDays", current + 1);
+  };
+
   const updateBookingMutation = useMutation({
-    mutationFn: async() => {
-      return await updateBookingService(formData , booking.id);
-    },
+    mutationFn: async () => updateBookingService(formData, booking.id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.dashboard.recentBookings()
-      });
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.dashboard.stats()
-      });
-      queryClient.invalidateQueries({ 
-        queryKey: queryKeys.dashboard.upcomingCheckins()
-      });
-
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.recentBookings() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.upcomingCheckins() });
       handleSuccess("Updated Booking Successfully!");
-
       onClose();
     },
-    onError: handleMutationError
-  })
+    onError: handleMutationError,
+  });
 
-  // Handler Function to Update Booking
   const handleUpdateBooking = async (e: React.FormEvent) => {
     e.preventDefault();
     updateBookingMutation.mutate();
@@ -83,9 +86,8 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
         <DialogHeader>
           <DialogTitle>Update Booking ID - {booking.id}</DialogTitle>
         </DialogHeader>
-        
+
         <form onSubmit={handleUpdateBooking} className="space-y-6">
-          {/* Guest Information & Booking Details in Grid */}
           <div className="grid gap-6 lg:grid-cols-2">
             {/* Guest Information */}
             <Card>
@@ -105,9 +107,8 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                     onChange={(e) => handleInputChange("guestName", e.target.value)}
                   />
                 </div>
-                
                 <div className="space-y-2">
-                  <Label htmlFor="update-guestEmail">Email Address *</Label>
+                  <Label htmlFor="update-guestEmail">Email Address</Label>
                   <Input
                     id="update-guestEmail"
                     type="email"
@@ -116,7 +117,6 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                     onChange={(e) => handleInputChange("guestEmail", e.target.value)}
                   />
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="update-guestPhone">Phone Number *</Label>
                   <Input
@@ -145,15 +145,12 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                       <SelectValue placeholder="Choose a villa" />
                     </SelectTrigger>
                     <SelectContent>
-                      {
-                        villas.listOfVilla.map((villa) => (
-                          <SelectItem key={villa.id} value={villa.id.toString()}>{villa.name}</SelectItem>
-                        ))
-                      }
+                      {villas.listOfVilla.map((villa) => (
+                        <SelectItem key={villa.id} value={villa.id.toString()}>{villa.name}</SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
-                
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="update-checkIn">Check-in Date *</Label>
@@ -174,7 +171,6 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                     />
                   </div>
                 </div>
-                
                 <div className="space-y-2">
                   <Label htmlFor="update-totalGuests">Number of Guests *</Label>
                   <Input
@@ -190,7 +186,7 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
             </Card>
           </div>
 
-          {/* Additional Information */}
+          {/* Special Requests */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -212,47 +208,110 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
             </CardContent>
           </Card>
 
-          {/* Pricing Configuration */}
+          {/* GST Configuration */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CreditCard className="h-5 w-5" />
-                Pricing Configuration
+                GST Configuration
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between py-3">
-                <div>
-                  <Label htmlFor="update-gst-toggle" className="text-sm font-medium">
-                    Include GST (18%)
-                  </Label>
-                  <p className="text-sm text-muted-foreground">
-                    Enable to include 18% GST in the final booking amount
-                  </p>
-                </div>
-                <Switch 
-                  id="update-gst-toggle" 
-                  checked={formData.isGSTIncluded}
-                  onCheckedChange={(checked) => handleInputChange("isGSTIncluded", checked)}
-                />
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                <Percent className="h-4 w-4" />
+                Select how GST should be applied
               </div>
+
+              <RadioGroup value={formData.gstMode} onValueChange={handleGstModeChange} className="space-y-2">
+                <div className="flex items-center space-x-3 p-3 rounded-md border border-border/50 hover:bg-accent/5 transition-colors">
+                  <RadioGroupItem value="NONE" id="upd-gst-none" />
+                  <Label htmlFor="upd-gst-none" className="flex-1 cursor-pointer">
+                    <span className="font-medium text-sm">No GST</span>
+                    <p className="text-xs text-muted-foreground">No tax will be applied</p>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-3 rounded-md border border-border/50 hover:bg-accent/5 transition-colors">
+                  <RadioGroupItem value="ALL" id="upd-gst-all" />
+                  <Label htmlFor="upd-gst-all" className="flex-1 cursor-pointer">
+                    <span className="font-medium text-sm">GST on All (18%)</span>
+                    <p className="text-xs text-muted-foreground">Apply 18% GST on entire subtotal</p>
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-3 p-3 rounded-md border border-border/50 hover:bg-accent/5 transition-colors">
+                  <RadioGroupItem value="SELECTIVE" id="upd-gst-selective" />
+                  <Label htmlFor="upd-gst-selective" className="flex-1 cursor-pointer">
+                    <span className="font-medium text-sm">GST on Specific Items</span>
+                    <p className="text-xs text-muted-foreground">Choose which charges include GST</p>
+                  </Label>
+                </div>
+              </RadioGroup>
+
+              {formData.gstMode === "SELECTIVE" && (
+                <div className="p-3 rounded-lg bg-muted/30 border border-border/50 space-y-2">
+                  <p className="text-xs font-medium text-muted-foreground">Select items to apply GST:</p>
+                  <div className="flex items-center justify-between p-2.5 rounded-md bg-card border border-border/50">
+                    <Label htmlFor="upd-gst-base" className="text-sm cursor-pointer">Base / Custom Price</Label>
+                    <Switch
+                      id="upd-gst-base"
+                      checked={formData.gstOnBasePrice}
+                      onCheckedChange={(checked) => handleInputChange("gstOnBasePrice", checked)}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between p-2.5 rounded-md bg-card border border-border/50">
+                    <Label htmlFor="upd-gst-extra" className="text-sm cursor-pointer">Extra Person Charge</Label>
+                    <Switch
+                      id="upd-gst-extra"
+                      checked={formData.gstOnExtraCharge}
+                      onCheckedChange={(checked) => handleInputChange("gstOnExtraCharge", checked)}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {formData.gstMode !== "NONE" && (
+                <div className="p-3 rounded-lg bg-muted/30 border border-border/50">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">GST Days</p>
+                      <p className="text-xs text-muted-foreground">Days to apply GST on (max {totalDaysOfStay})</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        onClick={handleGstDaysDecrement}
+                        disabled={Number(formData.gstDays) <= 0}
+                      >
+                        <Minus className="h-3.5 w-3.5" />
+                      </Button>
+                      <span className="w-16 text-center text-sm font-semibold tabular-nums">
+                        {Number(formData.gstDays)} / {totalDaysOfStay}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-8 w-8 rounded-full"
+                        onClick={handleGstDaysIncrement}
+                        disabled={Number(formData.gstDays) >= totalDaysOfStay || totalDaysOfStay === 0}
+                      >
+                        <Plus className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Action Buttons */}
           <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={onClose}
-            >
+            <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit"
-              size="lg" 
-              className="min-w-[150px]"
-            >
+            <Button type="submit" size="lg" className="min-w-[150px]">
               Update Booking
             </Button>
           </div>

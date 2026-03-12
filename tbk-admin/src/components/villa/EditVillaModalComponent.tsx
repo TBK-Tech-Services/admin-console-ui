@@ -135,17 +135,7 @@ export default function EditVillaModalComponent({ villa, isOpen, onClose }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="edit-price">Price per Night</Label>
-              <Input 
-                id="edit-price" 
-                type="number"
-                defaultValue={villa?.price || 15000}
-                min="0"
-              />
-            </div>
-            <div>
+          <div>
               <Label htmlFor="edit-status">Status</Label>
               <Select defaultValue={villa?.status}>
                 <SelectTrigger>

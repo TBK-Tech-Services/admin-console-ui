@@ -46,18 +46,15 @@ export default function LoginPage() {
                     roleValue = user.role.name;
                 }
 
-                if (roleValue === 'Admin') {
-                    navigate("/");
-                }
-                else if (roleValue === 'Owner') {
+                if (roleValue === 'Owner') {
                     navigate("/owner-dashboard");
                 }
                 else if (roleValue === 'Agent') {
                     navigate("/agent");
                 }
                 else {
-                    console.log("Unknown role format:", user.role);
-                    navigate("/unauthorized");
+                    // Admin, Manager, Staff, or any other non-owner/agent role
+                    navigate("/");
                 }
             }, 1000);
         },

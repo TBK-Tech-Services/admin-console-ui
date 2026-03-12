@@ -113,10 +113,15 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
                 </Badge>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">GST Included</p>
+                <p className="text-xs text-muted-foreground">GST</p>
                 <p className="font-medium text-sm">
-                  {booking.isGSTIncluded ? 'Yes' : 'No'}
-                  {booking.isGSTIncluded && booking.totalTax && (
+                  {booking.gstMode === "NONE" || !booking.gstMode ? 'No GST' : booking.gstMode}
+                  {booking.gstMode !== "NONE" && booking.gstMode && booking.gstDays > 0 && (
+                    <span className="text-xs text-muted-foreground ml-1">
+                      · {booking.gstDays} day{booking.gstDays !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {booking.totalTax > 0 && (
                     <span className="text-xs text-muted-foreground ml-1">
                       (₹{booking.totalTax})
                     </span>
