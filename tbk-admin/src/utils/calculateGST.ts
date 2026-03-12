@@ -23,6 +23,12 @@ export const calculateGST = ({
     }
 
     if (gstMode === "SELECTIVE") {
+        // If no items selected, fall back to ALL mode formula
+        if (!gstOnBasePrice && !gstOnExtraCharge) {
+            if (gstDays <= 0) return 0;
+            return (subTotalAmount / numberOfNights) * gstDays * 0.18;
+        }
+
         let gstOnBase = 0;
         let gstOnExtra = 0;
 
