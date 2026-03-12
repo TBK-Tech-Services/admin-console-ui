@@ -49,7 +49,10 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     setFormData((prev) => ({
       ...prev,
       gstMode: value,
-      ...(value === "NONE" && { gstOnBasePrice: false, gstOnExtraCharge: false, gstDays: 0 }),
+      ...(value === "NONE"
+        ? { gstOnBasePrice: false, gstOnExtraCharge: false, gstDays: 0 }
+        : (Number(prev.gstDays) === 0 ? { gstDays: totalDaysOfStay } : {})
+      ),
     }));
   };
 

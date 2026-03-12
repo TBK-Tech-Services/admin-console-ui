@@ -59,6 +59,9 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
       onInputChange("gstOnBasePrice", false);
       onInputChange("gstOnExtraCharge", false);
       onInputChange("gstDays", 0);
+    } else if (Number(formData.gstDays) === 0) {
+      // Auto-set gstDays to full stay nights when first enabling GST
+      onInputChange("gstDays", nights);
     }
   };
 
