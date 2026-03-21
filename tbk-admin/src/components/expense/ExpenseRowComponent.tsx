@@ -6,7 +6,7 @@ import { Eye, Edit, Trash2 } from "lucide-react";
 export default function ExpenseRowComponent({ expense, onView, onEdit, onDelete }) {
 
   // Convert amount from paise to rupees for display
-  const displayAmount = expense.amount / 100;
+  const displayAmount = Number(expense.amount) / 100;
 
   // Prepare villa names for display
   const getVillaNames = () => {
@@ -25,7 +25,7 @@ export default function ExpenseRowComponent({ expense, onView, onEdit, onDelete 
     <TableRow>
       <TableCell className="font-medium text-sm">{expense.title}</TableCell>
       <TableCell className="font-semibold text-foreground text-sm">
-        ₹{displayAmount.toLocaleString()}
+        ₹{displayAmount.toLocaleString('en-IN')}
       </TableCell>
       <TableCell className="text-sm">
         {new Date(expense.date).toLocaleDateString('en-IN', {

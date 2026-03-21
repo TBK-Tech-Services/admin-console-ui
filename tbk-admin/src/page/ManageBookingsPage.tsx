@@ -20,9 +20,13 @@ export default function ManageBookingsPage() {
     setCheckInDate(null);
   };
 
+  const checkInDateString = checkInDate
+    ? `${checkInDate.getFullYear()}-${String(checkInDate.getMonth() + 1).padStart(2, '0')}-${String(checkInDate.getDate()).padStart(2, '0')}`
+    : null;
+
   const { data } = useQuery({
-    queryKey: ['bookings', searchText, bookingStatus, paymentStatus, checkInDate],
-    queryFn: () => searchAndFilterBookingsService(searchText, bookingStatus, paymentStatus, checkInDate),
+    queryKey: ['bookings', searchText, bookingStatus, paymentStatus, checkInDateString],
+    queryFn: () => searchAndFilterBookingsService(searchText, bookingStatus, paymentStatus, checkInDateString),
   });
 
   return (

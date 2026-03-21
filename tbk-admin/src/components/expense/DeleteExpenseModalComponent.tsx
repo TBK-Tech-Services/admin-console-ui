@@ -17,7 +17,7 @@ export default function DeleteExpenseModalComponent({ isOpen, onClose, expense, 
   };
 
   // Convert paise to rupees for display
-  const displayAmount = expense.amount / 100;
+  const displayAmount = Number(expense.amount) / 100;
 
   // Get villa names safely
   const getVillaNames = () => {
@@ -67,7 +67,7 @@ export default function DeleteExpenseModalComponent({ isOpen, onClose, expense, 
               
               <div className="flex items-center gap-2 text-red-600 font-semibold">
                 <IndianRupee className="h-4 w-4" />
-                {displayAmount.toLocaleString()}
+                {displayAmount.toLocaleString('en-IN')}
               </div>
 
               <div className="text-sm text-gray-600">

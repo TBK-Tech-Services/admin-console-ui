@@ -34,7 +34,7 @@ export default function VillaBookingsTableComponent({ villa, allBookings }) {
                   <TableCell className="text-sm hidden sm:table-cell">{booking.guestPhone}</TableCell>
                   <TableCell className="text-xs sm:text-sm">{new Date(booking.checkIn).toLocaleDateString()}</TableCell>
                   <TableCell className="text-xs sm:text-sm hidden md:table-cell">{new Date(booking.checkOut).toLocaleDateString()}</TableCell>
-                  <TableCell className="font-bold text-xs sm:text-sm">₹{booking.totalPayableAmount?.toLocaleString()}</TableCell>
+                  <TableCell className="font-bold text-xs sm:text-sm">₹{Number(booking.totalPayableAmount).toLocaleString('en-IN')}</TableCell>
                   <TableCell>
                     <Badge className={`${getBookingStatusColor(booking.bookingStatus)} text-[10px] sm:text-xs`}>
                       {booking.bookingStatus}

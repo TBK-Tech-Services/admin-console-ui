@@ -34,7 +34,7 @@ export default function ProfitTrendChartComponent({ profitTrendData }: ProfitTre
               tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
             />
             <Tooltip 
-              formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Profit']}
+              formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Profit']}
               contentStyle={{
                 backgroundColor: "hsl(var(--popover))",
                 border: "1px solid hsl(var(--border))",

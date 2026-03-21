@@ -57,7 +57,7 @@ export default function BookingAmountComponent({ amount, bookedOn, paymentStatus
   return (
     <div className="text-right space-y-2">
       <div className="font-bold text-xl text-primary">
-        ₹{amount?.toLocaleString()}
+        ₹{Number(amount).toLocaleString('en-IN')}
       </div>
 
       <DropdownMenu>

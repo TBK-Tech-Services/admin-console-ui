@@ -1,10 +1,11 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { Menu, LogOut, ChevronUp } from "lucide-react";
+import { Menu, LogOut, ChevronUp, KeyRound } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useState, useCallback, memo } from "react";
+import ChangePasswordModalComponent from "@/components/auth/ChangePasswordModalComponent";
 import { cn } from "@/lib/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
@@ -63,35 +64,41 @@ interface ProfileSectionProps {
   lastName: string;
   email: string;
   onLogout: () => void;
+  onChangePassword: () => void;
 }
 
-const ProfileSection = ({ firstName, lastName, email, onLogout }: ProfileSectionProps) => (
+const ProfileSection = ({ firstName, lastName, email, onLogout, onChangePassword }: ProfileSectionProps) => (
   <div className="mt-auto pt-6 border-t border-border">
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full flex items-center justify-between px-4 py-3 h-auto hover:bg-secondary/80 transition-all duration-200"
+          className="w-full flex items-center gap-3 px-4 py-3 h-auto hover:bg-secondary/80 transition-all duration-200 overflow-hidden"
         >
-          <div className="flex items-center gap-3">
-            <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
-                {firstName.charAt(0).toUpperCase()}{lastName.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex flex-col items-start text-left">
-              <span className="text-sm font-medium text-foreground">
-                {firstName} {lastName}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                {email}
-              </span>
-            </div>
+          <Avatar className="h-8 w-8 flex-shrink-0">
+            <AvatarFallback className="bg-primary text-primary-foreground text-sm font-medium">
+              {firstName.charAt(0).toUpperCase()}{lastName.charAt(0).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+          <div className="flex flex-col items-start text-left min-w-0 flex-1">
+            <span className="text-sm font-medium text-foreground truncate w-full">
+              {firstName} {lastName}
+            </span>
+            <span className="text-xs text-muted-foreground truncate w-full">
+              {email}
+            </span>
           </div>
-          <ChevronUp className="h-4 w-4 text-muted-foreground" />
+          <ChevronUp className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56" side="top" sideOffset={8}>
+        <DropdownMenuItem
+          onClick={onChangePassword}
+          className="cursor-pointer"
+        >
+          <KeyRound className="mr-2 h-4 w-4" />
+          <span>Change Password</span>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={onLogout}
           className="cursor-pointer hover:bg-destructive/10 hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
@@ -107,6 +114,7 @@ const ProfileSection = ({ firstName, lastName, email, onLogout }: ProfileSection
 export function Navigation() {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   const user = useSelector((state: RootState) => state.auth.user);
 
@@ -148,8 +156,17 @@ export function Navigation() {
     logoutMutation.mutate();
   }, [logoutMutation]);
 
+  const handleChangePassword = useCallback(() => {
+    setIsChangePasswordOpen(true);
+  }, []);
+
   return (
     <>
+      <ChangePasswordModalComponent
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
+
       {/* Mobile Navigation */}
       <div className="lg:hidden bg-card border-b border-border px-4 py-3">
         <div className="flex items-center justify-between">
@@ -176,6 +193,7 @@ export function Navigation() {
                 lastName={lastName}
                 email={email}
                 onLogout={handleLogout}
+                onChangePassword={handleChangePassword}
               />
             </SheetContent>
           </Sheet>
@@ -203,6 +221,7 @@ export function Navigation() {
               lastName={lastName}
               email={email}
               onLogout={handleLogout}
+              onChangePassword={handleChangePassword}
             />
           </div>
         </div>

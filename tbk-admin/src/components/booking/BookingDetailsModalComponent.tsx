@@ -104,7 +104,7 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
             <div className="space-y-2">
               <div>
                 <p className="text-xs text-muted-foreground">Total Amount</p>
-                <p className="font-bold text-lg text-primary">{booking.totalPayableAmount} Rs</p>
+                <p className="font-bold text-lg text-primary">₹{Number(booking.totalPayableAmount).toLocaleString('en-IN')}</p>
               </div>
               <div>
                 <p className="text-xs text-muted-foreground">Payment Status</p>
@@ -123,7 +123,7 @@ export default function BookingDetailsModalComponent({ isOpen, onClose, booking 
                   )}
                   {booking.totalTax > 0 && (
                     <span className="text-xs text-muted-foreground ml-1">
-                      (₹{booking.totalTax})
+                      (₹{Number(booking.totalTax).toLocaleString('en-IN')})
                     </span>
                   )}
                 </p>

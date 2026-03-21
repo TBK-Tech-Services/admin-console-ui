@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar, MapPin, CreditCard, Percent, Minus, Plus } from "lucide-react";
+import { Users, Calendar, MapPin, CreditCard, Percent, Minus, Plus, User, Wallet } from "lucide-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { formatDateForInput } from "@/utils/formatDateForInput";
@@ -17,6 +17,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateBookingService } from "@/services/booking.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import { queryKeys } from "@/lib/queryKeys";
+import { formatAmount } from "@/utils/formatNumber";
+import { getBookingSubtotal } from "@/utils/getBookingSubtotal";
+import { calculateGST } from "@/utils/calculateGST";
+
+const BOOKING_SOURCES = [
+  { value: "DIRECT", label: "Direct" },
+  { value: "AIRBNB", label: "Airbnb" },
+  { value: "MAKEMYTRIP", label: "MakeMyTrip" },
+  { value: "BOOKING_COM", label: "Booking.com" },
+  { value: "GOIBIBO", label: "Goibibo" },
+  { value: "AGODA", label: "Agoda" },
+  { value: "OTHER", label: "Other" },
+];
 
 export default function UpdateBookingModalComponent({ isOpen, onClose, booking }) {
 
@@ -24,19 +37,32 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
   const { handleMutationError, handleSuccess } = useErrorHandler();
   const villas = useSelector((state: RootState) => state.villas);
 
+  // Determine priceType from existing booking
+  const existingPerNightPrice = Number((booking as any)?.perNightPrice ?? 0);
+  const initialPriceType: "perNight" | "custom" = existingPerNightPrice > 0 ? "perNight" : "custom";
+
   const [formData, setFormData] = useState({
     guestName: booking?.guestName || "",
     guestEmail: booking?.guestEmail || "",
     guestPhone: booking?.guestPhone || "",
+    alternatePhone: (booking as any)?.alternatePhone || "",
+    agentName: (booking as any)?.agentName || "",
     villaId: booking?.villaId?.toString() || "",
     checkIn: formatDateForInput(booking?.checkIn) || "",
     checkOut: formatDateForInput(booking?.checkOut) || "",
-    totalGuests: booking?.totalGuests || "",
+    numberOfAdults: (booking as any)?.numberOfAdults || 1,
+    numberOfChildren: (booking as any)?.numberOfChildren || 0,
     specialRequest: booking?.specialRequest || "",
+    bookingSource: (booking as any)?.bookingSource || "",
+    priceType: initialPriceType,
+    perNightPrice: existingPerNightPrice || 0,
+    customPrice: Number((booking as any)?.customPrice ?? 0),
+    extraPersonCharge: Number(booking?.extraPersonCharge ?? 0),
+    advancePaid: Number(booking?.advancePaid ?? 0),
     gstMode: booking?.gstMode || "NONE",
     gstOnBasePrice: booking?.gstOnBasePrice || false,
     gstOnExtraCharge: booking?.gstOnExtraCharge || false,
-    gstDays: booking?.gstDays || 0,
+    gstDays: (booking as any)?.gstDays || 0,
   });
 
   const handleInputChange = (field: string, value: string | boolean | number) => {
@@ -66,8 +92,47 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
     if (current < totalDaysOfStay) handleInputChange("gstDays", current + 1);
   };
 
+  // Live billing calculations
+  const effectivePrice = formData.priceType === "perNight"
+    ? Number(formData.perNightPrice) * totalDaysOfStay
+    : Number(formData.customPrice);
+
+  const subTotal = getBookingSubtotal(formData, totalDaysOfStay);
+
+  const gstAmount = calculateGST({
+    gstMode: formData.gstMode,
+    gstOnBasePrice: formData.gstOnBasePrice,
+    gstOnExtraCharge: formData.gstOnExtraCharge,
+    effectivePrice,
+    extraPersonCharge: Number(formData.extraPersonCharge),
+    subTotalAmount: subTotal,
+    gstDays: Math.min(Number(formData.gstDays), totalDaysOfStay),
+    numberOfNights: totalDaysOfStay,
+  });
+
+  const totalPayable = subTotal + gstAmount;
+  const dueAmount = totalPayable - Number(formData.advancePaid);
+
   const updateBookingMutation = useMutation({
-    mutationFn: async () => updateBookingService(formData, booking.id),
+    mutationFn: async () => {
+      const payload: any = {
+        ...formData,
+        villaId: Number(formData.villaId),
+        numberOfAdults: Number(formData.numberOfAdults),
+        numberOfChildren: Number(formData.numberOfChildren),
+        perNightPrice: formData.priceType === "perNight" ? Number(formData.perNightPrice) : null,
+        customPrice: formData.priceType === "custom" ? Number(formData.customPrice) : 0,
+        extraPersonCharge: Number(formData.extraPersonCharge),
+        advancePaid: Number(formData.advancePaid),
+        gstDays: Number(formData.gstDays),
+        bookingSource: formData.bookingSource || null,
+        alternatePhone: formData.alternatePhone || null,
+        agentName: formData.agentName || null,
+      };
+      // Remove frontend-only field
+      delete payload.priceType;
+      return updateBookingService(payload, booking.id);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.recentBookings() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });
@@ -129,6 +194,15 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                     onChange={(e) => handleInputChange("guestPhone", e.target.value)}
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label htmlFor="update-alternatePhone">Alternate Phone</Label>
+                  <Input
+                    id="update-alternatePhone"
+                    placeholder="98765 43210"
+                    value={formData.alternatePhone}
+                    onChange={(e) => handleInputChange("alternatePhone", e.target.value)}
+                  />
+                </div>
               </CardContent>
             </Card>
 
@@ -174,22 +248,49 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                     />
                   </div>
                 </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="update-numberOfAdults">Adults *</Label>
+                    <Input
+                      id="update-numberOfAdults"
+                      type="number"
+                      min="1"
+                      value={formData.numberOfAdults}
+                      onChange={(e) => handleInputChange("numberOfAdults", Number(e.target.value))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="update-numberOfChildren">Children</Label>
+                    <Input
+                      id="update-numberOfChildren"
+                      type="number"
+                      min="0"
+                      value={formData.numberOfChildren}
+                      onChange={(e) => handleInputChange("numberOfChildren", Number(e.target.value))}
+                    />
+                  </div>
+                </div>
                 <div className="space-y-2">
-                  <Label htmlFor="update-totalGuests">Number of Guests *</Label>
-                  <Input
-                    id="update-totalGuests"
-                    type="number"
-                    placeholder="Enter number of guests"
-                    min="1"
-                    value={formData.totalGuests}
-                    onChange={(e) => handleInputChange("totalGuests", e.target.value)}
-                  />
+                  <Label htmlFor="update-bookingSource">Booking Source</Label>
+                  <Select
+                    value={formData.bookingSource || ""}
+                    onValueChange={(value) => handleInputChange("bookingSource", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select source" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {BOOKING_SOURCES.map((src) => (
+                        <SelectItem key={src.value} value={src.value}>{src.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          {/* Special Requests */}
+          {/* Additional Information */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -197,7 +298,19 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
                 Additional Information
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="update-agentName" className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5 text-purple-500" />
+                  Agent Name <span className="text-xs text-muted-foreground">(optional)</span>
+                </Label>
+                <Input
+                  id="update-agentName"
+                  placeholder="Enter agent name"
+                  value={formData.agentName}
+                  onChange={(e) => handleInputChange("agentName", e.target.value)}
+                />
+              </div>
               <div className="space-y-2">
                 <Label htmlFor="update-specialRequest">Special Requests</Label>
                 <Textarea
@@ -211,20 +324,155 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
             </CardContent>
           </Card>
 
-          {/* GST Configuration */}
+          {/* Pricing */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <CreditCard className="h-5 w-5" />
+                Pricing
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Price Type Toggle */}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleInputChange("priceType", "perNight")}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
+                    formData.priceType === "perNight"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  Per Night Price
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleInputChange("priceType", "custom")}
+                  className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
+                    formData.priceType === "custom"
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted/30 border-border/50 text-muted-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  Custom Price
+                </button>
+              </div>
+
+              {formData.priceType === "perNight" ? (
+                <div className="space-y-2">
+                  <Label htmlFor="update-perNightPrice">Per Night Price (₹) *</Label>
+                  <Input
+                    id="update-perNightPrice"
+                    type="number"
+                    min="0"
+                    placeholder="Enter per night price"
+                    value={formData.perNightPrice || ""}
+                    onChange={(e) => handleInputChange("perNightPrice", Number(e.target.value))}
+                  />
+                  {totalDaysOfStay > 0 && Number(formData.perNightPrice) > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      ₹{formatAmount(Number(formData.perNightPrice))} × {totalDaysOfStay} night{totalDaysOfStay !== 1 ? "s" : ""} = ₹{formatAmount(Number(formData.perNightPrice) * totalDaysOfStay)}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Label htmlFor="update-customPrice">Custom Total Price (₹) *</Label>
+                  <Input
+                    id="update-customPrice"
+                    type="number"
+                    min="0"
+                    placeholder="Enter flat total price"
+                    value={formData.customPrice || ""}
+                    onChange={(e) => handleInputChange("customPrice", Number(e.target.value))}
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="update-extraPersonCharge">Extra Person Charge (₹)</Label>
+                <Input
+                  id="update-extraPersonCharge"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={formData.extraPersonCharge || ""}
+                  onChange={(e) => handleInputChange("extraPersonCharge", Number(e.target.value))}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="update-advancePaid" className="flex items-center gap-1.5">
+                  <Wallet className="h-3.5 w-3.5 text-green-500" />
+                  Advance Paid (₹)
+                </Label>
+                <Input
+                  id="update-advancePaid"
+                  type="number"
+                  min="0"
+                  placeholder="0"
+                  value={formData.advancePaid || ""}
+                  onChange={(e) => handleInputChange("advancePaid", Number(e.target.value))}
+                />
+              </div>
+
+              {/* Live Billing Summary */}
+              {totalDaysOfStay > 0 && (
+                <div className="mt-2 p-3 rounded-lg bg-muted/30 border border-border/50 space-y-2 text-sm">
+                  {formData.priceType === "perNight" ? (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>₹{formatAmount(Number(formData.perNightPrice))} × {totalDaysOfStay} nights</span>
+                      <span>₹{formatAmount(effectivePrice)}</span>
+                    </div>
+                  ) : (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Custom Price</span>
+                      <span>₹{formatAmount(effectivePrice)}</span>
+                    </div>
+                  )}
+                  {Number(formData.extraPersonCharge) > 0 && (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Extra Person Charge</span>
+                      <span>+ ₹{formatAmount(Number(formData.extraPersonCharge))}</span>
+                    </div>
+                  )}
+                  {gstAmount > 0 && (
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>GST (18%)</span>
+                      <span>+ ₹{formatAmount(gstAmount)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between font-semibold pt-1 border-t">
+                    <span>Total Payable</span>
+                    <span className="text-primary">₹{formatAmount(totalPayable)}</span>
+                  </div>
+                  {Number(formData.advancePaid) > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Advance Paid</span>
+                      <span>- ₹{formatAmount(Number(formData.advancePaid))}</span>
+                    </div>
+                  )}
+                  {Number(formData.advancePaid) > 0 && (
+                    <div className="flex justify-between font-semibold text-orange-600">
+                      <span>Due Amount</span>
+                      <span>₹{formatAmount(Math.max(0, dueAmount))}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* GST Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Percent className="h-5 w-5" />
                 GST Configuration
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                <Percent className="h-4 w-4" />
-                Select how GST should be applied
-              </div>
-
               <RadioGroup value={formData.gstMode} onValueChange={handleGstModeChange} className="space-y-2">
                 <div className="flex items-center space-x-3 p-3 rounded-md border border-border/50 hover:bg-accent/5 transition-colors">
                   <RadioGroupItem value="NONE" id="upd-gst-none" />
@@ -314,8 +562,8 @@ export default function UpdateBookingModalComponent({ isOpen, onClose, booking }
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" size="lg" className="min-w-[150px]">
-              Update Booking
+            <Button type="submit" size="lg" className="min-w-[150px]" disabled={updateBookingMutation.isPending}>
+              {updateBookingMutation.isPending ? "Updating..." : "Update Booking"}
             </Button>
           </div>
         </form>

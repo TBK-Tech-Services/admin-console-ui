@@ -21,7 +21,7 @@ export default function VillaBookingsTabComponent({ bookingsData }) {
                   <p className="text-xs text-muted-foreground">{booking.totalGuests} guests</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-bold">₹{booking.totalPayableAmount.toLocaleString()}</p>
+                  <p className="font-bold">₹{Number(booking.totalPayableAmount).toLocaleString('en-IN')}</p>
                   <Badge className={getBookingStatusColor(booking.bookingStatus)}>
                     {booking.bookingStatus}
                   </Badge>

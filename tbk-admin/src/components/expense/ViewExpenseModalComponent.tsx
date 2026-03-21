@@ -11,7 +11,7 @@ export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) 
   };
 
   // Convert amount from paise to rupees
-  const displayAmount = expense.amount / 100;
+  const displayAmount = Number(expense.amount) / 100;
 
   // Get villa names for display
   const getVillaInfo = () => {
@@ -57,7 +57,7 @@ export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) 
             </div>
             <div className="flex items-center gap-2 text-3xl font-bold text-green-600">
               <IndianRupee className="h-8 w-8" />
-              {displayAmount.toLocaleString()}
+              {displayAmount.toLocaleString('en-IN')}
             </div>
           </div>
 
@@ -120,7 +120,7 @@ export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) 
               <div className="text-sm font-medium text-gray-700">Split Distribution</div>
               <div className="space-y-3">
                 <div className="text-sm text-gray-600">
-                  Amount per villa: ₹{Math.floor(villaInfo.amountPerVilla).toLocaleString()}
+                  Amount per villa: ₹{Math.floor(villaInfo.amountPerVilla).toLocaleString('en-IN')}
                 </div>
                 <div className="text-sm text-gray-600">
                   Total villas: {villaInfo.totalVillas}
@@ -132,7 +132,7 @@ export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) 
                   {expense.villas.map((villaExpense, index) => (
                     <div key={index} className="flex justify-between items-center text-xs text-gray-600 bg-white p-2 rounded border">
                       <span>{villaExpense.villa.name}</span>
-                      <span className="font-medium">₹{(villaExpense.amount / 100).toLocaleString()}</span>
+                      <span className="font-medium">₹{(Number(villaExpense.amount) / 100).toLocaleString('en-IN')}</span>
                     </div>
                   ))}
                 </div>
@@ -146,7 +146,7 @@ export default function ViewExpenseModalComponent({ isOpen, onClose, expense }) 
               <div className="text-sm font-medium text-blue-700">Individual Expense</div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-blue-600">{expense.villa.name}</span>
-                <span className="text-sm font-medium text-blue-600">₹{displayAmount.toLocaleString()}</span>
+                <span className="text-sm font-medium text-blue-600">₹{displayAmount.toLocaleString('en-IN')}</span>
               </div>
             </div>
           )}

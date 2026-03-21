@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
-import { CreditCard, Calendar, IndianRupee, Percent, Gift, Wallet, TrendingUp, Globe, Minus, Plus } from "lucide-react";
+import { CreditCard, Calendar, IndianRupee, Percent, Wallet, TrendingUp, Globe, Minus, Plus, User } from "lucide-react";
 import { getBookingSubtotal } from "@/utils/getBookingSubtotal";
 import { calculateGST } from "@/utils/calculateGST";
 import { getDueAmount } from "@/utils/getDueAmount";
+import { formatAmount } from "@/utils/formatNumber";
 
 interface GSTPricingConfigurationComponentProps {
   formData: any;
@@ -28,15 +29,18 @@ const BOOKING_SOURCES = [
 ];
 
 export default function GSTPricingConfigurationComponent({ formData, villaData, totalDaysOfStay, onInputChange }: GSTPricingConfigurationComponentProps) {
+  const nights = totalDaysOfStay || 0;
+  const priceType = formData.priceType || "custom";
+  const perNightPrice = Number(formData.perNightPrice) || 0;
   const customPrice = Number(formData.customPrice) || 0;
   const extraPersonCharge = Number(formData.extraPersonCharge) || 0;
-  const discount = Number(formData.discount) || 0;
   const advancePaid = Number(formData.advancePaid) || 0;
-  const nights = totalDaysOfStay || 0;
   const gstDays = Math.min(Number(formData.gstDays) || 0, nights);
-  const effectivePrice = customPrice;
 
-  const subTotalAmount: number = getBookingSubtotal(formData);
+  // Effective price: perNight × nights OR flat customPrice
+  const effectivePrice = priceType === "perNight" ? perNightPrice * nights : customPrice;
+
+  const subTotalAmount: number = getBookingSubtotal(formData, nights);
 
   const gstAmount: number = calculateGST({
     gstMode: formData.gstMode,
@@ -44,14 +48,23 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
     gstOnExtraCharge: formData.gstOnExtraCharge,
     effectivePrice,
     extraPersonCharge,
-    discount,
     subTotalAmount,
     gstDays,
     numberOfNights: nights,
   });
 
-  const totalPayableAmount: number = (subTotalAmount + gstAmount);
+  const totalPayableAmount: number = subTotalAmount + gstAmount;
   const dueAmount: number = getDueAmount(totalPayableAmount, advancePaid);
+
+  const handlePriceTypeChange = (value: "perNight" | "custom") => {
+    onInputChange("priceType", value);
+    // Clear the other price field when switching
+    if (value === "perNight") {
+      onInputChange("customPrice", 0);
+    } else {
+      onInputChange("perNightPrice", 0);
+    }
+  };
 
   const handleGstModeChange = (value: string) => {
     onInputChange("gstMode", value);
@@ -60,7 +73,6 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
       onInputChange("gstOnExtraCharge", false);
       onInputChange("gstDays", 0);
     } else if (Number(formData.gstDays) === 0) {
-      // Auto-set gstDays to full stay nights when first enabling GST
       onInputChange("gstDays", nights);
     }
   };
@@ -131,74 +143,138 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
             </Select>
           </div>
 
-          {/* Price Adjustments */}
+          {/* Agent Name */}
+          <div className="p-3 sm:p-4 rounded-lg border border-border/50 bg-card">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10 shrink-0">
+                <User className="h-4 w-4 sm:h-5 sm:w-5 text-purple-500" />
+              </div>
+              <div className="min-w-0">
+                <Label htmlFor="agentName" className="text-sm font-semibold">Agent Name <span className="text-xs text-muted-foreground font-normal">(Optional)</span></Label>
+                <p className="text-xs text-muted-foreground">Name of the agent who made this booking</p>
+              </div>
+            </div>
+            <Input
+              id="agentName"
+              type="text"
+              placeholder="Enter agent name"
+              value={formData.agentName || ""}
+              onChange={(e) => onInputChange("agentName", e.target.value)}
+              className="h-10 sm:h-11 border-border/60 focus:border-purple-500 transition-colors text-sm"
+            />
+          </div>
+
+          {/* Pricing Type */}
           <div className="space-y-3 sm:space-y-4 pt-2">
             <div className="flex items-center gap-2 mb-3 sm:mb-4">
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              <h3 className="font-semibold text-sm">Price Adjustments</h3>
+              <h3 className="font-semibold text-sm">Pricing</h3>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+
+            {/* Price type toggle */}
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handlePriceTypeChange("perNight")}
+                className={`p-3 rounded-lg border-2 text-left transition-all ${
+                  priceType === "perNight"
+                    ? "border-primary bg-primary/5"
+                    : "border-border/50 hover:border-border"
+                }`}
+              >
+                <p className={`text-xs sm:text-sm font-semibold ${priceType === "perNight" ? "text-primary" : "text-foreground"}`}>
+                  Per Night Price
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Rate × number of nights</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => handlePriceTypeChange("custom")}
+                className={`p-3 rounded-lg border-2 text-left transition-all ${
+                  priceType === "custom"
+                    ? "border-primary bg-primary/5"
+                    : "border-border/50 hover:border-border"
+                }`}
+              >
+                <p className={`text-xs sm:text-sm font-semibold ${priceType === "custom" ? "text-primary" : "text-foreground"}`}>
+                  Custom Price
+                </p>
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-0.5">Flat total for entire stay</p>
+              </button>
+            </div>
+
+            {/* Price input — switches based on type */}
+            {priceType === "perNight" ? (
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="perNightPrice" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                  <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                  Per Night Price
+                </Label>
+                <Input
+                  id="perNightPrice"
+                  type="number"
+                  min="0"
+                  placeholder="Price per night"
+                  value={formData.perNightPrice || ""}
+                  onChange={(e) => onInputChange("perNightPrice", e.target.value)}
+                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
+                />
+                {perNightPrice > 0 && nights > 0 && (
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    ₹{perNightPrice.toLocaleString("en-IN")} × {nights} night{nights !== 1 ? "s" : ""} = <span className="font-semibold text-foreground">₹{(perNightPrice * nights).toLocaleString("en-IN")}</span>
+                  </p>
+                )}
+              </div>
+            ) : (
               <div className="space-y-1.5 sm:space-y-2">
                 <Label htmlFor="customPrice" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
                   <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-                  Custom Price
+                  Custom Price (Total)
                 </Label>
                 <Input
                   id="customPrice"
                   type="number"
                   min="0"
                   placeholder="Total price for the stay"
-                  value={formData.customPrice || ''}
+                  value={formData.customPrice || ""}
                   onChange={(e) => onInputChange("customPrice", e.target.value)}
                   className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
                 />
                 <p className="text-[10px] sm:text-xs text-muted-foreground">Total price for the entire stay</p>
               </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="extraPersonCharge" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
-                  <span className="hidden xs:inline">Extra Person Charge</span>
-                  <span className="xs:hidden">Extra Charge</span>
-                </Label>
-                <Input
-                  id="extraPersonCharge"
-                  type="number"
-                  placeholder="0"
-                  value={formData.extraPersonCharge || ''}
-                  onChange={(e) => onInputChange("extraPersonCharge", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
-                />
-              </div>
+            )}
+
+            {/* Extra Person Charge */}
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="extraPersonCharge" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                <IndianRupee className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+                <span className="hidden xs:inline">Extra Person Charge</span>
+                <span className="xs:hidden">Extra Charge</span>
+              </Label>
+              <Input
+                id="extraPersonCharge"
+                type="number"
+                placeholder="0"
+                value={formData.extraPersonCharge || ""}
+                onChange={(e) => onInputChange("extraPersonCharge", e.target.value)}
+                className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
+              />
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4">
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="discount" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <Gift className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600" />
-                  Discount
-                </Label>
-                <Input
-                  id="discount"
-                  type="number"
-                  placeholder="0"
-                  value={formData.discount || ''}
-                  onChange={(e) => onInputChange("discount", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-green-500 transition-colors text-sm"
-                />
-              </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <Label htmlFor="advancePaid" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
-                  <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
-                  Advance Paid
-                </Label>
-                <Input
-                  id="advancePaid"
-                  type="number"
-                  placeholder="0"
-                  value={formData.advancePaid || ''}
-                  onChange={(e) => onInputChange("advancePaid", e.target.value)}
-                  className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
-                />
-              </div>
+
+            {/* Advance Paid */}
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="advancePaid" className="text-xs sm:text-sm font-medium flex items-center gap-1.5 sm:gap-2">
+                <Wallet className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary" />
+                Advance Paid
+              </Label>
+              <Input
+                id="advancePaid"
+                type="number"
+                placeholder="0"
+                value={formData.advancePaid || ""}
+                onChange={(e) => onInputChange("advancePaid", e.target.value)}
+                className="h-10 sm:h-11 border-border/60 focus:border-primary transition-colors text-sm"
+              />
             </div>
           </div>
 
@@ -247,7 +323,9 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
               <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/50 space-y-2 sm:space-y-3">
                 <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Select items to apply GST:</p>
                 <div className="flex items-center justify-between p-2.5 sm:p-3 rounded-md bg-card border border-border/50">
-                  <Label htmlFor="gst-base" className="text-xs sm:text-sm cursor-pointer">Base / Custom Price</Label>
+                  <Label htmlFor="gst-base" className="text-xs sm:text-sm cursor-pointer">
+                    {priceType === "perNight" ? "Per Night Price" : "Custom Price"}
+                  </Label>
                   <Switch
                     id="gst-base"
                     checked={formData.gstOnBasePrice}
@@ -265,7 +343,7 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
               </div>
             )}
 
-            {/* GST Days control — shown for ALL and SELECTIVE modes */}
+            {/* GST Days control */}
             {showGstDays && (
               <div className="mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg bg-muted/30 border border-border/50">
                 <div className="flex items-center justify-between">
@@ -312,26 +390,34 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
               Billing Details
             </h3>
             <div className="bg-gradient-to-br from-muted/30 to-muted/50 rounded-xl p-3 sm:p-5 space-y-2 sm:space-y-3 border border-border/50">
-              <div className="flex justify-between text-xs sm:text-sm">
-                <span className="text-muted-foreground">Custom Price</span>
-                <span className="font-semibold">₹{customPrice}</span>
-              </div>
+              {/* Price line */}
+              {priceType === "perNight" ? (
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-muted-foreground">
+                    Per Night Price
+                    {nights > 0 && <span className="ml-1 text-[10px]">(×{nights} nights)</span>}
+                  </span>
+                  <span className="font-semibold">₹{formatAmount(effectivePrice)}</span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-xs sm:text-sm">
+                  <span className="text-muted-foreground">Custom Price (Total)</span>
+                  <span className="font-semibold">₹{formatAmount(customPrice)}</span>
+                </div>
+              )}
+
               {extraPersonCharge > 0 && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Extra Person Charge</span>
-                  <span className="font-medium text-primary">+ ₹{extraPersonCharge}</span>
+                  <span className="font-medium text-primary">+ ₹{formatAmount(extraPersonCharge)}</span>
                 </div>
               )}
-              {discount > 0 && (
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Discount</span>
-                  <span className="font-medium text-green-600">- ₹{discount}</span>
-                </div>
-              )}
+
               <div className="flex justify-between text-xs sm:text-sm pt-2 border-t border-border/30">
                 <span className="text-muted-foreground font-medium">Subtotal</span>
-                <span className="font-semibold">₹{subTotalAmount}</span>
+                <span className="font-semibold">₹{formatAmount(subTotalAmount)}</span>
               </div>
+
               {formData.gstMode !== "NONE" && (
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">
@@ -345,23 +431,25 @@ export default function GSTPricingConfigurationComponent({ formData, villaData, 
                       </span>
                     )}
                   </span>
-                  <span className="font-medium text-accent">+ ₹{gstAmount.toFixed(2)}</span>
+                  <span className="font-medium text-accent">+ ₹{formatAmount(gstAmount)}</span>
                 </div>
               )}
+
               <div className="border-t border-border/30 pt-2 sm:pt-3 mt-2">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold text-sm sm:text-base">Total Payable Amount</span>
-                  <span className="font-bold text-primary text-xl sm:text-2xl">₹{totalPayableAmount.toFixed(2)}</span>
+                  <span className="font-bold text-primary text-xl sm:text-2xl">₹{formatAmount(totalPayableAmount)}</span>
                 </div>
               </div>
+
               <div className="border-t border-border/30 pt-2 sm:pt-3 mt-2 sm:mt-3 space-y-2 bg-white/50 rounded-lg p-2 sm:p-3">
                 <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-muted-foreground">Advance Paid</span>
-                  <span className="font-medium text-green-600">- ₹{advancePaid}</span>
+                  <span className="font-medium text-green-600">- ₹{formatAmount(advancePaid)}</span>
                 </div>
                 <div className="flex justify-between items-center pt-2 border-t border-border/30">
                   <span className="font-semibold text-sm">Due Amount</span>
-                  <span className="font-bold text-orange-600 text-xl sm:text-2xl">₹{dueAmount.toFixed(2)}</span>
+                  <span className="font-bold text-orange-600 text-xl sm:text-2xl">₹{formatAmount(dueAmount)}</span>
                 </div>
               </div>
             </div>

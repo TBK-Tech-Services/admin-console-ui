@@ -101,7 +101,7 @@ export default function OwnerBookingsComponent({ data, isLoading }: OwnerBooking
                       {booking.bookingStatus}
                     </Badge>
                     <div className="text-xs sm:text-sm font-semibold text-foreground mt-1">
-                      ₹{booking.amount?.toLocaleString('en-IN')}
+                      ₹{Number(booking.amount).toLocaleString('en-IN')}
                     </div>
                   </div>
                 </div>

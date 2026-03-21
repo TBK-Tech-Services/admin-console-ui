@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { getBookingSubtotal } from "@/utils/getBookingSubtotal";
 import { calculateGST } from "@/utils/calculateGST";
 import { getDueAmount } from "@/utils/getDueAmount";
+import { formatAmount } from "@/utils/formatNumber";
 
 export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
   if (!bookingData) return null;
@@ -12,15 +13,16 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
   const { formData, villaData, totalDaysOfStay } = bookingData;
 
   // Convert string values to numbers
+  const perNightPrice = Number(formData.perNightPrice) || 0;
   const customPrice = Number(formData.customPrice) || 0;
   const extraPersonCharge = Number(formData.extraPersonCharge) || 0;
-  const discount = Number(formData.discount) || 0;
   const advancePaid = Number(formData.advancePaid) || 0;
-  // Calculate amounts
-  const effectivePrice = customPrice;
-  const subTotalAmount = getBookingSubtotal(formData);
-
   const nights = totalDaysOfStay || 0;
+
+  // Calculate amounts
+  const effectivePrice = formData.priceType === 'perNight' ? perNightPrice * nights : customPrice;
+  const subTotalAmount = getBookingSubtotal(formData, nights);
+
   const gstDays = Math.min(Number(formData.gstDays) || 0, nights);
   const gstAmount = calculateGST({
     gstMode: formData.gstMode,
@@ -28,7 +30,6 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
     gstOnExtraCharge: formData.gstOnExtraCharge,
     effectivePrice,
     extraPersonCharge,
-    discount,
     subTotalAmount,
     gstDays,
     numberOfNights: nights,
@@ -92,7 +93,7 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 sm:gap-3">
+                <div className={`flex items-center gap-2 sm:gap-3 ${formData.agentName ? 'pb-2.5 sm:pb-3 border-b border-border/30' : ''}`}>
                   <div className="p-1.5 sm:p-2 rounded-lg bg-success/10">
                     <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-success" />
                   </div>
@@ -103,6 +104,18 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                     </p>
                   </div>
                 </div>
+
+                {formData.agentName && (
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="p-1.5 sm:p-2 rounded-lg bg-purple-500/10">
+                      <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-purple-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted-foreground">Agent Name</p>
+                      <p className="font-semibold text-sm sm:text-base truncate">{formData.agentName}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Booking Status */}
@@ -124,33 +137,44 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
               </div>
 
               <div className="bg-muted/30 rounded-lg p-3 sm:p-4 space-y-2 sm:space-y-2.5 border border-border/50">
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Custom Price</span>
-                  <span className="font-semibold">₹{customPrice}</span>
-                </div>
-
-                <div className="flex justify-between text-xs sm:text-sm">
-                  <span className="text-muted-foreground">Number of Nights</span>
-                  <span className="font-medium">{totalDaysOfStay || 0}</span>
-                </div>
+                {formData.priceType === 'perNight' ? (
+                  <>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Per Night Price</span>
+                      <span className="font-semibold">₹{formatAmount(perNightPrice)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Number of Nights</span>
+                      <span className="font-medium">{nights}</span>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Base Price Total</span>
+                      <span className="font-semibold">₹{formatAmount(effectivePrice)}</span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Custom Price</span>
+                      <span className="font-semibold">₹{formatAmount(customPrice)}</span>
+                    </div>
+                    <div className="flex justify-between text-xs sm:text-sm">
+                      <span className="text-muted-foreground">Number of Nights</span>
+                      <span className="font-medium">{nights}</span>
+                    </div>
+                  </>
+                )}
 
                 {extraPersonCharge > 0 && (
                   <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-muted-foreground">Extra Person Charge</span>
-                    <span className="font-medium text-primary">+ ₹{extraPersonCharge}</span>
-                  </div>
-                )}
-
-                {discount > 0 && (
-                  <div className="flex justify-between text-xs sm:text-sm">
-                    <span className="text-muted-foreground">Discount</span>
-                    <span className="font-medium text-green-600">- ₹{discount}</span>
+                    <span className="font-medium text-primary">+ ₹{formatAmount(extraPersonCharge)}</span>
                   </div>
                 )}
 
                 <div className="flex justify-between text-xs sm:text-sm pt-2 border-t">
                   <span className="text-muted-foreground font-medium">Subtotal</span>
-                  <span className="font-semibold">₹{subTotalAmount}</span>
+                  <span className="font-semibold">₹{formatAmount(subTotalAmount)}</span>
                 </div>
 
                 {gstAmount > 0 && (
@@ -169,7 +193,7 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                         </span>
                       )}
                     </span>
-                    <span className="font-medium text-accent">+ ₹{gstAmount.toFixed(2)}</span>
+                    <span className="font-medium text-accent">+ ₹{formatAmount(gstAmount)}</span>
                   </div>
                 )}
 
@@ -177,7 +201,7 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                   <div className="flex justify-between items-center">
                     <span className="font-semibold text-sm sm:text-base">Total Amount</span>
                     <span className="font-bold text-primary text-xl sm:text-2xl">
-                      ₹{totalPayableAmount.toFixed(2)}
+                      ₹{formatAmount(totalPayableAmount)}
                     </span>
                   </div>
                 </div>
@@ -190,13 +214,13 @@ export default function BookingSummaryModal({ isOpen, onClose, bookingData }) {
                       Advance Paid
                     </span>
                     <span className="font-medium text-green-600">
-                      ₹{advancePaid}
+                      ₹{formatAmount(Number(advancePaid))}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t">
                     <span className="font-semibold text-sm">Due Amount</span>
                     <span className="font-bold text-orange-600 text-lg sm:text-xl">
-                      ₹{dueAmount.toFixed(2)}
+                      ₹{formatAmount(dueAmount)}
                     </span>
                   </div>
                 </div>

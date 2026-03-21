@@ -28,15 +28,8 @@ export const getABookingService = async (id: number): Promise<void> => {
 }
 
 // Service to Update a Booking
-export const updateBookingService = async (formData: Booking_Data, id: number): Promise<void> => {
-    const transformedData = {
-        ...formData,
-        villaId: Number(formData.villaId),
-        numberOfAdults: Number(formData.numberOfAdults),
-        numberOfChildren: Number(formData.numberOfChildren),
-    };
-
-    const response = await apiService.put(`/bookings/v1/${id}`, transformedData);
+export const updateBookingService = async (formData: any, id: number): Promise<void> => {
+    const response = await apiService.put(`/bookings/v1/${id}`, formData);
     return response.data;
 }
 

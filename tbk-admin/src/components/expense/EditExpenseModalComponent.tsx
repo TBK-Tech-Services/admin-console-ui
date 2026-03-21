@@ -5,13 +5,7 @@ import { Edit } from "lucide-react";
 import ExpenseVillaSelectionComponent from "./ExpenseVillaSelectionComponent";
 import ExpenseTypeSelectionComponent from "./ExpenseTypeSelectionComponent";
 import ExpenseBasicInfoComponent from "./ExpenseBasicInfoComponent";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
-
-export default function EditExpenseModalComponent({ isOpen, onClose, expense, onUpdateExpense, isLoading = false }) {
-  
-  // useSelector
-  const villas = useSelector((store: RootState) => store.villas.listOfVilla);
+export default function EditExpenseModalComponent({ isOpen, onClose, expense, onUpdateExpense, isLoading = false, villas = [] }) {
   
   // State Variables
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");

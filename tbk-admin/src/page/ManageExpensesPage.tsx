@@ -156,6 +156,7 @@ export default function ManageExpensesPage() {
         onClose={() => setIsAddModalOpen(false)}
         onAddExpense={handleAddExpense}
         isLoading={addExpenseMutation.isPending}
+        villas={villasData || []}
       />
 
       <ViewExpenseModalComponent isOpen={isViewModalOpen} onClose={handleCloseViewModal} expense={selectedViewExpense} />
@@ -165,6 +166,7 @@ export default function ManageExpensesPage() {
         expense={selectedEditExpense}
         onUpdateExpense={handleUpdateExpense}
         isLoading={updateExpenseMutation.isPending}
+        villas={villasData || []}
       />
       <DeleteExpenseModalComponent
         isOpen={isDeleteModalOpen}

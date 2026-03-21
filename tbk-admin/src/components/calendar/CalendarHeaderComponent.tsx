@@ -1,6 +1,6 @@
 import { MonthNavigationComponent } from "./MonthNavigationComponent";
 import { VillaFilterComponent } from "./VillaFilterComponent";
-import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar as CalendarIcon, Sheet } from "lucide-react";
 
 interface CalendarHeaderComponentProps {
     selectedVilla: string;
@@ -39,11 +39,24 @@ export function CalendarHeaderComponent({
                     </div>
                 </div>
 
-                {/* Villa Filter */}
-                <VillaFilterComponent
-                    selectedVilla={selectedVilla}
-                    onVillaChange={onVillaChange}
-                />
+                <div className="flex items-center gap-3">
+                    {/* Google Sheets Link */}
+                    <a
+                        href="https://docs.google.com/spreadsheets/d/1_l1ffOTzUyr4efAd06fryJvyztssJ9TnV1qmRYYl8HE/edit?gid=0#gid=0"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border/50 bg-green-500/10 hover:bg-green-500/20 text-green-700 dark:text-green-400 text-sm font-medium transition-colors"
+                    >
+                        <Sheet className="h-4 w-4" />
+                        <span className="hidden sm:inline">Booking Sheet</span>
+                    </a>
+
+                    {/* Villa Filter */}
+                    <VillaFilterComponent
+                        selectedVilla={selectedVilla}
+                        onVillaChange={onVillaChange}
+                    />
+                </div>
             </div>
 
             {/* Month Navigation */}

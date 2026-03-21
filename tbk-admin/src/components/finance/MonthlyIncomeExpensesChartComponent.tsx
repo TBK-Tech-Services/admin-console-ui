@@ -31,7 +31,7 @@ export default function MonthlyIncomeExpensesChartComponent({ monthlyData }: Mon
               tickFormatter={(value) => `₹${value.toLocaleString('en-IN')}`}
             />
             <Tooltip 
-              formatter={(value: number) => [`₹${value.toLocaleString()}`, '']}
+              formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, '']}
               contentStyle={{
                 backgroundColor: "hsl(var(--popover))",
                 border: "1px solid hsl(var(--border))",

@@ -6,7 +6,6 @@ export const calculateGST = ({
     gstOnExtraCharge,
     effectivePrice,
     extraPersonCharge,
-    discount,
     subTotalAmount,
     gstDays,
     numberOfNights,

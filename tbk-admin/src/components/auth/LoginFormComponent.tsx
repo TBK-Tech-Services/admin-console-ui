@@ -6,6 +6,7 @@ import { LoginFormComponentProps } from '@/types/auth/loginFormProps';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 
 export default function LoginFormComponent({
     email,
@@ -46,9 +47,17 @@ export default function LoginFormComponent({
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password" className="text-sm font-medium">
-                                Password
-                            </Label>
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="password" className="text-sm font-medium">
+                                    Password
+                                </Label>
+                                <Link
+                                    to="/forgot-password"
+                                    className="text-xs text-primary hover:underline transition-colors"
+                                >
+                                    Forgot password?
+                                </Link>
+                            </div>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                                 <Input

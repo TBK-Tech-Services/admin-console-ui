@@ -21,14 +21,16 @@ export default function NewBookingPage() {
     numberOfAdults: 1,
     numberOfChildren: 0,
     specialRequest: "",
+    agentName: "",
     gstMode: "NONE",
     gstOnBasePrice: false,
     gstOnExtraCharge: false,
     gstDays: 0,
     bookingSource: null,
+    priceType: "custom" as "perNight" | "custom",
+    perNightPrice: 0,
     customPrice: 0,
     extraPersonCharge: 0,
-    discount: 0,
     advancePaid: 0,
   });
   const [showModal, setShowModal] = useState(false);
@@ -61,9 +63,10 @@ export default function NewBookingPage() {
       setFormData({
         guestName: "", guestEmail: "", guestPhone: "", alternatePhone: "",
         villaId: null, checkIn: "", checkOut: "", numberOfAdults: 1, numberOfChildren: 0,
-        specialRequest: "", gstMode: "NONE", gstOnBasePrice: false,
-        gstOnExtraCharge: false, gstDays: 0, bookingSource: null, customPrice: 0,
-        extraPersonCharge: 0, discount: 0, advancePaid: 0,
+        specialRequest: "", agentName: "", gstMode: "NONE", gstOnBasePrice: false,
+        gstOnExtraCharge: false, gstDays: 0, bookingSource: null,
+        priceType: "custom", perNightPrice: 0, customPrice: 0,
+        extraPersonCharge: 0, advancePaid: 0,
       });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.recentBookings() });
       queryClient.invalidateQueries({ queryKey: queryKeys.dashboard.stats() });

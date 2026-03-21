@@ -38,7 +38,6 @@ const App = () => (
           <Route element={<PublicRoute />}>
             <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/change-password" element={<ChangePasswordPage />} />
           </Route>
 
           {/* Role-based Home Redirect */}
@@ -46,6 +45,7 @@ const App = () => (
 
           {/* Admin Only Routes */}
           <Route element={<RoleBasedRouteComponent blockedRoles={['Owner', 'Agent']} />}>
+            <Route path="/change-password" element={<ChangePasswordPage />} />
             <Route element={<Layout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/calendar" element={<CalendarPage />} />

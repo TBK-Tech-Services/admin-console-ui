@@ -17,7 +17,7 @@ export default function RecentBookingsComponent({recentBookingsData}) {
     checkOut: new Date(booking.checkOut).toLocaleDateString(),
     guests: booking.totalGuests,
     status: booking.bookingStatus,
-    amount: `₹${booking.totalPayableAmount.toLocaleString()}`,
+    amount: `₹${Number(booking.totalPayableAmount).toLocaleString('en-IN')}`,
     rawBookingData: booking
   })) || [];
 

@@ -99,7 +99,7 @@ const BookingCardComponent = memo(function BookingCardComponent({ booking }) {
                 {booking.guestName}
               </h3>
               <span className="font-bold text-lg text-primary shrink-0">
-                ₹{booking.totalPayableAmount?.toLocaleString()}
+                ₹{Number(booking.totalPayableAmount).toLocaleString('en-IN')}
               </span>
             </div>
             <p className="text-sm text-muted-foreground truncate mt-0.5">

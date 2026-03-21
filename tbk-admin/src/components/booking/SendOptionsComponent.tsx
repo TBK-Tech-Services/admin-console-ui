@@ -102,7 +102,7 @@ export default function SendOptionsComponent({
                     />
                     <p className="text-xs text-muted-foreground">
                         {sendType === "whatsapp"
-                            ? "Note: Using 'Hello World' template for demo. Custom message will be used once template is approved."
+                            ? "Note: Message is sent using the approved 'booking_confirmation_utility' WhatsApp template."
                             : "Customize the message sent with the voucher"}
                     </p>
                 </div>

@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import { Navigation } from "./Navigation";
+import BackButtonComponent from "./BackButtonComponent";
 
 export function Layout() {
   return (
@@ -9,6 +10,7 @@ export function Layout() {
       <div className="lg:pl-64">
         {/* Different Pages */}
         <main className="p-4 lg:p-8">
+          <BackButtonComponent />
           <Outlet />
         </main>
       </div>

@@ -26,3 +26,8 @@ export const inviteUserService = async(payload: any) : Promise<User> => {
     const response = await apiService.post('/settings/v1/user-management/invite-user' , payload);
     return response.data;
 }
+
+// Service to Delete a User
+export const deleteUserService = async(userId: number) : Promise<void> => {
+    await apiService.delete(`/settings/v1/user-management/users/${userId}`);
+}

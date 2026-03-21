@@ -5,14 +5,9 @@ import { Receipt, Loader2, Plus } from "lucide-react";
 import ExpenseVillaSelectionComponent from "./ExpenseVillaSelectionComponent";
 import ExpenseTypeSelectionComponent from "./ExpenseTypeSelectionComponent";
 import ExpenseBasicInfoComponent from "./ExpenseBasicInfoComponent";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store/store";
 import { motion } from 'framer-motion';
 
-export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense, isLoading = false }) {
-
-  // useSelector
-  const villas = useSelector((store: RootState) => store.villas.listOfVilla);
+export default function AddExpenseModalComponent({ isOpen, onClose, onAddExpense, isLoading = false, villas = [] }) {
 
   // State Variables
   const [expenseType, setExpenseType] = useState<"individual" | "split">("individual");

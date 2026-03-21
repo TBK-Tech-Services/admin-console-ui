@@ -8,7 +8,7 @@ export const addVillaService = async (formData: Villa_Data): Promise<void> => {
 }
 
 // Service to Get All Villas
-export const getAllVillasService = async (): Promise<[]> => {
+export const getAllVillasService = async (): Promise<any[]> => {
     const response = await apiService.get('/villas/v1');
     return response.data;
 }

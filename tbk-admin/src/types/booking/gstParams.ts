@@ -4,7 +4,6 @@ export interface CalculateGSTParams {
     gstOnExtraCharge: boolean;
     effectivePrice: number;
     extraPersonCharge: number;
-    discount: number;
     subTotalAmount: number;
     gstDays: number;
     numberOfNights: number;

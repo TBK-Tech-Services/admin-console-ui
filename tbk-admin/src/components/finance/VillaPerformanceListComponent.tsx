@@ -27,13 +27,13 @@ export default function VillaPerformanceListComponent({ villaData }: VillaPerfor
                 <div>
                   <h4 className="font-medium text-foreground">{villa.villaName}</h4>
                   <p className="text-sm text-muted-foreground">
-                    Income: ₹{villa.income.toLocaleString()}
+                    Income: ₹{Number(villa.income).toLocaleString('en-IN')}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className={`font-semibold ${villa.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
                     {villa.profit >= 0 ? '₹' : '-₹'}
-                    {Math.abs(villa.profit).toLocaleString()}
+                    {Math.abs(Number(villa.profit)).toLocaleString('en-IN')}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Profit ({villa.profitMargin}%)

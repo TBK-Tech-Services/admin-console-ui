@@ -3,7 +3,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { BarChart3 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { getAllVillasService } from "@/services/villa.service";
 
 interface FinanceFiltersComponentProps {
@@ -23,21 +23,10 @@ export default function FinanceFiltersComponent({
   onMonthChange,
   onDateRangeChange
 }: FinanceFiltersComponentProps) {
-  const [villas, setVillas] = useState<any[]>([]);
-
-  useEffect(() => {
-    const fetchVillas = async () => {
-      try {
-        const response = await getAllVillasService();
-        if (response.success) {
-          setVillas(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching villas:', error);
-      }
-    };
-    fetchVillas();
-  }, []);
+  const { data: villas = [] } = useQuery({
+    queryKey: ['villas'],
+    queryFn: getAllVillasService,
+  });
 
   return (
     <Card>

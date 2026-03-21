@@ -39,7 +39,7 @@ export default function FinanceMetricsComponent({
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold">
-            ₹{totalIncomeData.totalIncome.toLocaleString()}
+            ₹{Number(totalIncomeData.totalIncome).toLocaleString('en-IN')}
           </div>
           <p className="text-[10px] sm:text-xs opacity-80 mt-1">
             {totalIncomeData.isGrowthPositive ? (
@@ -61,7 +61,7 @@ export default function FinanceMetricsComponent({
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold">
-            ₹{totalExpensesData.totalExpenses.toLocaleString()}
+            ₹{Number(totalExpensesData.totalExpenses).toLocaleString('en-IN')}
           </div>
           <p className="text-[10px] sm:text-xs opacity-80 mt-1">
             {totalExpensesData.isGrowthPositive ? (
@@ -89,7 +89,7 @@ export default function FinanceMetricsComponent({
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold">
             {netProfitLossData.isProfit ? '₹' : '-₹'}
-            {Math.abs(netProfitLossData.netAmount).toLocaleString()}
+            {Math.abs(Number(netProfitLossData.netAmount)).toLocaleString('en-IN')}
           </div>
           <p className="text-[10px] sm:text-xs opacity-80 mt-1">
             Margin: {netProfitLossData.profitMargin}%
@@ -105,7 +105,7 @@ export default function FinanceMetricsComponent({
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold text-foreground">
-            ₹{averageMonthlyData.averageMonthlyProfit.toLocaleString()}
+            ₹{Number(averageMonthlyData.averageMonthlyProfit).toLocaleString('en-IN')}
           </div>
           <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
             Monthly profit average

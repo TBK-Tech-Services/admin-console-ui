@@ -68,7 +68,7 @@ export default function ExpenseDistributionChartComponent({
                   boxShadow: "0 10px 30px -10px hsl(var(--primary) / 0.2)"
                 }}
                 formatter={(value: number, name: string, props: any) => [
-                  `${value}% (₹${props.payload.amount.toLocaleString()})`,
+                  `${value}% (₹${props.payload.amount.toLocaleString('en-IN')})`,
                   name
                 ]}
               />
