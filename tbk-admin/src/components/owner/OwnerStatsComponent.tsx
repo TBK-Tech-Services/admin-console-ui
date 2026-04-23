@@ -3,17 +3,23 @@ import { Building2, Calendar, DollarSign, Users } from "lucide-react";
 
 interface StatCardProps {
   title: string;
+  subtitle?: string;
   value: string;
   icon: React.ComponentType<any>;
   gradient?: string;
 }
 
-const StatCard = ({ title, value, icon: Icon, gradient = "bg-gradient-primary" }: StatCardProps) => (
+const StatCard = ({ title, subtitle, value, icon: Icon, gradient = "bg-gradient-primary" }: StatCardProps) => (
   <Card className="border-border shadow-soft hover:shadow-medium transition-all duration-200">
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-      <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
-        {title}
-      </CardTitle>
+      <div>
+        <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">
+          {title}
+        </CardTitle>
+        {subtitle && (
+          <p className="text-[11px] text-muted-foreground/70 mt-0.5 leading-tight">{subtitle}</p>
+        )}
+      </div>
       <div className={`p-1.5 sm:p-2 rounded-lg ${gradient}`}>
         <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-primary-foreground" />
       </div>
@@ -52,13 +58,15 @@ export default function OwnerStatsComponent({ data, isLoading }: OwnerStatsCompo
       gradient: "bg-gradient-primary",
     },
     {
-      title: "Active Bookings",
+      title: "Total Bookings",
+      subtitle: "Total bookings for your villa(s) across all time",
       value: String(statsData.activeBookings || 0),
       icon: Calendar,
       gradient: "bg-gradient-accent",
     },
     {
-      title: "Monthly Revenue",
+      title: "Current Month Revenue",
+      subtitle: "Revenue from confirmed bookings checking in this month",
       value: `₹${(statsData.monthlyRevenue || 0).toLocaleString('en-IN')}`,
       icon: DollarSign,
       gradient: "bg-gradient-sunset",

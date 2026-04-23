@@ -90,7 +90,7 @@ export default function OwnerFinancesComponent() {
         <div className="grid grid-cols-2 gap-4">
           <div className="p-4 rounded-lg bg-gradient-primary/10 border border-primary/20">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-medium text-muted-foreground">Monthly Revenue</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">Current Month Revenue</h3>
               <div className={`flex items-center text-xs ${
                 revenueChange >= 0 ? "text-success" : "text-destructive"
               }`}>

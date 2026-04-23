@@ -91,7 +91,7 @@ export default function OwnerAnalyticsPage() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <OwnerMonthlySummaryCardComponent
-                        title="Monthly Revenue"
+                        title="Current Month Revenue"
                         value={formatCurrency(currentMonth.revenue || 0)}
                         change={changes.revenueChangePercent || 0}
                         subtitle={`Avg: ${formatCurrency(currentMonth.avgBookingValue || 0)} per booking`}
