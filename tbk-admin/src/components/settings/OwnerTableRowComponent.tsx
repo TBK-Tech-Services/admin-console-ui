@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Home, Edit } from "lucide-react";
+import { Home, Edit, MapPin } from "lucide-react";
 import { DeleteOwnerDialogComponent } from "./DeleteOwnerDialogComponent";
 import { UnassignVillaDialogComponent } from "./UnassignVillaDialogComponent";
 
@@ -34,16 +33,15 @@ export function OwnerTableRowComponent({
                                     <Home className="h-4 w-4 text-primary" />
                                     <span className="text-sm font-medium">{villa.name}</span>
                                     {villa.location && (
-                                        <Badge variant="outline" className="text-xs px-2 py-0.5">
-                                            <a
-                                                href={villa.location}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="text-blue-600 underline cursor-pointer hover:text-blue-800"
-                                            >
-                                                Open in Maps ↗
-                                            </a>
-                                        </Badge>
+                                        <a
+                                            href={villa.location}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 border border-orange-400 text-orange-500 rounded-full px-3 py-1 text-xs font-medium cursor-pointer hover:bg-orange-50 transition-colors"
+                                        >
+                                            <MapPin size={12} />
+                                            View Location
+                                        </a>
                                     )}
                                 </div>
 
