@@ -7,6 +7,12 @@ export const getFinanceDashboardDataService = async (params?: any) => {
     return data;
 };
 
+// Service to Get Net Revenue Dashboard Data
+export const getNetRevenueDataService = async (params?: any) => {
+    const data = await apiService.get('/finance/v1/net-revenue', { params });
+    return data;
+};
+
 // Service to Download Finance Report PDF
 export const downloadFinanceReportService = async (filters: {
     villaId?: string;

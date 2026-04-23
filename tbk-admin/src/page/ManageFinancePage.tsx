@@ -3,8 +3,10 @@ import FinanceFiltersComponent from "@/components/finance/FinanceFiltersComponen
 import FinanceMetricsComponent from "@/components/finance/FinanceMetricsComponent";
 import FinancePageHeaderComponent from "@/components/finance/FinancePageHeaderComponent";
 import FinanceVillaPerformanceComponent from "@/components/finance/FinanceVillaPerformanceComponent";
+import NetRevenueDashboardComponent from "@/components/finance/NetRevenueDashboardComponent";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
-import { getFinanceDashboardDataService } from "@/services/finance.service";
+import { getFinanceDashboardDataService, getNetRevenueDataService } from "@/services/finance.service";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 
@@ -30,6 +32,12 @@ export default function ManageFinancePage() {
   const { data: response, isLoading, isError, error } = useQuery({
     queryKey: ['financeDashboard', selectedVilla, selectedMonth, dateRange.start, dateRange.end],
     queryFn: () => getFinanceDashboardDataService(queryParams),
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const { data: netRevenueResponse, isLoading: netRevenueLoading } = useQuery({
+    queryKey: ['financeNetRevenue', selectedVilla, selectedMonth, dateRange.start, dateRange.end],
+    queryFn: () => getNetRevenueDataService(queryParams),
     staleTime: 1000 * 60 * 5,
   });
 
@@ -72,6 +80,7 @@ export default function ManageFinancePage() {
   }
 
   const { summaryCards, charts, villaPerformance } = response.data;
+  const netRevenueData = netRevenueResponse?.data ?? netRevenueResponse;
 
   return (
     <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
@@ -86,22 +95,43 @@ export default function ManageFinancePage() {
         onDateRangeChange={setDateRange}
       />
 
-      <FinanceMetricsComponent
-        totalIncomeData={summaryCards.totalIncome}
-        totalExpensesData={summaryCards.totalExpenses}
-        netProfitLossData={summaryCards.netProfitLoss}
-        averageMonthlyData={summaryCards.averageMonthly}
-      />
+      <Tabs defaultValue="overview">
+        <TabsList className="mb-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="net-revenue">Net Revenue</TabsTrigger>
+        </TabsList>
 
-      <FinanceChartsComponent
-        monthlyData={charts.monthlyIncomeExpense}
-        profitTrendData={charts.profitTrend}
-      />
+        <TabsContent value="overview" className="space-y-4 sm:space-y-6">
+          <FinanceMetricsComponent
+            totalIncomeData={summaryCards.totalIncome}
+            totalExpensesData={summaryCards.totalExpenses}
+            netProfitLossData={summaryCards.netProfitLoss}
+            averageMonthlyData={summaryCards.averageMonthly}
+          />
+          <FinanceChartsComponent
+            monthlyData={charts.monthlyIncomeExpense}
+            profitTrendData={charts.profitTrend}
+          />
+          <FinanceVillaPerformanceComponent
+            villaData={villaPerformance}
+            expenseCategories={charts.expenseBreakdown}
+          />
+        </TabsContent>
 
-      <FinanceVillaPerformanceComponent
-        villaData={villaPerformance}
-        expenseCategories={charts.expenseBreakdown}
-      />
+        <TabsContent value="net-revenue">
+          {netRevenueLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <p className="text-sm text-muted-foreground">Loading net revenue data...</p>
+            </div>
+          ) : netRevenueData?.filteredPeriod ? (
+            <NetRevenueDashboardComponent data={netRevenueData} />
+          ) : (
+            <div className="flex items-center justify-center h-64">
+              <p className="text-sm text-muted-foreground">No net revenue data available</p>
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
