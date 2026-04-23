@@ -77,14 +77,16 @@ export function CalendarGridComponent({
             for (let day = 1; day <= daysInMonth; day++) {
                 const currentDate = createDateOnly(currentYear, currentMonth, day);
 
-                if (currentDate >= checkIn && currentDate <= checkOut) {
+                if (currentDate >= checkIn && currentDate < checkOut) {
+                    const nextDate = new Date(currentDate);
+                    nextDate.setDate(nextDate.getDate() + 1);
                     const key = String(day);
                     if (!map.has(key)) map.set(key, []);
                     map.get(key)!.push({
                         ...booking,
                         isStart: isSameDay(checkIn, currentDate),
-                        isEnd: isSameDay(checkOut, currentDate),
-                        isContinuation: !(isSameDay(checkIn, currentDate) || isSameDay(checkOut, currentDate)),
+                        isEnd: isSameDay(checkOut, nextDate),
+                        isContinuation: !(isSameDay(checkIn, currentDate) || isSameDay(checkOut, nextDate)),
                     });
                 }
             }

@@ -74,8 +74,11 @@ export function OwnerCalendarGridComponent({
         let bookings = BOOKING_RANGES.filter(booking => {
             const checkIn = getDateOnly(booking.checkIn);
             const checkOut = getDateOnly(booking.checkOut);
-            return currentDate >= checkIn && currentDate <= checkOut;
+            return currentDate >= checkIn && currentDate < checkOut;
         });
+
+        const nextDate = new Date(currentDate);
+        nextDate.setDate(nextDate.getDate() + 1);
 
         return bookings.map(booking => {
             const checkIn = getDateOnly(booking.checkIn);
@@ -84,8 +87,8 @@ export function OwnerCalendarGridComponent({
             return {
                 ...booking,
                 isStart: isSameDay(checkIn, currentDate),
-                isEnd: isSameDay(checkOut, currentDate),
-                isContinuation: !(isSameDay(checkIn, currentDate) || isSameDay(checkOut, currentDate))
+                isEnd: isSameDay(checkOut, nextDate),
+                isContinuation: !(isSameDay(checkIn, currentDate) || isSameDay(checkOut, nextDate))
             };
         });
     };
