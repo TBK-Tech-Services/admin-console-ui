@@ -33,9 +33,18 @@ export function OwnerTableRowComponent({
                                 <div className="flex items-center gap-2">
                                     <Home className="h-4 w-4 text-primary" />
                                     <span className="text-sm font-medium">{villa.name}</span>
-                                    <Badge variant="outline" className="text-xs">
-                                        {villa.location}
-                                    </Badge>
+                                    {villa.location && (
+                                        <Badge variant="outline" className="text-xs px-2 py-0.5">
+                                            <a
+                                                href={villa.location}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-blue-600 underline cursor-pointer hover:text-blue-800"
+                                            >
+                                                Open in Maps ↗
+                                            </a>
+                                        </Badge>
+                                    )}
                                 </div>
 
                                 {/* Unassign Villa Dialog */}
