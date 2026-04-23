@@ -25,7 +25,7 @@ export default function VillaTabsComponent({ villa, bookingsData }) {
       </TabsContent>
 
       <TabsContent value="revenue" className="mt-3 sm:mt-4">
-        <VillaRevenueTabComponent villa={villa} />
+        <VillaRevenueTabComponent villaId={String(villa.id)} />
       </TabsContent>
     </Tabs>
   );

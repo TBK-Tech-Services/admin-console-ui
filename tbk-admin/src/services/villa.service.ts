@@ -48,3 +48,15 @@ export const getAllBookingsForVillaService = async (id: string): Promise<void> =
     const response = await apiService.get(`/villas/v1/${id}/bookings`);
     return response.data;
 }
+
+// Service to Get KPI Stats For a Villa
+export const getVillaStatsService = async (id: string): Promise<any> => {
+    const response = await apiService.get(`/villas/v1/${id}/stats`);
+    return response.data;
+}
+
+// Service to Get Revenue Data For a Villa
+export const getVillaRevenueService = async (id: string): Promise<any> => {
+    const response = await apiService.get(`/villas/v1/${id}/revenue`);
+    return response.data;
+}

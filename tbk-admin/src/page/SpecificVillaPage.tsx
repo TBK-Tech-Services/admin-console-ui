@@ -8,7 +8,7 @@ import VillaBookingsTableComponent from "@/components/villa/VillaBookingsTableCo
 import VillaTabsComponent from "@/components/villa/VillaTabsComponent";
 import EditVillaModalComponent from "@/components/villa/EditVillaModalComponent";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { deleteAVillaService, getAllBookingsForVillaService, getAVillaService, getRecentBookingsForVillaService } from "@/services/villa.service";
+import { deleteAVillaService, getAllBookingsForVillaService, getAVillaService, getRecentBookingsForVillaService, getVillaStatsService } from "@/services/villa.service";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 
 export default function SpecificVillaPage() {
@@ -50,6 +50,12 @@ export default function SpecificVillaPage() {
     enabled: !!id && !!villa && showAllBookings,
   });
 
+  const { data: statsResponse } = useQuery({
+    queryKey: ['villa-stats', id],
+    queryFn: () => getVillaStatsService(id!),
+    enabled: !!id && !!villa,
+  });
+
   const allBookingsData = allBookingsResponse?.data || allBookingsResponse || [];
 
   const deleteVillaMutation = useMutation({
@@ -69,7 +75,13 @@ export default function SpecificVillaPage() {
     }, 2000);
   };
 
-  const mockStats = {
+  const rawStats = statsResponse?.data ?? statsResponse;
+  const villaStats = rawStats ? {
+    totalBookings: rawStats.totalBookings,
+    totalRevenue: `₹${Number(rawStats.totalRevenue).toLocaleString('en-IN')}`,
+    occupancyRate: `${rawStats.occupancyRate}%`,
+    averageStay: `${rawStats.avgStay} days`
+  } : {
     totalBookings: 0,
     totalRevenue: "₹0",
     occupancyRate: "0%",
@@ -133,7 +145,7 @@ export default function SpecificVillaPage() {
         onDeleteVilla={handleDeleteVilla}
       />
 
-      <VillaStatsComponent stats={mockStats} />
+      <VillaStatsComponent stats={villaStats} />
 
       {showAllBookings && Array.isArray(allBookingsData) && allBookingsData.length > 0 && (
         <VillaBookingsTableComponent
