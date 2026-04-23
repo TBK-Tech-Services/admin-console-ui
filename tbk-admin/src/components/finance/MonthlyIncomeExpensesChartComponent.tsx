@@ -45,10 +45,10 @@ export default function MonthlyIncomeExpensesChartComponent({ monthlyData }: Mon
               name="Income" 
               radius={[4, 4, 0, 0]}
             />
-            <Bar 
-              dataKey="expenses" 
-              fill="url(#expenseGradient)" 
-              name="Expenses" 
+            <Bar
+              dataKey="expense"
+              fill="url(#expenseGradient)"
+              name="Expenses"
               radius={[4, 4, 0, 0]}
             />
             <defs>
