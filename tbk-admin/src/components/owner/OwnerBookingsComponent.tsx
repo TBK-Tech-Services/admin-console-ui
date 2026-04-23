@@ -19,6 +19,21 @@ const getStatusColor = (status: string) => {
   }
 };
 
+const getTimeContextBadge = (checkIn: string, checkOut: string) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const checkInDate = new Date(checkIn);
+  const checkOutDate = new Date(checkOut);
+
+  if (checkInDate > today) {
+    return { label: "Upcoming", className: "bg-blue-50 text-blue-600 border-blue-200" };
+  }
+  if (checkOutDate < today) {
+    return { label: "Past", className: "bg-muted/50 text-muted-foreground border-muted" };
+  }
+  return { label: "Ongoing", className: "bg-success/10 text-success border-success/20" };
+};
+
 const getPaymentStatusColor = (status: string) => {
   switch (status) {
     case "PAID":
@@ -96,11 +111,21 @@ export default function OwnerBookingsComponent({ data, isLoading }: OwnerBooking
                       <span className="truncate">{booking.villaName}</span>
                     </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <Badge className={`${getStatusColor(booking.bookingStatus)} text-[10px] sm:text-xs`}>
-                      {booking.bookingStatus}
-                    </Badge>
-                    <div className="text-xs sm:text-sm font-semibold text-foreground mt-1">
+                  <div className="text-right shrink-0 space-y-1">
+                    <div className="flex items-center justify-end gap-1 flex-wrap">
+                      <Badge className={`${getStatusColor(booking.bookingStatus)} text-[10px] sm:text-xs`}>
+                        {booking.bookingStatus}
+                      </Badge>
+                      {(() => {
+                        const ctx = getTimeContextBadge(booking.checkIn, booking.checkOut);
+                        return (
+                          <Badge variant="outline" className={`${ctx.className} text-[10px] sm:text-xs`}>
+                            {ctx.label}
+                          </Badge>
+                        );
+                      })()}
+                    </div>
+                    <div className="text-xs sm:text-sm font-semibold text-foreground">
                       ₹{Number(booking.amount).toLocaleString('en-IN')}
                     </div>
                   </div>
