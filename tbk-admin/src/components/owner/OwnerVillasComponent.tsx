@@ -1,24 +1,8 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, Users, Calendar, IndianRupee } from "lucide-react";
-
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case "AVAILABLE":
-      return "bg-success/10 text-success border-success/20";
-    case "MAINTENANCE":
-      return "bg-warning/10 text-warning border-warning/20";
-    case "OCCUPIED":
-      return "bg-destructive/10 text-destructive border-destructive/20";
-    default:
-      return "bg-muted text-muted-foreground";
-  }
-};
-
-const isUrl = (str: string) =>
-  typeof str === "string" && (str.startsWith("http") || str.startsWith("www"));
-
-const fmt = (val: any) => (val != null && val !== "" ? String(val) : "—");
+import { Building2, MapPin, Users, Bed, Bath, ExternalLink } from "lucide-react";
+import { getVillaStatusColor } from "@/utils/getVillaStatusColor";
+import villaPlaceholder from "@/assets/villa-placeholder.svg";
 
 interface OwnerVillasComponentProps {
   data: any;
@@ -57,64 +41,114 @@ export default function OwnerVillasComponent({ data, isLoading }: OwnerVillasCom
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-3 sm:space-y-4">
+      <CardContent>
         {villas.length === 0 ? (
           <div className="text-center py-6 sm:py-8 text-sm text-muted-foreground">No villas found</div>
         ) : (
-          villas.map((villa: any) => (
-            <div
-              key={villa.id}
-              className="relative rounded-xl border border-gray-200 border-l-4 border-l-orange-400 bg-white p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
-            >
-              {/* Status badge — top-right */}
-              <div className="absolute top-4 right-4">
-                <Badge className={`${getStatusColor(villa.status)} text-[10px] sm:text-xs font-semibold px-2.5 py-0.5`}>
-                  {villa.status}
-                </Badge>
-              </div>
-
-              {/* Villa name */}
-              <h3 className="text-lg font-bold text-foreground mb-2 pr-24 truncate">{villa.name}</h3>
-
-              {/* Location */}
-              {isUrl(villa.location) ? (
-                <a
-                  href={villa.location}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 border border-orange-400 text-orange-500 rounded-full px-3 py-1 text-xs hover:bg-orange-50 transition-colors mb-4"
-                >
-                  <MapPin className="h-3 w-3 shrink-0" />
-                  View Location
-                </a>
-              ) : (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-4">
-                  <MapPin className="h-3.5 w-3.5 shrink-0 text-orange-400" />
-                  <span className="truncate">{villa.location || "—"}</span>
-                </div>
-              )}
-
-              {/* Stats row */}
-              <div className="flex items-center divide-x divide-gray-200">
-                <div className="flex items-center gap-1.5 pr-4">
-                  <Users className="h-3.5 w-3.5 text-orange-400 shrink-0" />
-                  <span className="text-sm font-semibold text-foreground">{fmt(villa.maxGuests)}</span>
-                  <span className="text-xs text-muted-foreground">Guests</span>
-                </div>
-                <div className="flex items-center gap-1.5 px-4">
-                  <Calendar className="h-3.5 w-3.5 text-orange-400 shrink-0" />
-                  <span className="text-sm font-semibold text-foreground">{fmt(villa.currentBookings)}</span>
-                  <span className="text-xs text-muted-foreground">Bookings</span>
-                </div>
-                <div className="flex items-center gap-1.5 pl-4">
-                  <IndianRupee className="h-3.5 w-3.5 text-orange-400 shrink-0" />
-                  <span className="text-sm font-semibold text-foreground">{fmt(villa.totalRevenue)}</span>
-                  <span className="text-xs text-muted-foreground">Revenue</span>
-                </div>
-              </div>
-            </div>
-          ))
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+            {villas.map((villa: any, index: number) => (
+              <VillaCard key={villa.id} villa={villa} isPriority={index === 0} />
+            ))}
+          </div>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function VillaCard({ villa, isPriority }: { villa: any; isPriority: boolean }) {
+  const amenityNames: string[] = villa.amenities || [];
+
+  const handleLocationClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (villa.location) {
+      window.open(villa.location, "_blank");
+    }
+  };
+
+  return (
+    <Card className="overflow-hidden hover:shadow-elegant transition-all duration-300 group">
+      {/* Image */}
+      <div className="relative">
+        <img
+          src={villa.imageUrl || villaPlaceholder}
+          alt={villa.name}
+          loading={isPriority ? "eager" : "lazy"}
+          decoding="async"
+          className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+        />
+        <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
+          <Badge variant="outline" className={`${getVillaStatusColor(villa.status)} text-xs`}>
+            {villa.status}
+          </Badge>
+        </div>
+      </div>
+
+      {/* Header: name + location + ID */}
+      <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-base sm:text-lg mb-0.5 sm:mb-1 truncate">{villa.name}</CardTitle>
+            {villa.location ? (
+              <button
+                onClick={handleLocationClick}
+                className="flex items-center text-primary hover:text-primary/80 text-xs sm:text-sm transition-colors"
+              >
+                <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 shrink-0" />
+                <span className="truncate max-w-[120px] sm:max-w-[150px]">View Location</span>
+                <ExternalLink className="h-3 w-3 ml-1 shrink-0" />
+              </button>
+            ) : (
+              <span className="flex items-center text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3 mr-1 shrink-0" />
+                No location set
+              </span>
+            )}
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-[10px] sm:text-xs text-muted-foreground">ID: {villa.id}</div>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 pt-0 sm:pt-0">
+        {/* Bed / Bath / Guests row */}
+        <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
+          <div className="flex items-center">
+            <Bed className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            {villa.bedrooms != null ? `${villa.bedrooms} Bed` : "— Bed"}
+          </div>
+          <div className="flex items-center">
+            <Bath className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            {villa.bathrooms != null ? `${villa.bathrooms} Bath` : "— Bath"}
+          </div>
+          <div className="flex items-center">
+            <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+            {villa.maxGuests != null ? `Up to ${villa.maxGuests}` : "— Guests"}
+          </div>
+        </div>
+
+        {/* Amenities pills */}
+        {amenityNames.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {amenityNames.slice(0, 3).map((name, i) => (
+              <Badge key={i} variant="secondary" className="text-[10px] sm:text-xs">{name}</Badge>
+            ))}
+            {amenityNames.length > 3 && (
+              <Badge variant="secondary" className="text-[10px] sm:text-xs">
+                +{amenityNames.length - 3} more
+              </Badge>
+            )}
+          </div>
+        )}
+
+        {/* Description */}
+        <div className="border-t pt-2 sm:pt-3 text-sm">
+          <div className="text-muted-foreground mb-0.5 sm:mb-1 text-xs sm:text-sm">Description</div>
+          <div className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2">
+            {villa.description || "No description available"}
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
