@@ -20,7 +20,7 @@ export default function OwnerDashboardPage() {
   });
 
   // Query for Owner Villas
-  const { data: villasData, isLoading: villasLoading } = useQuery({
+  const { data: villasData, isLoading: villasLoading, isError: villasError } = useQuery({
     queryKey: ["ownerVillas", ownerId],
     queryFn: () => getOwnerVillasService({ ownerId }),
   });
@@ -56,7 +56,7 @@ export default function OwnerDashboardPage() {
       <div className="grid gap-4 sm:gap-6 lg:grid-cols-2">
         {/* Villas Section */}
         <div>
-          <OwnerVillasComponent data={villasData} isLoading={villasLoading} />
+          <OwnerVillasComponent data={villasData} isLoading={villasLoading} isError={villasError} />
         </div>
 
         {/* Bookings Section */}

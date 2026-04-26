@@ -7,13 +7,24 @@ import villaPlaceholder from "@/assets/villa-placeholder.svg";
 interface OwnerVillasComponentProps {
   data: any;
   isLoading: boolean;
+  isError?: boolean;
 }
 
-export default function OwnerVillasComponent({ data, isLoading }: OwnerVillasComponentProps) {
+export default function OwnerVillasComponent({ data, isLoading, isError }: OwnerVillasComponentProps) {
   if (isLoading) {
     return (
       <Card className="border-border shadow-soft">
         <CardContent className="py-6 sm:py-8 text-center text-sm">Loading villas...</CardContent>
+      </Card>
+    );
+  }
+
+  if (isError) {
+    return (
+      <Card className="border-border shadow-soft">
+        <CardContent className="py-6 sm:py-8 text-center text-sm text-destructive">
+          Failed to load villas. Please refresh the page.
+        </CardContent>
       </Card>
     );
   }
