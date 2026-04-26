@@ -129,3 +129,41 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+/* ─── Print styles ─────────────────────────────────────────────────────────── */
+@media print {
+  /* Hide interactive / navigation elements */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Remove the sidebar left-offset so content fills the page */
+  .print-content-wrapper {
+    padding-left: 0 !important;
+  }
+
+  /* Page setup — A4 portrait */
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  /* Preserve colours for charts */
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  /* Print header injected via data attributes on <body> */
+  body[data-print-page]::before {
+    content: "TBK Villas  —  " attr(data-print-page) "  —  Printed on " attr(data-print-date);
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #000;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid #333;
+    letter-spacing: 0.01em;
+  }
+}

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 import BookingsExportModalComponent from "./BookingsExportModalComponent";
+import PrintButtonComponent from "@/components/common/PrintButtonComponent";
 
 interface BookingsExportComponentProps {
   searchTerm: string;
@@ -20,6 +21,8 @@ export default function BookingsExportComponent({
 
   return (
     <>
+      <PrintButtonComponent pageName="Manage Bookings" />
+
       <Button
         variant="outline"
         onClick={() => setIsExportModalOpen(true)}

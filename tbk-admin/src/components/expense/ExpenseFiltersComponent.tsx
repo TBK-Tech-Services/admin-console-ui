@@ -111,7 +111,7 @@ export default function ExpenseFiltersComponent({
     };
 
     return (
-        <Card>
+        <Card className="no-print">
             <CardContent className="pt-4 sm:pt-6">
                 <div className="space-y-3 sm:space-y-4">
                     <div className="flex items-center justify-between">

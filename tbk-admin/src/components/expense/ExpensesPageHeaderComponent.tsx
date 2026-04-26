@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import ExpenseReportDownloadComponent from "./ExpenseReportDownloadComponent";
+import PrintButtonComponent from "@/components/common/PrintButtonComponent";
 import { ExpenseFilters } from "@/types/expense/expenseFilters";
 
 interface ExpensesPageHeaderComponentProps {
@@ -13,7 +14,7 @@ export default function ExpensesPageHeaderComponent({
   filters,
 }: ExpensesPageHeaderComponentProps) {
   return (
-    <div className="space-y-3 sm:space-y-4">
+    <div className="no-print space-y-3 sm:space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Manage Expenses</h1>
@@ -22,6 +23,7 @@ export default function ExpensesPageHeaderComponent({
           </p>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
+          <PrintButtonComponent pageName="Manage Expenses" />
           <ExpenseReportDownloadComponent filters={filters} />
           <Button onClick={onModalOpen} className="gap-2 flex-1 sm:flex-none">
             <Plus className="h-4 w-4" />

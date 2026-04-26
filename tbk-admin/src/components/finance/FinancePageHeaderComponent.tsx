@@ -1,5 +1,6 @@
 import { TrendingUp } from "lucide-react";
 import FinanceReportDownloadComponent from "./FinanceReportDownloadComponent";
+import PrintButtonComponent from "@/components/common/PrintButtonComponent";
 
 interface FinancePageHeaderComponentProps {
   filters?: {
@@ -13,7 +14,7 @@ export default function FinancePageHeaderComponent({
   filters,
 }: FinancePageHeaderComponentProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+    <div className="no-print flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-2">
           <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
@@ -24,11 +25,10 @@ export default function FinancePageHeaderComponent({
         </p>
       </div>
 
-      {filters && (
-        <div className="shrink-0">
-          <FinanceReportDownloadComponent filters={filters} />
-        </div>
-      )}
+      <div className="flex items-center gap-2 shrink-0">
+        <PrintButtonComponent pageName="Finance Dashboard" />
+        {filters && <FinanceReportDownloadComponent filters={filters} />}
+      </div>
     </div>
   );
 }

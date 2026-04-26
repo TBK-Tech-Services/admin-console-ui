@@ -23,7 +23,7 @@ export default function BookingsFiltersComponent({
   const hasActiveFilters = searchTerm || statusFilter || paymentStatusFilter || checkInDate;
 
   return (
-    <Card>
+    <Card className="no-print">
       <CardContent className="pt-4 sm:pt-6">
         <div className="flex flex-col gap-3 sm:gap-4">
           {/* Search - Full width on top for mobile/tablet */}
