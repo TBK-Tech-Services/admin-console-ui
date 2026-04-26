@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, TrendingUp, DollarSign, Calendar, Building2, BarChart3 } from "lucide-react";
+import { ArrowLeft, TrendingUp, DollarSign, Calendar, Building2, BarChart3, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import OwnerMonthlySummaryCardComponent from "@/components/owner/OwnerMonthlySummaryCardComponent";
@@ -31,6 +31,7 @@ export default function OwnerAnalyticsPage() {
     const navigate = useNavigate();
     const ownerId = useSelector((state: RootState) => state?.auth?.user?.id);
     const [showPerformance, setShowPerformance] = useState(false);
+    const [visibleMonths, setVisibleMonths] = useState(3);
 
     const { data: summaryData, isLoading: summaryLoading } = useQuery({
         queryKey: ["analyticsSummary", ownerId],
@@ -180,7 +181,7 @@ export default function OwnerAnalyticsPage() {
                         Recent Months
                     </CardTitle>
                     <CardDescription>
-                        Last 3 months · Bookings by check-in date · Excludes cancelled
+                        Bookings by check-in date · Excludes cancelled
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -189,16 +190,31 @@ export default function OwnerAnalyticsPage() {
                     ) : months.length === 0 ? (
                         <div className="text-center py-8 text-muted-foreground">No revenue data available</div>
                     ) : (
-                        months.map((month: any, index: number) => (
-                            <OwnerMonthlyTrendCardComponent
-                                key={month.month}
-                                month={month.month}
-                                bookings={month.bookings}
-                                revenue={formatCurrency(month.revenue)}
-                                avgBookingValue={formatCurrency(month.avgBookingValue)}
-                                isCurrent={index === 0}
-                            />
-                        ))
+                        <>
+                            {months.slice(0, visibleMonths).map((month: any, index: number) => (
+                                <OwnerMonthlyTrendCardComponent
+                                    key={month.month}
+                                    month={month.month}
+                                    bookings={month.bookings}
+                                    revenue={formatCurrency(month.revenue)}
+                                    avgBookingValue={formatCurrency(month.avgBookingValue)}
+                                    isCurrent={index === 0}
+                                />
+                            ))}
+                            <div className="pt-2 flex justify-center">
+                                {visibleMonths < months.length ? (
+                                    <button
+                                        onClick={() => setVisibleMonths(prev => prev + 3)}
+                                        className="flex items-center gap-2 px-6 py-2 text-sm text-orange-500 border border-orange-400 rounded-full hover:bg-orange-50 transition-colors"
+                                    >
+                                        Load More
+                                        <ChevronDown className="h-4 w-4" />
+                                    </button>
+                                ) : (
+                                    <p className="text-xs text-muted-foreground">All months loaded</p>
+                                )}
+                            </div>
+                        </>
                     )}
                 </CardContent>
             </Card>
