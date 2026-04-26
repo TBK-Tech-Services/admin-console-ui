@@ -124,7 +124,7 @@ function VillaCard({ villa, isPriority }: { villa: any; isPriority: boolean }) {
           </div>
           <div className="flex items-center">
             <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-            {villa.maxGuests != null ? `Up to ${villa.maxGuests}` : "— Guests"}
+            {villa.currentBookings != null ? `${villa.currentBookings} Bookings` : "— Bookings"}
           </div>
         </div>
 
