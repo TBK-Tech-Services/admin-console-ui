@@ -23,23 +23,23 @@ export default function OwnerPerformanceSectionComponent({ data }: Props) {
 
     const metrics = [
         {
-            label: "Occupancy Rate",
+            label: "Occupancy Rate This Month",
             value: `${occupancyRate}%`,
-            sub: `${totalNightsBooked} of ${totalAvailableNights} nights`,
+            sub: `${totalNightsBooked} of ${totalAvailableNights} nights booked · Current month`,
             icon: Percent,
             gradient: "bg-gradient-primary/10 text-primary",
         },
         {
-            label: "RevPAR",
+            label: "RevPAR This Month",
             value: formatCurrency(revPAR),
-            sub: "Revenue per available room/night",
+            sub: "Total revenue ÷ available nights · Current month",
             icon: TrendingUp,
             gradient: "bg-gradient-accent/10 text-accent",
         },
         {
-            label: "Avg Stay Length",
+            label: "Avg Stay Length This Month",
             value: `${avgStayLength} nights`,
-            sub: "Average per confirmed booking",
+            sub: "Avg nights per confirmed booking · Current month",
             icon: Clock,
             gradient: "bg-gradient-sunset/10 text-primary",
         },
@@ -52,7 +52,7 @@ export default function OwnerPerformanceSectionComponent({ data }: Props) {
                     <BedDouble className="h-5 w-5 text-primary" />
                     Performance Metrics
                 </CardTitle>
-                <CardDescription>Aggregate KPIs across all your villas — current month</CardDescription>
+                <CardDescription>Aggregate KPIs across all your villas · Confirmed bookings · Current month</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

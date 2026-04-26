@@ -31,10 +31,13 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <Card className={isPositive ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium opacity-90">Lifetime Net Revenue</CardTitle>
+                        <div>
+                            <CardTitle className="text-sm font-medium opacity-90">Net Revenue (All Time)</CardTitle>
+                            <p className="text-[10px] opacity-70 mt-0.5">Lifetime income − lifetime expenses</p>
+                        </div>
                         {isPositive
-                            ? <TrendingUp className="h-4 w-4 opacity-90" />
-                            : <TrendingDown className="h-4 w-4 opacity-90" />}
+                            ? <TrendingUp className="h-4 w-4 opacity-90 shrink-0" />
+                            : <TrendingDown className="h-4 w-4 opacity-90 shrink-0" />}
                     </CardHeader>
                     <CardContent className="pt-0">
                         <div className="text-2xl font-bold">{fmtSigned(lifetimeNetRevenue)}</div>
@@ -46,10 +49,13 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
 
                 <Card className={currentMonth.isPositive ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium opacity-90">Current Month Net Revenue</CardTitle>
+                        <div>
+                            <CardTitle className="text-sm font-medium opacity-90">Net Revenue (Current Month)</CardTitle>
+                            <p className="text-[10px] opacity-70 mt-0.5">This month's income − expenses</p>
+                        </div>
                         {currentMonth.isPositive
-                            ? <TrendingUp className="h-4 w-4 opacity-90" />
-                            : <TrendingDown className="h-4 w-4 opacity-90" />}
+                            ? <TrendingUp className="h-4 w-4 opacity-90 shrink-0" />
+                            : <TrendingDown className="h-4 w-4 opacity-90 shrink-0" />}
                     </CardHeader>
                     <CardContent className="pt-0">
                         <div className="text-2xl font-bold">{fmtSigned(currentMonth.netRevenue)}</div>
@@ -61,12 +67,14 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
 
                 <Card className="bg-gradient-primary text-primary-foreground">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium opacity-90">Profit Margin</CardTitle>
-                        <BarChart3 className="h-4 w-4 opacity-90" />
+                        <div>
+                            <CardTitle className="text-sm font-medium opacity-90">Profit Margin (Lifetime)</CardTitle>
+                            <p className="text-[10px] opacity-70 mt-0.5">Net ÷ Income × 100 · All time</p>
+                        </div>
+                        <BarChart3 className="h-4 w-4 opacity-90 shrink-0" />
                     </CardHeader>
                     <CardContent className="pt-0">
                         <div className="text-2xl font-bold">{isPositive ? "" : "-"}{Math.abs(margin)}%</div>
-                        <p className="text-xs opacity-80 mt-1">Net ÷ Income × 100 (lifetime)</p>
                     </CardContent>
                 </Card>
             </div>
@@ -78,30 +86,30 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
                         <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/40">
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <DollarSign className="h-4 w-4" />
-                                <span className="text-sm font-medium">Lifetime Income</span>
+                                <span className="text-sm font-medium">Total Income (All Time)</span>
                             </div>
                             <div className="text-2xl font-bold text-foreground">{fmt(lifetimeIncome)}</div>
-                            <div className="text-xs text-muted-foreground">All confirmed bookings</div>
+                            <div className="text-xs text-muted-foreground">All confirmed bookings · Excludes cancelled</div>
                         </div>
                         <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/40">
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Receipt className="h-4 w-4" />
-                                <span className="text-sm font-medium">Lifetime Expenses</span>
+                                <span className="text-sm font-medium">Total Expenses (All Time)</span>
                             </div>
                             <div className="text-2xl font-bold text-foreground">{fmt(lifetimeExpenses)}</div>
-                            <div className="text-xs text-muted-foreground">All allocated expenses</div>
+                            <div className="text-xs text-muted-foreground">INDIVIDUAL + SPLIT expenses · Your villas</div>
                         </div>
                         <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/40">
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 {isPositive
                                     ? <TrendingUp className="h-4 w-4 text-success" />
                                     : <TrendingDown className="h-4 w-4 text-destructive" />}
-                                <span className="text-sm font-medium">Net Revenue</span>
+                                <span className="text-sm font-medium">Net Revenue (Income − Expenses)</span>
                             </div>
                             <div className={`text-2xl font-bold ${isPositive ? "text-success" : "text-destructive"}`}>
                                 {fmtSigned(lifetimeNetRevenue)}
                             </div>
-                            <div className="text-xs text-muted-foreground">Income − Expenses</div>
+                            <div className="text-xs text-muted-foreground">All time · Income minus expenses</div>
                         </div>
                     </div>
                 </CardContent>

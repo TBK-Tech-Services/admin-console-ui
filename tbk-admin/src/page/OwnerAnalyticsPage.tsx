@@ -115,15 +115,15 @@ export default function OwnerAnalyticsPage() {
                         title="Current Month Revenue"
                         value={formatCurrency(currentMonth.revenue || 0)}
                         change={changes.revenueChangePercent || 0}
-                        subtitle={`Avg: ${formatCurrency(currentMonth.avgBookingValue || 0)} per booking`}
+                        subtitle={`Confirmed bookings checking in this month · Avg: ${formatCurrency(currentMonth.avgBookingValue || 0)}/booking`}
                         icon={DollarSign}
                         gradientClass="bg-gradient-primary/10 text-primary"
                     />
                     <OwnerMonthlySummaryCardComponent
-                        title="Total Bookings"
+                        title="Bookings This Month"
                         value={String(currentMonth.bookings || 0)}
                         change={changes.bookingsChangePercent || 0}
-                        subtitle={`${currentMonth.bookings || 0} bookings this month`}
+                        subtitle="Confirmed bookings checking in this month · Excludes cancelled"
                         icon={Calendar}
                         gradientClass="bg-gradient-accent/10 text-accent"
                     />
@@ -149,7 +149,7 @@ export default function OwnerAnalyticsPage() {
                         Villa Performance
                     </CardTitle>
                     <CardDescription>
-                        Individual villa metrics and occupancy rates
+                        Per-villa metrics · Confirmed bookings checking in this month · Excludes cancelled
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
@@ -180,7 +180,7 @@ export default function OwnerAnalyticsPage() {
                         Recent Months
                     </CardTitle>
                     <CardDescription>
-                        Historical revenue and booking trends
+                        Last 3 months · Bookings by check-in date · Excludes cancelled
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-3">
@@ -208,10 +208,10 @@ export default function OwnerAnalyticsPage() {
                 <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                         <BarChart3 className="h-5 w-5 text-primary" />
-                        Net Revenue
+                        Net Revenue (Income − Expenses)
                     </CardTitle>
                     <CardDescription>
-                        Revenue minus expenses — lifetime and monthly trend
+                        Lifetime and current month · Last 12 months trend · INDIVIDUAL + SPLIT expenses
                     </CardDescription>
                 </CardHeader>
                 <CardContent>

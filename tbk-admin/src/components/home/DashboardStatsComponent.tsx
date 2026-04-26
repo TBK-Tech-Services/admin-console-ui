@@ -1,9 +1,29 @@
 import StatCardComponent from "../dashboard/StatCardComponent";
 
 const TITLE_OVERRIDES: Record<string, { title: string; subtitle: string }> = {
+  "Total Villas": {
+    title: "Total Villas",
+    subtitle: "All active properties in the system",
+  },
   "Total Bookings": {
-    title: "Bookings This Month",
-    subtitle: "Total bookings created or checking in this month",
+    title: "Total Bookings (All Time)",
+    subtitle: "All bookings ever created · Includes cancelled",
+  },
+  "Revenue": {
+    title: "Total Revenue (All Time)",
+    subtitle: "Paid bookings only · Excludes cancelled",
+  },
+  "Guests": {
+    title: "Total Guests (All Time)",
+    subtitle: "Sum of all guests · Includes cancelled bookings",
+  },
+  "Pending": {
+    title: "Pending Payments",
+    subtitle: "Bookings with outstanding balance · All time",
+  },
+  "Cancellations": {
+    title: "Cancellations (All Time)",
+    subtitle: "Total cancelled bookings · All time",
   },
 };
 

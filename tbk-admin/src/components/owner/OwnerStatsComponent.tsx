@@ -53,26 +53,28 @@ export default function OwnerStatsComponent({ data, isLoading }: OwnerStatsCompo
   const stats = [
     {
       title: "My Villas",
+      subtitle: "Villas assigned to your account",
       value: String(statsData.myVillasCount || 0),
       icon: Building2,
       gradient: "bg-gradient-primary",
     },
     {
-      title: "Total Bookings",
-      subtitle: "Total bookings for your villa(s) across all time",
+      title: "Active Bookings",
+      subtitle: "Currently confirmed or checked-in · Your villas",
       value: String(statsData.activeBookings || 0),
       icon: Calendar,
       gradient: "bg-gradient-accent",
     },
     {
       title: "Current Month Revenue",
-      subtitle: "Revenue from confirmed bookings checking in this month",
+      subtitle: "Bookings checking in this month · Excludes cancelled",
       value: `₹${(statsData.monthlyRevenue || 0).toLocaleString('en-IN')}`,
       icon: DollarSign,
       gradient: "bg-gradient-sunset",
     },
     {
-      title: "Total Guests",
+      title: "Guests This Month",
+      subtitle: "Total guests checking in this month · Excludes cancelled",
       value: String(statsData.totalGuests || 0),
       icon: Users,
       gradient: "bg-gradient-secondary",

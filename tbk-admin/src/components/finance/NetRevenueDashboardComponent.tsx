@@ -42,13 +42,16 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
     <div className="space-y-4 sm:space-y-6">
       {/* KPI Cards */}
       <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-6">
-        {/* Period Net Revenue */}
+        {/* Net Revenue (Selected Period) */}
         <Card className={filteredPeriod.isPositive ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Net Revenue (Period)</CardTitle>
+            <div>
+              <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Net Revenue (Selected Period)</CardTitle>
+              <p className="text-[10px] opacity-70 mt-0.5">Income minus expenses · For selected filters</p>
+            </div>
             {filteredPeriod.isPositive
-              ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />
-              : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />}
+              ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />
+              : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />}
           </CardHeader>
           <CardContent className="pt-0">
             <div className="text-xl sm:text-2xl font-bold">{fmtSigned(filteredPeriod.netRevenue)}</div>
@@ -58,13 +61,16 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
           </CardContent>
         </Card>
 
-        {/* Current Month Net Revenue */}
+        {/* Net Revenue (Current Month) */}
         <Card className={currentMonth.isPositive ? "bg-success text-success-foreground" : "bg-destructive text-destructive-foreground"}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Current Month</CardTitle>
+            <div>
+              <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Net Revenue (Current Month)</CardTitle>
+              <p className="text-[10px] opacity-70 mt-0.5">This calendar month · Fixed to current month</p>
+            </div>
             {currentMonth.isPositive
-              ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />
-              : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />}
+              ? <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />
+              : <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />}
           </CardHeader>
           <CardContent className="pt-0">
             <div className="text-xl sm:text-2xl font-bold">{fmtSigned(currentMonth.netRevenue)}</div>
@@ -74,19 +80,19 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
           </CardContent>
         </Card>
 
-        {/* Margin % */}
+        {/* Profit Margin (Period) */}
         <Card className="bg-gradient-primary text-primary-foreground">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-            <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Profit Margin</CardTitle>
-            <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />
+            <div>
+              <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Profit Margin (Selected Period)</CardTitle>
+              <p className="text-[10px] opacity-70 mt-0.5">Net ÷ Income × 100 · For selected filters</p>
+            </div>
+            <BarChart3 className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />
           </CardHeader>
           <CardContent className="pt-0">
             <div className="text-xl sm:text-2xl font-bold">
               {filteredPeriod.isPositive ? "" : "-"}{Math.abs(filteredPeriod.margin)}%
             </div>
-            <p className="text-[10px] sm:text-xs opacity-80 mt-1">
-              Net ÷ Income × 100
-            </p>
           </CardContent>
         </Card>
       </div>
@@ -103,19 +109,19 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
             <div className="flex flex-col gap-1 p-3 sm:p-4 rounded-lg bg-muted/40">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <DollarSign className="h-4 w-4" />
-                <span className="text-xs sm:text-sm font-medium">Total Income</span>
+                <span className="text-xs sm:text-sm font-medium">Total Income (Period)</span>
               </div>
               <div className="text-lg sm:text-2xl font-bold text-foreground">{fmt(filteredPeriod.income)}</div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground">Confirmed bookings</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Confirmed bookings · Excludes cancelled</div>
             </div>
 
             <div className="flex flex-col gap-1 p-3 sm:p-4 rounded-lg bg-muted/40">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Receipt className="h-4 w-4" />
-                <span className="text-xs sm:text-sm font-medium">Total Expenses</span>
+                <span className="text-xs sm:text-sm font-medium">Total Expenses (Period)</span>
               </div>
               <div className="text-lg sm:text-2xl font-bold text-foreground">{fmt(filteredPeriod.expenses)}</div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground">All expense categories</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">INDIVIDUAL + SPLIT expenses</div>
             </div>
 
             <div className="flex flex-col gap-1 p-3 sm:p-4 rounded-lg bg-muted/40">
@@ -123,12 +129,12 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
                 {filteredPeriod.isPositive
                   ? <TrendingUp className="h-4 w-4 text-success" />
                   : <TrendingDown className="h-4 w-4 text-destructive" />}
-                <span className="text-xs sm:text-sm font-medium">Net Revenue</span>
+                <span className="text-xs sm:text-sm font-medium">Net Revenue (Income − Expenses)</span>
               </div>
               <div className={`text-lg sm:text-2xl font-bold ${filteredPeriod.isPositive ? "text-success" : "text-destructive"}`}>
                 {fmtSigned(filteredPeriod.netRevenue)}
               </div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground">Income − Expenses</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">Income minus expenses</div>
             </div>
           </div>
         </CardContent>

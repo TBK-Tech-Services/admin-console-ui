@@ -34,8 +34,11 @@ export default function FinanceMetricsComponent({
       {/* Total Income Card */}
       <Card className="bg-gradient-primary text-primary-foreground">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Total Income</CardTitle>
-          <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />
+          <div>
+            <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Total Income (Selected Period)</CardTitle>
+            <p className="text-[10px] opacity-70 mt-0.5">Confirmed bookings · Default: current year · Excludes cancelled</p>
+          </div>
+          <DollarSign className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold">
@@ -56,8 +59,11 @@ export default function FinanceMetricsComponent({
       {/* Total Expenses Card */}
       <Card className="bg-gradient-accent text-accent-foreground">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Total Expenses</CardTitle>
-          <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />
+          <div>
+            <CardTitle className="text-xs sm:text-sm font-medium opacity-90">Total Expenses (Selected Period)</CardTitle>
+            <p className="text-[10px] opacity-70 mt-0.5">INDIVIDUAL + SPLIT expenses · Default: current year</p>
+          </div>
+          <Receipt className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold">
@@ -75,15 +81,18 @@ export default function FinanceMetricsComponent({
         </CardContent>
       </Card>
 
-      {/* Net Profit/Loss Card */}
+      {/* Net Revenue (Income − Expenses) Card */}
       <Card className={`${netProfitLossData.isProfit ? 'bg-success text-success-foreground' : 'bg-destructive text-destructive-foreground'}`}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium opacity-90">
-            Net {netProfitLossData.isProfit ? 'Profit' : 'Loss'}
-          </CardTitle>
+          <div>
+            <CardTitle className="text-xs sm:text-sm font-medium opacity-90">
+              Net Revenue (Income − Expenses)
+            </CardTitle>
+            <p className="text-[10px] opacity-70 mt-0.5">Income minus expenses · For selected period</p>
+          </div>
           {netProfitLossData.isProfit ?
-            <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" /> :
-            <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90" />
+            <TrendingUp className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" /> :
+            <TrendingDown className="h-3.5 w-3.5 sm:h-4 sm:w-4 opacity-90 shrink-0" />
           }
         </CardHeader>
         <CardContent className="pt-0">
@@ -97,19 +106,19 @@ export default function FinanceMetricsComponent({
         </CardContent>
       </Card>
 
-      {/* Average Monthly Card */}
+      {/* Avg Monthly Net Profit Card */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-          <CardTitle className="text-xs sm:text-sm font-medium">Average Monthly</CardTitle>
-          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
+          <div>
+            <CardTitle className="text-xs sm:text-sm font-medium">Avg Monthly Net Profit</CardTitle>
+            <p className="text-[10px] text-muted-foreground/70 mt-0.5">Average net profit per month · Across selected period</p>
+          </div>
+          <Calendar className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground shrink-0" />
         </CardHeader>
         <CardContent className="pt-0">
           <div className="text-xl sm:text-2xl font-bold text-foreground">
             ₹{Number(averageMonthlyData.averageMonthlyProfit).toLocaleString('en-IN')}
           </div>
-          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-            Monthly profit average
-          </p>
         </CardContent>
       </Card>
     </div>
