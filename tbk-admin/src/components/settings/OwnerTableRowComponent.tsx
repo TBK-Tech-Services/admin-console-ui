@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { Home, Edit, MapPin } from "lucide-react";
+import { Home, Edit, MapPin, Percent } from "lucide-react";
 import { DeleteOwnerDialogComponent } from "./DeleteOwnerDialogComponent";
 import { UnassignVillaDialogComponent } from "./UnassignVillaDialogComponent";
 
@@ -9,7 +9,8 @@ export function OwnerTableRowComponent({
     onUpdate,
     onDelete,
     onUnassignVilla,
-    isUnassigningVilla
+    isUnassigningVilla,
+    onEditFee
 }) {
     return (
         <TableRow className="border-border/20 hover:bg-muted/20">
@@ -59,6 +60,24 @@ export function OwnerTableRowComponent({
                             No villas assigned
                         </div>
                     )}
+                </div>
+            </TableCell>
+
+            {/* Fee % */}
+            <TableCell className="text-center hidden sm:table-cell">
+                <div className="flex flex-col items-center gap-1">
+                    <span className="text-sm font-semibold text-foreground">
+                        {Number(owner.managementFeePercent) || 0}%
+                    </span>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onEditFee(owner)}
+                        className="h-6 px-2 text-[10px] text-muted-foreground hover:text-primary"
+                    >
+                        <Percent className="h-3 w-3 mr-1" />
+                        Edit
+                    </Button>
                 </div>
             </TableCell>
 

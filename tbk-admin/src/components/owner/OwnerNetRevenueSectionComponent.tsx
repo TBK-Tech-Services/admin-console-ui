@@ -1,17 +1,19 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Receipt, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Receipt, BarChart3, Percent } from "lucide-react";
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, ReferenceLine
 } from "recharts";
 
-interface MonthEntry { month: string; year: number; income: number; expenses: number; netRevenue: number }
+interface MonthEntry { month: string; year: number; income: number; expenses: number; managementFee?: number; netRevenue: number }
 
 interface OwnerNetRevenueData {
+    managementFeePercent?: number;
     lifetimeNetRevenue: number;
     lifetimeIncome: number;
     lifetimeExpenses: number;
-    currentMonth: { income: number; expenses: number; netRevenue: number; isPositive: boolean };
+    lifetimeManagementFee?: number;
+    currentMonth: { income: number; expenses: number; managementFee?: number; netRevenue: number; isPositive: boolean };
     monthly: MonthEntry[];
     margin: number;
     isPositive: boolean;
@@ -23,7 +25,8 @@ const fmt = (n: number) => `₹${Math.abs(n).toLocaleString("en-IN")}`;
 const fmtSigned = (n: number) => `${n < 0 ? "-" : ""}₹${Math.abs(n).toLocaleString("en-IN")}`;
 
 export default function OwnerNetRevenueSectionComponent({ data }: Props) {
-    const { lifetimeNetRevenue, currentMonth, monthly, margin, isPositive, lifetimeIncome, lifetimeExpenses } = data;
+    const { lifetimeNetRevenue, currentMonth, monthly, margin, isPositive, lifetimeIncome, lifetimeExpenses, lifetimeManagementFee, managementFeePercent } = data;
+    const hasFee = managementFeePercent !== undefined && managementFeePercent > 0;
 
     return (
         <div className="space-y-4">
@@ -33,7 +36,9 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <div>
                             <CardTitle className="text-sm font-medium opacity-90">Net Revenue (All Time)</CardTitle>
-                            <p className="text-[10px] opacity-70 mt-0.5">Lifetime income − lifetime expenses</p>
+                            <p className="text-[10px] opacity-70 mt-0.5">
+                                {hasFee ? `Income − ${managementFeePercent}% fee − expenses` : "Lifetime income − lifetime expenses"}
+                            </p>
                         </div>
                         {isPositive
                             ? <TrendingUp className="h-4 w-4 opacity-90 shrink-0" />
@@ -43,6 +48,7 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
                         <div className="text-2xl font-bold">{fmtSigned(lifetimeNetRevenue)}</div>
                         <p className="text-xs opacity-80 mt-1">
                             Income: {fmt(lifetimeIncome)} · Exp: {fmt(lifetimeExpenses)}
+                            {hasFee && ` · Fee: ${fmt(lifetimeManagementFee ?? 0)}`}
                         </p>
                     </CardContent>
                 </Card>
@@ -51,7 +57,9 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <div>
                             <CardTitle className="text-sm font-medium opacity-90">Net Revenue (Current Month)</CardTitle>
-                            <p className="text-[10px] opacity-70 mt-0.5">This month's income − expenses</p>
+                            <p className="text-[10px] opacity-70 mt-0.5">
+                                {hasFee ? `Income − ${managementFeePercent}% fee − expenses` : "This month's income − expenses"}
+                            </p>
                         </div>
                         {currentMonth.isPositive
                             ? <TrendingUp className="h-4 w-4 opacity-90 shrink-0" />
@@ -61,6 +69,7 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
                         <div className="text-2xl font-bold">{fmtSigned(currentMonth.netRevenue)}</div>
                         <p className="text-xs opacity-80 mt-1">
                             Income: {fmt(currentMonth.income)} · Exp: {fmt(currentMonth.expenses)}
+                            {hasFee && ` · Fee: ${fmt(currentMonth.managementFee ?? 0)}`}
                         </p>
                     </CardContent>
                 </Card>
@@ -82,7 +91,7 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
             {/* Breakdown row */}
             <Card className="border-border shadow-soft">
                 <CardContent className="pt-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className={`grid grid-cols-1 gap-4 ${hasFee ? "md:grid-cols-4" : "md:grid-cols-3"}`}>
                         <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/40">
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <DollarSign className="h-4 w-4" />
@@ -99,17 +108,33 @@ export default function OwnerNetRevenueSectionComponent({ data }: Props) {
                             <div className="text-2xl font-bold text-foreground">{fmt(lifetimeExpenses)}</div>
                             <div className="text-xs text-muted-foreground">INDIVIDUAL + SPLIT expenses · Your villas</div>
                         </div>
+                        {hasFee && (
+                            <div className="flex flex-col gap-1 p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                                    <Percent className="h-4 w-4" />
+                                    <span className="text-sm font-medium">Management Fee ({managementFeePercent}%)</span>
+                                </div>
+                                <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+                                    −{fmt(lifetimeManagementFee ?? 0)}
+                                </div>
+                                <div className="text-xs text-amber-600 dark:text-amber-500">{managementFeePercent}% of total income · Admin deduction</div>
+                            </div>
+                        )}
                         <div className="flex flex-col gap-1 p-4 rounded-lg bg-muted/40">
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 {isPositive
                                     ? <TrendingUp className="h-4 w-4 text-success" />
                                     : <TrendingDown className="h-4 w-4 text-destructive" />}
-                                <span className="text-sm font-medium">Net Revenue (Income − Expenses)</span>
+                                <span className="text-sm font-medium">
+                                    {hasFee ? "Net Revenue (Income − Fee − Expenses)" : "Net Revenue (Income − Expenses)"}
+                                </span>
                             </div>
                             <div className={`text-2xl font-bold ${isPositive ? "text-success" : "text-destructive"}`}>
                                 {fmtSigned(lifetimeNetRevenue)}
                             </div>
-                            <div className="text-xs text-muted-foreground">All time · Income minus expenses</div>
+                            <div className="text-xs text-muted-foreground">
+                                {hasFee ? "After management fee & expenses" : "All time · Income minus expenses"}
+                            </div>
                         </div>
                     </div>
                 </CardContent>

@@ -13,7 +13,8 @@ export function OwnersTableComponent({
     onUpdateOwner,
     onDeleteOwner,
     onUnassignVilla,
-    isUnassigningVilla
+    isUnassigningVilla,
+    onEditFee
 }) {
     if (owners.length === 0) {
         return (
@@ -32,6 +33,7 @@ export function OwnersTableComponent({
                     <TableRow className="border-border/40">
                         <TableHead className="font-semibold text-xs sm:text-sm w-[120px] sm:w-[150px]">Owner Details</TableHead>
                         <TableHead className="font-semibold text-xs sm:text-sm">Assigned Villas</TableHead>
+                        <TableHead className="font-semibold text-xs sm:text-sm w-[80px] text-center hidden sm:table-cell">Fee %</TableHead>
                         <TableHead className="font-semibold text-right text-xs sm:text-sm w-[60px] sm:w-[80px] hidden sm:table-cell">Actions</TableHead>
                     </TableRow>
                 </TableHeader>
@@ -44,6 +46,7 @@ export function OwnersTableComponent({
                             onDelete={onDeleteOwner}
                             onUnassignVilla={onUnassignVilla}
                             isUnassigningVilla={isUnassigningVilla}
+                            onEditFee={onEditFee}
                         />
                     ))}
                 </TableBody>

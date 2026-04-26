@@ -25,6 +25,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
     const [selectedRole, setSelectedRole] = useState<string>("");
     const [customRole, setCustomRole] = useState<string>("");
     const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
+    const [managementFeePercent, setManagementFeePercent] = useState<string>("");
 
     // useQuery
     const { data: rolesList } = useQuery({ 
@@ -50,6 +51,7 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
             setCustomRole("");
             setSelectedPermissions([]);
             setIsCreatingNewRole(false);
+            setManagementFeePercent("");
             setNewUserCredentials({ email: payload.email, password: payload.password });
             handleSuccess("User Invited Successfully!");
         },
@@ -69,9 +71,14 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
         if (isCreatingNewRole) {
             payload.role = customRole.trim();
             payload.permissions = selectedPermissions;
-        } 
+        }
         else {
             payload.role = Number(selectedRole);
+        }
+
+        const selectedRoleName = rolesList?.find(r => String(r.id) === selectedRole)?.name;
+        if (selectedRoleName === 'Owner' && managementFeePercent !== "") {
+            payload.managementFeePercent = Number(managementFeePercent);
         }
 
         inviteUserMutation.mutate(payload);
@@ -208,7 +215,25 @@ export default function InviteUserModal({ inviteModalOpen, setInviteModalOpen, n
                             </div>
 
                             {
-                                isCreatingNewRole && 
+                                !isCreatingNewRole && rolesList?.find(r => String(r.id) === selectedRole)?.name === 'Owner' && (
+                                    <div>
+                                        <Label>Management Fee (%)</Label>
+                                        <Input
+                                            type="number"
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            value={managementFeePercent}
+                                            onChange={(e) => setManagementFeePercent(e.target.value)}
+                                            className="h-10"
+                                            placeholder="e.g. 10.5"
+                                        />
+                                    </div>
+                                )
+                            }
+
+                            {
+                                isCreatingNewRole &&
                                 (
                                 <>
                                     <Label>Permissions</Label>

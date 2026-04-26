@@ -1,14 +1,16 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, TrendingDown, DollarSign, Receipt, BarChart3 } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Receipt, BarChart3, Percent } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, ReferenceLine
 } from "recharts";
 
 interface NetRevenueData {
+  managementFeePercent?: number;
   filteredPeriod: {
     income: number;
     expenses: number;
+    managementFee?: number;
     netRevenue: number;
     margin: number;
     isPositive: boolean;
@@ -16,6 +18,7 @@ interface NetRevenueData {
   currentMonth: {
     income: number;
     expenses: number;
+    managementFee?: number;
     netRevenue: number;
     isPositive: boolean;
   };
@@ -24,6 +27,7 @@ interface NetRevenueData {
     year: number;
     income: number;
     expenses: number;
+    managementFee?: number;
     netRevenue: number;
   }>;
 }
@@ -36,7 +40,8 @@ const fmt = (n: number) => `₹${Math.abs(n).toLocaleString("en-IN")}`;
 const fmtSigned = (n: number) => `${n < 0 ? "-" : ""}₹${Math.abs(n).toLocaleString("en-IN")}`;
 
 export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboardComponentProps) {
-  const { filteredPeriod, currentMonth, monthly } = data;
+  const { filteredPeriod, currentMonth, monthly, managementFeePercent } = data;
+  const hasFee = managementFeePercent !== undefined && managementFeePercent > 0;
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -105,7 +110,7 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 xs:grid-cols-3 gap-3 sm:gap-6">
+          <div className={`grid grid-cols-1 gap-3 sm:gap-6 ${hasFee ? "xs:grid-cols-2 lg:grid-cols-4" : "xs:grid-cols-3"}`}>
             <div className="flex flex-col gap-1 p-3 sm:p-4 rounded-lg bg-muted/40">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <DollarSign className="h-4 w-4" />
@@ -124,17 +129,34 @@ export default function NetRevenueDashboardComponent({ data }: NetRevenueDashboa
               <div className="text-[10px] sm:text-xs text-muted-foreground">INDIVIDUAL + SPLIT expenses</div>
             </div>
 
+            {hasFee && (
+              <div className="flex flex-col gap-1 p-3 sm:p-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800">
+                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                  <Percent className="h-4 w-4" />
+                  <span className="text-xs sm:text-sm font-medium">Management Fee ({managementFeePercent}%)</span>
+                </div>
+                <div className="text-lg sm:text-2xl font-bold text-amber-700 dark:text-amber-400">
+                  −{fmt(filteredPeriod.managementFee ?? 0)}
+                </div>
+                <div className="text-[10px] sm:text-xs text-amber-600 dark:text-amber-500">{managementFeePercent}% of income · Owner deduction</div>
+              </div>
+            )}
+
             <div className="flex flex-col gap-1 p-3 sm:p-4 rounded-lg bg-muted/40">
               <div className="flex items-center gap-2 text-muted-foreground">
                 {filteredPeriod.isPositive
                   ? <TrendingUp className="h-4 w-4 text-success" />
                   : <TrendingDown className="h-4 w-4 text-destructive" />}
-                <span className="text-xs sm:text-sm font-medium">Net Revenue (Income − Expenses)</span>
+                <span className="text-xs sm:text-sm font-medium">
+                  {hasFee ? "Net Revenue (Income − Fee − Expenses)" : "Net Revenue (Income − Expenses)"}
+                </span>
               </div>
               <div className={`text-lg sm:text-2xl font-bold ${filteredPeriod.isPositive ? "text-success" : "text-destructive"}`}>
                 {fmtSigned(filteredPeriod.netRevenue)}
               </div>
-              <div className="text-[10px] sm:text-xs text-muted-foreground">Income minus expenses</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground">
+                {hasFee ? "After management fee & expenses" : "Income minus expenses"}
+              </div>
             </div>
           </div>
         </CardContent>

@@ -5,6 +5,7 @@ import { VillaOwnerStatsComponent } from "./VillaOwnerStatsComponent";
 import { UpdateVillaAssignmentsDialogComponent } from "./UpdateVillaAssignmentsDialogComponent";
 import { OwnersTableComponent } from "./OwnersTableComponent";
 import { AssignVillasDialogComponent } from "./AssignVillasDialogComponent";
+import EditOwnerFeeModalComponent from "./EditOwnerFeeModalComponent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useErrorHandler } from "@/hooks/useErrorHandler";
 import {
@@ -14,6 +15,7 @@ import {
   getOwnerVillaManagementStatsService,
   unassignAllVillasToOwnerService,
   unassignSpecificVillaToOwnerService,
+  updateOwnerFeeService,
   updateVillaAssignmentToOwnerService
 } from "@/services/villaOwnerManagementSettings.service";
 
@@ -23,9 +25,11 @@ export default function VillaOwnerManagementSettingsComponent() {
 
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
   const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
+  const [isFeeModalOpen, setIsFeeModalOpen] = useState(false);
   const [selectedOwner, setSelectedOwner] = useState("");
   const [selectedVillas, setSelectedVillas] = useState([]);
   const [ownerToUpdate, setOwnerToUpdate] = useState(null);
+  const [ownerToEditFee, setOwnerToEditFee] = useState(null);
 
   const { data: unAssignedVillasList, isLoading: isLoadingUnassignedVillas } = useQuery({
     queryKey: ['villa-owner-management', 'unassignedVillas'],
@@ -90,6 +94,18 @@ export default function VillaOwnerManagementSettingsComponent() {
     onError: handleMutationError
   });
 
+  const updateOwnerFeeMutation = useMutation({
+    mutationFn: ({ ownerId, managementFeePercent }: { ownerId: number, managementFeePercent: number }) =>
+      updateOwnerFeeService({ ownerId, managementFeePercent }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['villa-owner-management'] });
+      handleSuccess("Management fee updated successfully!");
+      setIsFeeModalOpen(false);
+      setOwnerToEditFee(null);
+    },
+    onError: handleMutationError
+  });
+
   const allVillas = [
     ...owners.flatMap((owner) => owner.ownedVillas),
     ...unassignedVillas
@@ -134,6 +150,15 @@ export default function VillaOwnerManagementSettingsComponent() {
   const handleUnassignVilla = (villaId, ownerId) => {
     const unassignData = { villaId, ownerId };
     unassignSpecificVillaMutation.mutate(unassignData);
+  };
+
+  const handleEditFee = (owner) => {
+    setOwnerToEditFee(owner);
+    setIsFeeModalOpen(true);
+  };
+
+  const handleSaveFee = (ownerId: number, managementFeePercent: number) => {
+    updateOwnerFeeMutation.mutate({ ownerId, managementFeePercent });
   };
 
   const resetAssignDialog = () => {
@@ -206,6 +231,7 @@ export default function VillaOwnerManagementSettingsComponent() {
               onDeleteOwner={handleDeleteOwner}
               onUnassignVilla={handleUnassignVilla}
               isUnassigningVilla={unassignSpecificVillaMutation.isPending}
+              onEditFee={handleEditFee}
             />
           </div>
         </div>
@@ -221,6 +247,15 @@ export default function VillaOwnerManagementSettingsComponent() {
           onUpdate={handleUpdateVillas}
           onReset={resetUpdateDialog}
           isLoading={updateAssignmentsMutation.isPending}
+        />
+
+        {/* Edit Fee Modal */}
+        <EditOwnerFeeModalComponent
+          isOpen={isFeeModalOpen}
+          onClose={() => { setIsFeeModalOpen(false); setOwnerToEditFee(null); }}
+          owner={ownerToEditFee}
+          onSave={handleSaveFee}
+          isLoading={updateOwnerFeeMutation.isPending}
         />
 
         {/* Quick Stats */}

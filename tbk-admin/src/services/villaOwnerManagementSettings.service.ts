@@ -49,3 +49,9 @@ export const getOwnerVillaManagementStatsService = async() => {
     const response = await apiService.get('/settings/v1/villa-owner-management/stats');
     return response.data;
 }
+
+// Service to Update Owner Management Fee
+export const updateOwnerFeeService = async({ ownerId, managementFeePercent }: { ownerId: number, managementFeePercent: number }) => {
+    const response = await apiService.patch(`/settings/v1/villa-owner-management/owner/${ownerId}/fee`, { managementFeePercent });
+    return response.data;
+}
