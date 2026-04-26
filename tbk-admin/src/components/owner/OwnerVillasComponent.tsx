@@ -1,6 +1,6 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Building2, MapPin, Users, Bed, Bath, ExternalLink } from "lucide-react";
+import { Building2, MapPin, Bed, Bath, CalendarCheck, ExternalLink } from "lucide-react";
 import { getVillaStatusColor } from "@/utils/getVillaStatusColor";
 import villaPlaceholder from "@/assets/villa-placeholder.svg";
 
@@ -14,7 +14,7 @@ export default function OwnerVillasComponent({ data, isLoading, isError }: Owner
   if (isLoading) {
     return (
       <Card className="border-border shadow-soft">
-        <CardContent className="py-6 sm:py-8 text-center text-sm">Loading villas...</CardContent>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">Loading villas...</CardContent>
       </Card>
     );
   }
@@ -22,7 +22,7 @@ export default function OwnerVillasComponent({ data, isLoading, isError }: Owner
   if (isError) {
     return (
       <Card className="border-border shadow-soft">
-        <CardContent className="py-6 sm:py-8 text-center text-sm text-destructive">
+        <CardContent className="py-8 text-center text-sm text-destructive">
           Failed to load villas. Please refresh the page.
         </CardContent>
       </Card>
@@ -34,15 +34,15 @@ export default function OwnerVillasComponent({ data, isLoading, isError }: Owner
   const totalCount = villasData.totalCount || 0;
 
   return (
-    <Card className="border-border shadow-soft">
-      <CardHeader className="pb-3 sm:pb-6">
+    <Card className="border-border shadow-soft w-full">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
+          <div>
             <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
               <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-primary shrink-0" />
               My Villas
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardDescription className="text-xs sm:text-sm mt-0.5">
               Overview of your villa properties
             </CardDescription>
           </div>
@@ -52,11 +52,11 @@ export default function OwnerVillasComponent({ data, isLoading, isError }: Owner
         </div>
       </CardHeader>
 
-      <CardContent>
+      <CardContent className="pt-0">
         {villas.length === 0 ? (
-          <div className="text-center py-6 sm:py-8 text-sm text-muted-foreground">No villas found</div>
+          <div className="text-center py-8 text-sm text-muted-foreground">No villas found</div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {villas.map((villa: any, index: number) => (
               <VillaCard key={villa.id} villa={villa} isPriority={index === 0} />
             ))}
@@ -77,90 +77,87 @@ function VillaCard({ villa, isPriority }: { villa: any; isPriority: boolean }) {
     }
   };
 
+  const stats = [
+    { icon: Bed, label: villa.bedrooms != null ? `${villa.bedrooms} Bed` : "— Bed" },
+    { icon: Bath, label: villa.bathrooms != null ? `${villa.bathrooms} Bath` : "— Bath" },
+    { icon: CalendarCheck, label: villa.currentBookings != null ? `${villa.currentBookings} Bookings` : "— Bookings" },
+  ];
+
   return (
-    <Card className="overflow-hidden hover:shadow-elegant transition-all duration-300 group">
-      {/* Image */}
+    <div className="rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden w-full bg-white">
+      {/* Image with status badge overlay */}
       <div className="relative">
         <img
           src={villa.imageUrl || villaPlaceholder}
           alt={villa.name}
           loading={isPriority ? "eager" : "lazy"}
           decoding="async"
-          className="w-full h-40 sm:h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+          className="w-full h-48 object-cover"
         />
-        <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
-          <Badge variant="outline" className={`${getVillaStatusColor(villa.status)} text-xs`}>
+        <div className="absolute top-3 right-3">
+          <Badge variant="outline" className={`${getVillaStatusColor(villa.status)} text-xs font-semibold`}>
             {villa.status}
           </Badge>
         </div>
       </div>
 
-      {/* Header: name + location + ID */}
-      <CardHeader className="pb-2 sm:pb-3 p-3 sm:p-6">
+      {/* Card body */}
+      <div className="p-4 space-y-3">
+        {/* Villa name + ID */}
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <CardTitle className="text-base sm:text-lg mb-0.5 sm:mb-1 truncate">{villa.name}</CardTitle>
-            {villa.location ? (
-              <button
-                onClick={handleLocationClick}
-                className="flex items-center text-primary hover:text-primary/80 text-xs sm:text-sm transition-colors"
-              >
-                <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1 shrink-0" />
-                <span className="truncate max-w-[120px] sm:max-w-[150px]">View Location</span>
-                <ExternalLink className="h-3 w-3 ml-1 shrink-0" />
-              </button>
-            ) : (
-              <span className="flex items-center text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3 mr-1 shrink-0" />
-                No location set
-              </span>
-            )}
-          </div>
-          <div className="text-right shrink-0">
-            <div className="text-[10px] sm:text-xs text-muted-foreground">ID: {villa.id}</div>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 pt-0 sm:pt-0">
-        {/* Bed / Bath / Guests row */}
-        <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground">
-          <div className="flex items-center">
-            <Bed className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-            {villa.bedrooms != null ? `${villa.bedrooms} Bed` : "— Bed"}
-          </div>
-          <div className="flex items-center">
-            <Bath className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-            {villa.bathrooms != null ? `${villa.bathrooms} Bath` : "— Bath"}
-          </div>
-          <div className="flex items-center">
-            <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-            {villa.currentBookings != null ? `${villa.currentBookings} Bookings` : "— Bookings"}
-          </div>
+          <h3 className="text-lg font-bold text-foreground leading-snug">{villa.name}</h3>
+          <span className="text-[11px] text-muted-foreground shrink-0 mt-1">#{villa.id}</span>
         </div>
 
-        {/* Amenities pills */}
+        {/* View Location */}
+        {villa.location ? (
+          <button
+            onClick={handleLocationClick}
+            className="inline-flex items-center gap-1.5 border border-orange-400 text-orange-500 rounded-full px-3 py-1 text-xs font-medium hover:bg-orange-50 transition-colors"
+          >
+            <MapPin className="h-3 w-3 shrink-0" />
+            View Location
+            <ExternalLink className="h-3 w-3 shrink-0" />
+          </button>
+        ) : (
+          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+            <MapPin className="h-3 w-3 shrink-0" />
+            No location set
+          </span>
+        )}
+
+        {/* Stats row: Bed | Bath | Bookings */}
+        <div className="flex flex-row flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+          {stats.map((stat, i) => (
+            <span key={i} className="flex items-center gap-1">
+              {i > 0 && <span className="text-gray-300 mr-0 select-none">|</span>}
+              <stat.icon className="h-3.5 w-3.5 text-orange-400 shrink-0" />
+              <span className="font-medium text-foreground">{stat.label}</span>
+            </span>
+          ))}
+        </div>
+
+        {/* Amenities */}
         {amenityNames.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-row flex-wrap gap-2">
             {amenityNames.slice(0, 3).map((name, i) => (
-              <Badge key={i} variant="secondary" className="text-[10px] sm:text-xs">{name}</Badge>
+              <span key={i} className="text-xs bg-gray-100 text-gray-600 rounded-full px-3 py-1">
+                {name}
+              </span>
             ))}
             {amenityNames.length > 3 && (
-              <Badge variant="secondary" className="text-[10px] sm:text-xs">
+              <span className="text-xs bg-gray-100 text-gray-500 rounded-full px-3 py-1">
                 +{amenityNames.length - 3} more
-              </Badge>
+              </span>
             )}
           </div>
         )}
 
         {/* Description */}
-        <div className="border-t pt-2 sm:pt-3 text-sm">
-          <div className="text-muted-foreground mb-0.5 sm:mb-1 text-xs sm:text-sm">Description</div>
-          <div className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2">
-            {villa.description || "No description available"}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed">
+          {villa.description || "No description available"}
+        </p>
+      </div>
+    </div>
   );
 }
